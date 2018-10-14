@@ -56,6 +56,8 @@ public class ObjectForm implements Form {
         }
     }
 
-    
-    
+    @Override
+    public boolean truthness() {
+        return true;
+    }    
 }

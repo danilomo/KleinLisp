@@ -1,6 +1,6 @@
-package net.sourceforge.lon.parser;
+package net.sourceforge.kleinlisp.parser;
 
-import java_cup.runtime.*;
+import net.sourceforge.kleinlisp.parser.java_cup.*;
 
 %%
 %unicode
@@ -13,7 +13,10 @@ import java_cup.runtime.*;
 double_literal          = ([1-9][0-9]*|0)([.][0-9]* )([eE]([+]|[-])?[0-9]+)?
 integer_literal         = ([1-9][0-9]*|0)
 digit		= [0-9]
-symbol          = [+] | [-] | [%] | [/] | [*] | [$] | [_] | [:]
+symbol          = 
+                    [+] | [-] | [%] | [/] |
+                    [*] | [$] | [_] | [:] | [>] | [<] | [=] |
+                    [!]
 
 letter		= {lowercase} | {uppercase}
 lowercase	= [a-z]

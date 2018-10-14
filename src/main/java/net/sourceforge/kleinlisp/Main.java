@@ -9,21 +9,25 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-        String code = "(poligon [(point (+ 40 90) 10) (point 67 60) (point 111 79) (point 80 132)])";
-
         Lisp runtime = new Lisp();
-        runtime.addClass(Point.class);
-        runtime.addClass(Poligon.class);
 
-        System.out.println(runtime.parse(code));
-
-        Poligon p = runtime.evaluate(code)
-                .asObject(Poligon.class)
-                .get();
-
-        System.out.println(p);
-
-        System.out.println(runtime.evaluate("(* 1 2 3 4)"));
+//        System.out.println(runtime.evaluate("(<= 1 2 3 4)"));
+//
+//        System.out.println(runtime.evaluate("(< 4 3 2 1)"));
+//
+//        System.out.println(runtime.evaluate("(>= 4 3 2 1)"));
+        
+        System.out.println(runtime.evaluate("(= 1 1)"));
+        
+        System.out.println(runtime.evaluate("(!= 1 1)"));
+        
+        System.out.println(runtime.evaluate("(= 1 1.0)"));
+        
+        System.out.println(runtime.evaluate("(= 1.0 1.0)"));
+        
+        boolean b = new Double(1.0).equals(new Integer(1));
+        
+        System.out.println(b);
     }
 }
 

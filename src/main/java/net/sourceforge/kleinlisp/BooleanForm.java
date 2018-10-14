@@ -1,38 +1,27 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package net.sourceforge.kleinlisp;
 
 import java.util.Optional;
-import java.util.OptionalDouble;
-import java.util.OptionalInt;
 
 /**
  *
- * @author daolivei
+ * @author danilo
  */
-public final class StringForm implements Form {
+public class BooleanForm implements Form {
 
-    private final String value;
+    private boolean value;
 
-    public StringForm(String value) {
+    public BooleanForm(boolean value) {
         this.value = value;
-    }
-
-    public String value() {
-        return value;
-    }
-
-    @Override
-    public String toString() {
-        return "\"" + value + "\"";
-    }
-
+    }        
+    
     @Override
     public Object asObject() {
-        return value;
-    }
-
-    @Override
-    public Form evaluate() {
-        return this;
+        return new Boolean(value);
     }
 
     @Override
@@ -54,10 +43,21 @@ public final class StringForm implements Form {
     public <T> Optional<T> asObject(Class<T> clazz) {
         return Optional.empty();
     }
-    
+
+    @Override
+    public Form evaluate() {
+        return this;
+    }
 
     @Override
     public boolean truthness() {
-        return ! value.isEmpty();
-    }    
+        return value;
+    } 
+
+    @Override
+    public String toString() {
+        return "" + value;
+    }
+   
+    
 }

@@ -59,4 +59,9 @@ public final class AtomForm implements Form {
     public <T> Optional<T> asObject(Class<T> clazz) {
         return Optional.empty();
     }
+
+    @Override
+    public boolean truthness() {
+        return true;
+    }
 }

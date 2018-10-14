@@ -42,7 +42,7 @@ public final class IntForm implements NumericForm {
 
     @Override
     public Object asObject() {
-        return value;
+        return new Integer(value);
     }
 
     @Override
@@ -69,4 +69,10 @@ public final class IntForm implements NumericForm {
     public <T> Optional<T> asObject(Class<T> clazz) {
         return Optional.empty();
     }
+    
+
+    @Override
+    public boolean truthness() {
+        return true;
+    }    
 }

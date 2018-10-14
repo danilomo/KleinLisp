@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.sourceforge.kleinlisp.functions.ArithmeticFunction;
 import net.sourceforge.kleinlisp.functions.ArithmeticFunction.Operator;
+import net.sourceforge.kleinlisp.functions.ComparisonOperator;
 
 /**
  *
@@ -45,7 +46,7 @@ public class LispEnv implements Environment {
             return ListForm.NIL;
         };
 
-        this.addFunction(clazz.getSimpleName().toLowerCase(), f);
+        this.addFunction(clazz.getSimpleName(), f);
     }
 
     public void addFunction(String name, Function function) {
@@ -57,7 +58,7 @@ public class LispEnv implements Environment {
     }
 
     private void initFunctionTable() {
-        
+
         functionTable.put("+", new ArithmeticFunction(Operator.PLUS));
         functionTable.put("-", new ArithmeticFunction(Operator.MINUS));
         functionTable.put("*", new ArithmeticFunction(Operator.TIMES));
@@ -65,6 +66,13 @@ public class LispEnv implements Environment {
         functionTable.put("%", new ArithmeticFunction(Operator.MOD));
 
         functionTable.put("list", parameters -> parameters);
+
+        functionTable.put("<", new ComparisonOperator(ComparisonOperator.Operator.LT));
+        functionTable.put(">", new ComparisonOperator(ComparisonOperator.Operator.GT));
+        functionTable.put("<=", new ComparisonOperator(ComparisonOperator.Operator.LEQ));
+        functionTable.put(">=", new ComparisonOperator(ComparisonOperator.Operator.GEQ));
+        functionTable.put("=", new ComparisonOperator(ComparisonOperator.Operator.EQ));
+        functionTable.put("!=", new ComparisonOperator(ComparisonOperator.Operator.NEQ));
     }
 
     @Override

@@ -84,6 +84,11 @@ public class ListForm implements Form, Iterable<Form> {
         public Optional<ListForm> asList() {
             return Optional.of(this);
         }
+
+        @Override
+        public boolean truthness() {
+            return false;
+        }
     };
 
     public List<Form> toList() {
@@ -165,4 +170,9 @@ public class ListForm implements Form, Iterable<Form> {
     public <T> Optional<T> asObject(Class<T> clazz) {
         return Optional.empty();
     }
+    
+    @Override
+    public boolean truthness() {
+        return true;
+    }    
 }

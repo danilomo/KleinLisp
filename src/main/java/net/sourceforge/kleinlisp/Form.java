@@ -19,6 +19,14 @@ public interface Form {
      * @return A java.lang.Object according to the Form concrete type
      */
     public Object asObject();
+    
+    /**
+     * Return the boolean value corresponding to the object.
+     * 
+     * Nil (empty list) -> False, 0 -> False, False -> False,
+     * "" -> False, everything else -> true
+     */
+    public boolean truthness(); 
 
     /**
      * If the form represents a numeric value, returns Optional.of(number),
