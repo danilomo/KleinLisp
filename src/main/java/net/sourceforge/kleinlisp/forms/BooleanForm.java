@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package net.sourceforge.kleinlisp;
+package net.sourceforge.kleinlisp.forms;
 
+import net.sourceforge.kleinlisp.Form;
 import java.util.Optional;
 
 /**
@@ -59,5 +60,8 @@ public class BooleanForm implements Form {
         return "" + value;
     }
    
-    
+    @Override
+    public Optional<FunctionForm> asFunction() {
+        return Optional.empty();
+    }        
 }

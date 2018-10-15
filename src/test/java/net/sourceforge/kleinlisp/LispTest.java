@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.sourceforge.kleinlisp;
 
 import java.util.List;
@@ -11,7 +6,7 @@ import static org.junit.Assert.*;
 
 /**
  *
- * @author danilo
+ * @author Danilo Oliveira
  */
 public class LispTest {
 
@@ -35,7 +30,7 @@ public class LispTest {
      * Test of parse method, of class Lisp.
      */
     @Test
-    public void testParse() {
+    public void testArithmetic() {
         System.out.println("parse");
         String expression = "(+ 10 20 30 40 50)";
         Lisp instance = new Lisp();
@@ -46,8 +41,6 @@ public class LispTest {
         for(int i = 1; i < arr.length; i++){
             assertEquals(arr[i], l.get(i).asInt().get());
         }
-        
-        
     }
 
     /**
@@ -121,6 +114,15 @@ class Point3D {
         Point3D p3d = (Point3D) obj;
         
         return p3d.x == x && p3d.y == y && p3d.z == z;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + this.x;
+        hash = 97 * hash + this.y;
+        hash = 97 * hash + this.z;
+        return hash;
     }
 
 }

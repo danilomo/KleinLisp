@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package net.sourceforge.kleinlisp;
+package net.sourceforge.kleinlisp.forms;
 
+import net.sourceforge.kleinlisp.Form;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
@@ -64,4 +65,9 @@ public final class AtomForm implements Form {
     public boolean truthness() {
         return true;
     }
+    
+    @Override
+    public Optional<FunctionForm> asFunction() {
+        return Optional.empty();
+    }    
 }

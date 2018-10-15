@@ -1,5 +1,6 @@
-package net.sourceforge.kleinlisp;
+package net.sourceforge.kleinlisp.forms;
 
+import net.sourceforge.kleinlisp.Form;
 import java.util.Optional;
 
 /**
@@ -7,6 +8,7 @@ import java.util.Optional;
  * @author daolivei
  */
 public class ObjectForm implements Form {
+
     private final Object object;
 
     public ObjectForm(Object object) {
@@ -31,7 +33,7 @@ public class ObjectForm implements Form {
     public Form evaluate() {
         return this;
     }
-    
+
     @Override
     public Optional<Integer> asInt() {
         return Optional.empty();
@@ -45,13 +47,13 @@ public class ObjectForm implements Form {
     @Override
     public Optional<ListForm> asList() {
         return Optional.empty();
-    } 
+    }
 
     @Override
     public <T> Optional<T> asObject(Class<T> clazz) {
-        if(clazz.isAssignableFrom(object.getClass())){
+        if (clazz.isAssignableFrom(object.getClass())) {
             return Optional.of((T) object);
-        }else{
+        } else {
             return Optional.empty();
         }
     }
@@ -59,5 +61,10 @@ public class ObjectForm implements Form {
     @Override
     public boolean truthness() {
         return true;
-    }    
+    }
+
+    @Override
+    public Optional<FunctionForm> asFunction() {
+        return Optional.empty();
+    }
 }

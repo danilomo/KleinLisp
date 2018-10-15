@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package net.sourceforge.kleinlisp;
+package net.sourceforge.kleinlisp.forms;
 
+import net.sourceforge.kleinlisp.Form;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
@@ -13,21 +14,21 @@ import java.util.OptionalInt;
  *
  * @author daolivei
  */
-public final class IntForm implements NumericForm {
+public final class DoubleForm implements NumericForm {
 
-    private int value;
+    private final double value;
 
-    public IntForm(int value) {
+    public DoubleForm(double value) {
         this.value = value;
     }
 
-    public int value() {
+    public double value() {
         return value;
     }
 
     @Override
     public int toInt() {
-        return value;
+        return (int) value;
     }
 
     @Override
@@ -37,12 +38,12 @@ public final class IntForm implements NumericForm {
 
     @Override
     public String toString() {
-        return Integer.toString(value);
+        return Double.toString(value);
     }
 
     @Override
     public Object asObject() {
-        return new Integer(value);
+        return value;
     }
 
     @Override
@@ -52,12 +53,12 @@ public final class IntForm implements NumericForm {
 
     @Override
     public Optional<Integer> asInt() {
-        return Optional.of(value);
+        return Optional.of((int) value);
     }
 
     @Override
     public Optional<Double> asDouble() {
-        return Optional.of((double) value);
+        return Optional.of(value);
     }
 
     @Override
@@ -69,10 +70,14 @@ public final class IntForm implements NumericForm {
     public <T> Optional<T> asObject(Class<T> clazz) {
         return Optional.empty();
     }
-    
 
     @Override
     public boolean truthness() {
         return true;
-    }    
+    }
+
+    @Override
+    public Optional<FunctionForm> asFunction() {
+        return Optional.empty();
+    }
 }

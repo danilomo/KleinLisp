@@ -6,13 +6,13 @@
 
 package net.sourceforge.kleinlisp.parser;
 
-import net.sourceforge.kleinlisp.IntForm;
-import net.sourceforge.kleinlisp.DoubleForm;
+import net.sourceforge.kleinlisp.forms.IntForm;
+import net.sourceforge.kleinlisp.forms.DoubleForm;
 import net.sourceforge.kleinlisp.Environment;
-import net.sourceforge.kleinlisp.AtomForm;
+import net.sourceforge.kleinlisp.forms.AtomForm;
 import net.sourceforge.kleinlisp.Form;
-import net.sourceforge.kleinlisp.StringForm;
-import net.sourceforge.kleinlisp.ListForm;
+import net.sourceforge.kleinlisp.forms.StringForm;
+import net.sourceforge.kleinlisp.forms.ListForm;
 
 /** CUP v0.11a beta 20060608 generated parser.
   * @version Thu Oct 11 10:17:54 CEST 2018

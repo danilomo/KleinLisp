@@ -10,5 +10,5 @@ package net.sourceforge.kleinlisp;
  * @author daolivei
  */
 public interface Environment {
-    public Function lookupFunction(String name);
+    public Function lookup(String name);
 }

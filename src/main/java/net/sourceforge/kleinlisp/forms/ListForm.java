@@ -1,10 +1,12 @@
-package net.sourceforge.kleinlisp;
+package net.sourceforge.kleinlisp.forms;
 
+import net.sourceforge.kleinlisp.Form;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import net.sourceforge.kleinlisp.Environment;
 
 /**
  *
@@ -15,16 +17,36 @@ public class ListForm implements Form, Iterable<Form> {
     private final Form head;
     private final Form tail;
     private Environment environment;
+    private final int length;
+
+    private ListForm() {
+        this.head = null;
+        this.tail = null;
+        this.length = 0;
+    }
 
     public ListForm(Form head, Form tail) {
         this.head = head;
         this.tail = tail;
+
+        if (tail.asList().isPresent()) {
+            this.length = 1 + tail.asList().get().length;
+        } else {
+            this.length = 2;
+        }
+
     }
 
     public ListForm(Form head, Form tail, Environment env) {
         this.head = head;
         this.tail = tail;
         this.environment = env;
+
+        if (tail.asList().isPresent()) {
+            this.length = 1 + tail.asList().get().length;
+        } else {
+            this.length = 2;
+        }
     }
 
     public Form head() {
@@ -43,6 +65,10 @@ public class ListForm implements Form, Iterable<Form> {
         return (ListForm) tail;
     }
 
+    public int length() {
+        return length;
+    }
+
     @Override
     public Object asObject() {
         List list = new ArrayList();
@@ -59,7 +85,7 @@ public class ListForm implements Form, Iterable<Form> {
         return "(" + String.join(" ", toList().stream().map(t -> t.toString()).collect(Collectors.toList())) + ")";
     }
 
-    public static final ListForm NIL = new ListForm(null, null) {
+    public static final ListForm NIL = new ListForm() {
         @Override
         public String toString() {
             return "()";
@@ -89,6 +115,13 @@ public class ListForm implements Form, Iterable<Form> {
         public boolean truthness() {
             return false;
         }
+
+        @Override
+        public int length() {
+            return 0;
+        }
+        
+        
     };
 
     public List<Form> toList() {
@@ -143,7 +176,7 @@ public class ListForm implements Form, Iterable<Form> {
         ListForm parameters = cdr().evaluateContents();
 
         try {
-            return environment.lookupFunction(fname).evaluate(parameters);
+            return environment.lookup(fname).evaluate(parameters);
         } catch (Exception e) {
             System.out.println(fname);
             System.out.println(parameters);
@@ -170,9 +203,14 @@ public class ListForm implements Form, Iterable<Form> {
     public <T> Optional<T> asObject(Class<T> clazz) {
         return Optional.empty();
     }
-    
+
     @Override
     public boolean truthness() {
         return true;
-    }    
+    }
+    
+    @Override
+    public Optional<FunctionForm> asFunction() {
+        return Optional.empty();
+    }        
 }

@@ -1,10 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package net.sourceforge.kleinlisp;
+package net.sourceforge.kleinlisp.forms;
 
+import net.sourceforge.kleinlisp.Form;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
@@ -13,31 +9,21 @@ import java.util.OptionalInt;
  *
  * @author daolivei
  */
-public final class DoubleForm implements NumericForm {
+public final class StringForm implements Form {
 
-    private final double value;
+    private final String value;
 
-    public DoubleForm(double value) {
+    public StringForm(String value) {
         this.value = value;
     }
 
-    public double value() {
-        return value;
-    }
-
-    @Override
-    public int toInt() {
-        return (int) value;
-    }
-
-    @Override
-    public double toDouble() {
+    public String value() {
         return value;
     }
 
     @Override
     public String toString() {
-        return Double.toString(value);
+        return "\"" + value + "\"";
     }
 
     @Override
@@ -52,12 +38,12 @@ public final class DoubleForm implements NumericForm {
 
     @Override
     public Optional<Integer> asInt() {
-        return Optional.of((int) value);
+        return Optional.empty();
     }
 
     @Override
     public Optional<Double> asDouble() {
-        return Optional.of(value);
+        return Optional.empty();
     }
 
     @Override
@@ -69,10 +55,14 @@ public final class DoubleForm implements NumericForm {
     public <T> Optional<T> asObject(Class<T> clazz) {
         return Optional.empty();
     }
-    
 
     @Override
     public boolean truthness() {
-        return true;
-    }    
+        return !value.isEmpty();
+    }
+
+    @Override
+    public Optional<FunctionForm> asFunction() {
+        return Optional.empty();
+    }
 }

@@ -5,10 +5,10 @@
  */
 package net.sourceforge.kleinlisp.functions;
 
-import net.sourceforge.kleinlisp.BooleanForm;
+import net.sourceforge.kleinlisp.forms.BooleanForm;
 import net.sourceforge.kleinlisp.Form;
 import net.sourceforge.kleinlisp.Function;
-import net.sourceforge.kleinlisp.ListForm;
+import net.sourceforge.kleinlisp.forms.ListForm;
 
 /**
  *
@@ -16,7 +16,7 @@ import net.sourceforge.kleinlisp.ListForm;
  */
 public class ComparisonOperator implements Function {
 
-    private Operator operator;
+    private final Operator operator;
 
     public ComparisonOperator(Operator operator) {
         this.operator = operator;

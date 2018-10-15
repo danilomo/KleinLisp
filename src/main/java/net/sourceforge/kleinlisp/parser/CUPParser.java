@@ -4,7 +4,7 @@ import net.sourceforge.kleinlisp.Parser;
 import java.io.ByteArrayInputStream;
 import net.sourceforge.kleinlisp.Environment;
 import net.sourceforge.kleinlisp.Form;
-import net.sourceforge.kleinlisp.ListForm;
+import net.sourceforge.kleinlisp.forms.ListForm;
 
 /**
  *

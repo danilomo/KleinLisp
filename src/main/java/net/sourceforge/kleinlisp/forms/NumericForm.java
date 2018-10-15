@@ -1,4 +1,6 @@
-package net.sourceforge.kleinlisp;
+package net.sourceforge.kleinlisp.forms;
+
+import net.sourceforge.kleinlisp.Form;
 
 /**
  *

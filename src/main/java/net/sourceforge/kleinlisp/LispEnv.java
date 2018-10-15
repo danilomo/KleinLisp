@@ -1,5 +1,7 @@
 package net.sourceforge.kleinlisp;
 
+import net.sourceforge.kleinlisp.forms.ObjectForm;
+import net.sourceforge.kleinlisp.forms.ListForm;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -8,9 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.sourceforge.kleinlisp.functions.ArithmeticFunction;
-import net.sourceforge.kleinlisp.functions.ArithmeticFunction.Operator;
+import net.sourceforge.kleinlisp.functions.ArithmeticOperator;
+import net.sourceforge.kleinlisp.functions.ArithmeticOperator.Operator;
 import net.sourceforge.kleinlisp.functions.ComparisonOperator;
+import net.sourceforge.kleinlisp.functions.ListFunctions;
 
 /**
  *
@@ -18,7 +21,7 @@ import net.sourceforge.kleinlisp.functions.ComparisonOperator;
  */
 public class LispEnv implements Environment {
 
-    private Map<String, Function> functionTable = new HashMap<>();
+    private final Map<String, Function> functionTable = new HashMap<>();
 
     public LispEnv() {
         initFunctionTable();
@@ -50,7 +53,7 @@ public class LispEnv implements Environment {
     }
 
     public void addFunction(String name, Function function) {
-        functionTable.put(name, function);
+        registerFunction(name, function);
     }
 
     public void removeFunction(String name) {
@@ -58,25 +61,32 @@ public class LispEnv implements Environment {
     }
 
     private void initFunctionTable() {
+        registerFunction("+", new ArithmeticOperator(Operator.PLUS));
+        registerFunction("-", new ArithmeticOperator(Operator.MINUS));
+        registerFunction("*", new ArithmeticOperator(Operator.TIMES));
+        registerFunction("/", new ArithmeticOperator(Operator.DIV));
+        registerFunction("%", new ArithmeticOperator(Operator.MOD));
 
-        functionTable.put("+", new ArithmeticFunction(Operator.PLUS));
-        functionTable.put("-", new ArithmeticFunction(Operator.MINUS));
-        functionTable.put("*", new ArithmeticFunction(Operator.TIMES));
-        functionTable.put("/", new ArithmeticFunction(Operator.DIV));
-        functionTable.put("%", new ArithmeticFunction(Operator.MOD));
+        registerFunction("list", parameters -> parameters);
 
-        functionTable.put("list", parameters -> parameters);
+        registerFunction("<", new ComparisonOperator(ComparisonOperator.Operator.LT));
+        registerFunction(">", new ComparisonOperator(ComparisonOperator.Operator.GT));
+        registerFunction("<=", new ComparisonOperator(ComparisonOperator.Operator.LEQ));
+        registerFunction(">=", new ComparisonOperator(ComparisonOperator.Operator.GEQ));
+        registerFunction("=", new ComparisonOperator(ComparisonOperator.Operator.EQ));
+        registerFunction("!=", new ComparisonOperator(ComparisonOperator.Operator.NEQ));
 
-        functionTable.put("<", new ComparisonOperator(ComparisonOperator.Operator.LT));
-        functionTable.put(">", new ComparisonOperator(ComparisonOperator.Operator.GT));
-        functionTable.put("<=", new ComparisonOperator(ComparisonOperator.Operator.LEQ));
-        functionTable.put(">=", new ComparisonOperator(ComparisonOperator.Operator.GEQ));
-        functionTable.put("=", new ComparisonOperator(ComparisonOperator.Operator.EQ));
-        functionTable.put("!=", new ComparisonOperator(ComparisonOperator.Operator.NEQ));
+        registerFunction("length", ListFunctions::length);
+        registerFunction("car", ListFunctions::car);
+        registerFunction("cdr", ListFunctions::cdr);
+    }
+
+    private void registerFunction(String name, Function func) {
+        functionTable.put(name, func);
     }
 
     @Override
-    public Function lookupFunction(String name) {
+    public Function lookup(String name) {
         return functionTable.get(name);
     }
 }

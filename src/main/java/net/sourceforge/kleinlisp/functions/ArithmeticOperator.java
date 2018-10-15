@@ -5,21 +5,21 @@
  */
 package net.sourceforge.kleinlisp.functions;
 
-import net.sourceforge.kleinlisp.DoubleForm;
+import net.sourceforge.kleinlisp.forms.DoubleForm;
 import net.sourceforge.kleinlisp.Form;
 import net.sourceforge.kleinlisp.Function;
-import net.sourceforge.kleinlisp.IntForm;
-import net.sourceforge.kleinlisp.ListForm;
+import net.sourceforge.kleinlisp.forms.IntForm;
+import net.sourceforge.kleinlisp.forms.ListForm;
 
 /**
  *
  * @author daolivei
  */
-public class ArithmeticFunction implements Function {
+public class ArithmeticOperator implements Function {
 
-    private Operator operator;
+    private final Operator operator;
 
-    public ArithmeticFunction(Operator operator) {
+    public ArithmeticOperator(Operator operator) {
         this.operator = operator;
     }
 

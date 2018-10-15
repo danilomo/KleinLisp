@@ -1,6 +1,8 @@
 package net.sourceforge.kleinlisp;
 
 import java.util.Optional;
+import net.sourceforge.kleinlisp.forms.FunctionForm;
+import net.sourceforge.kleinlisp.forms.ListForm;
 
 /**
  * A Lisp "form", i.e., something that can be evaluated in Lisp programs: atoms,
@@ -57,6 +59,16 @@ public interface Form {
      * @return see description
      */
     public Optional<ListForm> asList();
+    
+    /**
+     * If the form represents a list, returns an Optional.of(list), otherwise,
+     * return an Optional.empty().
+     *
+     * For IntForm, the value is promoted to int.
+     *
+     * @return see description
+     */
+    public Optional<FunctionForm> asFunction();    
 
     /**
      * Returns an Optional.of(reference) if it is an ObjectForm belonging to

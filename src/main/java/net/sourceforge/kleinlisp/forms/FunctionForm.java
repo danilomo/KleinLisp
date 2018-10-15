@@ -1,33 +1,38 @@
-package net.sourceforge.kleinlisp;
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package net.sourceforge.kleinlisp.forms;
 
+import net.sourceforge.kleinlisp.Form;
 import java.util.Optional;
-import java.util.OptionalDouble;
-import java.util.OptionalInt;
+import net.sourceforge.kleinlisp.Function;
 
 /**
  *
  * @author daolivei
  */
-public final class StringForm implements Form {
+public class FunctionForm implements Form {
 
-    private final String value;
+    private final Function function;
 
-    public StringForm(String value) {
-        this.value = value;
+    public FunctionForm(Function function) {
+        this.function = function;
     }
 
-    public String value() {
-        return value;
+    public Object object() {
+        return function;
     }
 
     @Override
     public String toString() {
-        return "\"" + value + "\"";
+        return function.toString();
     }
 
     @Override
     public Object asObject() {
-        return value;
+        return this;
     }
 
     @Override
@@ -58,6 +63,11 @@ public final class StringForm implements Form {
 
     @Override
     public boolean truthness() {
-        return ! value.isEmpty();
+        return true;
     }    
+
+    @Override
+    public Optional<FunctionForm> asFunction() {
+        return Optional.of(this);
+    }
 }

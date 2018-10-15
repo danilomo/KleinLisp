@@ -11,23 +11,31 @@ public class Main {
     public static void main(String[] args) {
         Lisp runtime = new Lisp();
 
-//        System.out.println(runtime.evaluate("(<= 1 2 3 4)"));
-//
-//        System.out.println(runtime.evaluate("(< 4 3 2 1)"));
-//
-//        System.out.println(runtime.evaluate("(>= 4 3 2 1)"));
+        String code = "(length [1 2 3 4 5 6])";
+        String code2 = "(length (list 1 2 3 4 5 6))";
+
+        System.out.println(runtime.evaluate(code));
+        System.out.println(runtime.evaluate(code2));
         
-        System.out.println(runtime.evaluate("(= 1 1)"));
-        
-        System.out.println(runtime.evaluate("(!= 1 1)"));
-        
-        System.out.println(runtime.evaluate("(= 1 1.0)"));
-        
-        System.out.println(runtime.evaluate("(= 1.0 1.0)"));
-        
-        boolean b = new Double(1.0).equals(new Integer(1));
-        
-        System.out.println(b);
+        System.out.println(runtime.evaluate("(cdr (list 1 2 3 4 5))"));
+
+////        System.out.println(runtime.evaluate("(<= 1 2 3 4)"));
+////
+////        System.out.println(runtime.evaluate("(< 4 3 2 1)"));
+////
+////        System.out.println(runtime.evaluate("(>= 4 3 2 1)"));
+//        
+//        System.out.println(runtime.evaluate("(= 1 1)"));
+//        
+//        System.out.println(runtime.evaluate("(!= 1 1)"));
+//        
+//        System.out.println(runtime.evaluate("(= 1 1.0)"));
+//        
+//        System.out.println(runtime.evaluate("(= 1.0 1.0)"));
+//        
+//        boolean b = new Double(1.0).equals(new Integer(1));
+//        
+//        System.out.println(b);
     }
 }
 
