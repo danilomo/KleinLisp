@@ -25,7 +25,11 @@ public final class AtomObject implements LispObject {
     public AtomObject(String value, Environment env) {
         this.value = value;
         this.env = env;
-    }        
+    } 
+
+    public Environment environment() {
+        return env;
+    }
 
     public String value() {
         return value;

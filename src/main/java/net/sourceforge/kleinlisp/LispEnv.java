@@ -20,7 +20,7 @@ import net.sourceforge.kleinlisp.objects.FunctionObject;
  *
  * @author daolivei
  */
-public class LispEnv implements Environment {
+public class LispEnv implements Environment {    
 
     private final Map<String, LispObject> objects = new HashMap<>();
 
@@ -95,5 +95,20 @@ public class LispEnv implements Environment {
     @Override
     public LispObject lookup(String name) {
         return objects.get(name);
+    }
+
+    @Override
+    public void set(String name, LispObject obj) {
+        objects.put(name, obj);
+    }
+
+    @Override
+    public void define(String name, LispObject obj) {
+        set(name, obj);
+    }
+
+    @Override
+    public void undefine(String name) {
+        objects.remove(name);
     }
 }

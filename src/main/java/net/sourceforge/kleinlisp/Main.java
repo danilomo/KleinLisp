@@ -13,6 +13,8 @@ public class Main {
 
         String code = "(if 0 (log [1 2 3 4 5 6]) (log \"banana\"))";
         
+        code = "((lambda (x y) (+ x y)) 10 20)";
+        
         System.out.println(runtime.parse(code));
         System.out.println("");
         System.out.println(runtime.evaluate(code));

@@ -157,7 +157,7 @@ public class ListObject implements LispObject, Iterable<LispObject> {
 
         if (atom.isPresent()) {
             Optional<Function> specialForm = SpecialForm
-                    .of(atom.get().toString());
+                    .of(atom.get().toString(), atom.get().environment());
 
             if (specialForm.isPresent()) {
                 return specialForm.get().evaluate(cdr());

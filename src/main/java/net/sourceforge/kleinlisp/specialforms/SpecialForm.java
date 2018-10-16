@@ -6,6 +6,7 @@
 package net.sourceforge.kleinlisp.specialforms;
 
 import java.util.Optional;
+import net.sourceforge.kleinlisp.Environment;
 import net.sourceforge.kleinlisp.Function;
 
 /**
@@ -13,10 +14,11 @@ import net.sourceforge.kleinlisp.Function;
  * @author Danilo Oliveira
  */
 public class SpecialForm {
-    public static Optional<Function> of(String str){
+    public static Optional<Function> of(String str, Environment env){
         switch(str){
             case "quote": return Optional.of(QuoteForm.instance());
             case "if" : return Optional.of(IfForm.instance());
+            case "lambda": return Optional.of(new LambdaForm(env));
         }
         
         return Optional.empty();
