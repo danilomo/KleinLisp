@@ -5,14 +5,14 @@
  */
 package net.sourceforge.kleinlisp.functions;
 
-import net.sourceforge.kleinlisp.forms.BooleanForm;
-import net.sourceforge.kleinlisp.Form;
+import net.sourceforge.kleinlisp.objects.BooleanObject;
 import net.sourceforge.kleinlisp.Function;
-import net.sourceforge.kleinlisp.forms.ListForm;
+import net.sourceforge.kleinlisp.objects.ListObject;
+import net.sourceforge.kleinlisp.LispObject;
 
 /**
  *
- * @author danilo
+ * @author Danilo Oliveira
  */
 public class ComparisonOperator implements Function {
 
@@ -23,18 +23,18 @@ public class ComparisonOperator implements Function {
     }
 
     @Override
-    public Form evaluate(ListForm parameters) {
+    public LispObject evaluate(ListObject parameters) {
         boolean result = evaluate(parameters.car(), parameters.cdr());
 
-        return new BooleanForm(result);
+        return new BooleanObject(result);
     }
 
-    private boolean evaluate(Form car, ListForm cdr) {
-        if (cdr == ListForm.NIL) {
+    private boolean evaluate(LispObject car, ListObject cdr) {
+        if (cdr == ListObject.NIL) {
             return true;
         }
 
-        Form op = cdr.car();
+        LispObject op = cdr.car();
 
         Object c1 = car.asObject();
         Object c2 = op.asObject();

@@ -16,7 +16,7 @@ digit		= [0-9]
 symbol          = 
                     [+] | [-] | [%] | [/] |
                     [*] | [$] | [_] | [:] | [>] | [<] | [=] |
-                    [!]
+                    [!] | [?]
 
 letter		= {lowercase} | {uppercase}
 lowercase	= [a-z]
@@ -49,17 +49,17 @@ StringBuilder str = new StringBuilder();
 
 
 <YYINITIAL> {
-    "\""        {str.setLength(0); yybegin(STRING);}
-    "'"          { return symbol( sym.QUOTE ); }
-    "("           { return symbol( sym.OPEN_PAR ); }
-    ")"           { return symbol( sym.CLOSE_PAR ); }
-    "["           { return symbol( sym.OPEN_BRACKET ); }
-    "]"           { return symbol( sym.CLOSE_BRACKET ); }
+    "\""                            {str.setLength(0); yybegin(STRING);}
+    "'"                             { return symbol( sym.QUOTE ); }
+    "("                             { return symbol( sym.OPEN_PAR ); }
+    ")"                             { return symbol( sym.CLOSE_PAR ); }
+    "["                             { return symbol( sym.OPEN_BRACKET ); }
+    "]"                             { return symbol( sym.CLOSE_BRACKET ); }
 
-    {identifier}   { return symbol( sym.ATOM,  yytext() ); }
-    {integer_literal}       { return symbol( sym.INT_LITERAL,  Integer.parseInt(yytext()) ); }
-    {double_literal}        { return symbol( sym.DOUBLE_LITERAL,  Double.parseDouble(yytext()) ); }
-    " "|\t|\n|	{lineterminator}	{/* whitespace */}
+    {identifier}                    { return symbol( sym.ATOM,  yytext() ); }
+    {integer_literal}               { return symbol( sym.INT_LITERAL,  Integer.parseInt(yytext()) ); }
+    {double_literal}                { return symbol( sym.DOUBLE_LITERAL,  Double.parseDouble(yytext()) ); }
+    " "|\t|\n|	{lineterminator}    {/* whitespace */}
 }
 
 <STRING> {

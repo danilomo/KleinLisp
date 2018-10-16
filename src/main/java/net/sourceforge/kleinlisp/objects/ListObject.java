@@ -1,31 +1,31 @@
-package net.sourceforge.kleinlisp.forms;
+package net.sourceforge.kleinlisp.objects;
 
-import net.sourceforge.kleinlisp.Form;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import net.sourceforge.kleinlisp.Environment;
+import net.sourceforge.kleinlisp.Function;
+import net.sourceforge.kleinlisp.LispObject;
+import net.sourceforge.kleinlisp.specialforms.SpecialForm;
 
 /**
  *
  * @author daolivei
  */
-public class ListForm implements Form, Iterable<Form> {
+public class ListObject implements LispObject, Iterable<LispObject> {
 
-    private final Form head;
-    private final Form tail;
-    private Environment environment;
+    private final LispObject head;
+    private final LispObject tail;
     private final int length;
 
-    private ListForm() {
+    private ListObject() {
         this.head = null;
         this.tail = null;
         this.length = 0;
     }
 
-    public ListForm(Form head, Form tail) {
+    public ListObject(LispObject head, LispObject tail) {
         this.head = head;
         this.tail = tail;
 
@@ -37,32 +37,20 @@ public class ListForm implements Form, Iterable<Form> {
 
     }
 
-    public ListForm(Form head, Form tail, Environment env) {
-        this.head = head;
-        this.tail = tail;
-        this.environment = env;
-
-        if (tail.asList().isPresent()) {
-            this.length = 1 + tail.asList().get().length;
-        } else {
-            this.length = 2;
-        }
-    }
-
-    public Form head() {
+    public LispObject head() {
         return head;
     }
 
-    public Form tail() {
+    public LispObject tail() {
         return tail;
     }
 
-    public Form car() {
+    public LispObject car() {
         return head;
     }
 
-    public ListForm cdr() {
-        return (ListForm) tail;
+    public ListObject cdr() {
+        return (ListObject) tail;
     }
 
     public int length() {
@@ -73,7 +61,7 @@ public class ListForm implements Form, Iterable<Form> {
     public Object asObject() {
         List list = new ArrayList();
 
-        for (Form f : this) {
+        for (LispObject f : this) {
             list.add(f.asObject());
         }
 
@@ -85,14 +73,14 @@ public class ListForm implements Form, Iterable<Form> {
         return "(" + String.join(" ", toList().stream().map(t -> t.toString()).collect(Collectors.toList())) + ")";
     }
 
-    public static final ListForm NIL = new ListForm() {
+    public static final ListObject NIL = new ListObject() {
         @Override
         public String toString() {
             return "()";
         }
 
         @Override
-        public Form evaluate() {
+        public LispObject evaluate() {
             return this;
         }
 
@@ -107,7 +95,7 @@ public class ListForm implements Form, Iterable<Form> {
         }
 
         @Override
-        public Optional<ListForm> asList() {
+        public Optional<ListObject> asList() {
             return Optional.of(this);
         }
 
@@ -120,36 +108,34 @@ public class ListForm implements Form, Iterable<Form> {
         public int length() {
             return 0;
         }
-        
-        
     };
 
-    public List<Form> toList() {
-        List<Form> list = new ArrayList<>();
-        Iterator<Form> it = iterator();
+    public List<LispObject> toList() {
+        List<LispObject> list = new ArrayList<>();
+        Iterator<LispObject> it = iterator();
         it.forEachRemaining(list::add);
         return list;
     }
 
     @Override
-    public Iterator<Form> iterator() {
+    public Iterator<LispObject> iterator() {
         return new ListFormIterator();
     }
 
-    private ListForm evaluateContents() {
+    private ListObject evaluateContents() {
         if (cdr() != NIL) {
-            return new ListForm(car().evaluate(), cdr().evaluateContents(), environment);
+            return new ListObject(car().evaluate(), cdr().evaluateContents());
         } else {
-            return new ListForm(car().evaluate(), NIL, environment);
+            return new ListObject(car().evaluate(), NIL);
         }
     }
 
-    private class ListFormIterator implements Iterator<Form> {
+    private class ListFormIterator implements Iterator<LispObject> {
 
-        private ListForm cursor;
+        private ListObject cursor;
 
         public ListFormIterator() {
-            cursor = ListForm.this;
+            cursor = ListObject.this;
         }
 
         @Override
@@ -158,30 +144,37 @@ public class ListForm implements Form, Iterable<Form> {
         }
 
         @Override
-        public Form next() {
-            Form f = cursor.head;
+        public LispObject next() {
+            LispObject f = cursor.head;
             cursor = cursor.cdr();
             return f;
         }
     }
 
     @Override
-    public Form evaluate() {
-        String fname = car().toString();
+    public LispObject evaluate() {
+        Optional<AtomObject> atom = car().asAtom();
 
-        if ("quote".equals(fname)) {
-            return cdr();
+        if (atom.isPresent()) {
+            Optional<Function> specialForm = SpecialForm
+                    .of(atom.get().toString());
+
+            if (specialForm.isPresent()) {
+                return specialForm.get().evaluate(cdr());
+            }
         }
 
-        ListForm parameters = cdr().evaluateContents();
+        ListObject parameters = cdr().evaluateContents();
+        FunctionObject obj = car().evaluate().asFunction().get();
+        return obj.function().evaluate(parameters);
 
-        try {
-            return environment.lookup(fname).evaluate(parameters);
-        } catch (Exception e) {
-            System.out.println(fname);
-            System.out.println(parameters);
-            throw e;
-        }
+//        try {
+//            return environment.lookup(fname).evaluate(parameters);
+//        } catch (Exception e) {
+//            System.out.println(fname);
+//            System.out.println(parameters);
+//            throw e;
+//        }
     }
 
     @Override
@@ -195,7 +188,7 @@ public class ListForm implements Form, Iterable<Form> {
     }
 
     @Override
-    public Optional<ListForm> asList() {
+    public Optional<ListObject> asList() {
         return Optional.of(this);
     }
 
@@ -208,9 +201,14 @@ public class ListForm implements Form, Iterable<Form> {
     public boolean truthness() {
         return true;
     }
-    
+
     @Override
-    public Optional<FunctionForm> asFunction() {
+    public Optional<FunctionObject> asFunction() {
         return Optional.empty();
-    }        
+    }
+
+    @Override
+    public Optional<AtomObject> asAtom() {
+        return Optional.empty();
+    }
 }

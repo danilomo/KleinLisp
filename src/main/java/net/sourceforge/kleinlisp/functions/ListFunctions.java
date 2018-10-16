@@ -5,9 +5,9 @@
  */
 package net.sourceforge.kleinlisp.functions;
 
-import net.sourceforge.kleinlisp.Form;
-import net.sourceforge.kleinlisp.forms.IntForm;
-import net.sourceforge.kleinlisp.forms.ListForm;
+import net.sourceforge.kleinlisp.objects.IntObject;
+import net.sourceforge.kleinlisp.objects.ListObject;
+import net.sourceforge.kleinlisp.LispObject;
 
 /**
  *
@@ -15,23 +15,27 @@ import net.sourceforge.kleinlisp.forms.ListForm;
  */
 public class ListFunctions {
 
-    public static Form length(ListForm parameters) {
-        ListForm arg = parameters.car().asList().get();
+    public static LispObject length(ListObject parameters) {
+        ListObject arg = parameters.car().asList().get();
 
-        return new IntForm(arg.length());
+        return new IntObject(arg.length());
     }
 
-    public static Form car(ListForm parameters) {
-        ListForm arg = parameters.car().asList().get();
+    public static LispObject car(ListObject parameters) {
+        ListObject arg = parameters.car().asList().get();
 
         return arg.head();
     }
 
-    public static Form cdr(ListForm parameters) {
-        ListForm arg = parameters.car().asList().get();
+    public static LispObject cdr(ListObject parameters) {
+        ListObject arg = parameters.car().asList().get();
 
         System.out.println(">> arg " + arg);
-        
+
         return arg.tail();
+    }
+
+    public static LispObject list(ListObject parameters) {
+        return parameters;
     }
 }

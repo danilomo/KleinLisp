@@ -10,5 +10,5 @@ package net.sourceforge.kleinlisp;
  * @author daolivei
  */
 public interface Environment {
-    public Function lookup(String name);
+    public LispObject lookup(String name);    
 }

@@ -3,20 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package net.sourceforge.kleinlisp.forms;
+package net.sourceforge.kleinlisp.objects;
 
-import net.sourceforge.kleinlisp.Form;
 import java.util.Optional;
+import net.sourceforge.kleinlisp.LispObject;
 
 /**
  *
  * @author danilo
  */
-public class BooleanForm implements Form {
+public class BooleanObject implements LispObject {
 
     private boolean value;
 
-    public BooleanForm(boolean value) {
+    public BooleanObject(boolean value) {
         this.value = value;
     }        
     
@@ -36,7 +36,7 @@ public class BooleanForm implements Form {
     }
 
     @Override
-    public Optional<ListForm> asList() {
+    public Optional<ListObject> asList() {
         return Optional.empty();
     }
 
@@ -46,7 +46,12 @@ public class BooleanForm implements Form {
     }
 
     @Override
-    public Form evaluate() {
+    public Optional<AtomObject> asAtom() {
+        return Optional.empty();
+    }        
+
+    @Override
+    public LispObject evaluate() {
         return this;
     }
 
@@ -61,7 +66,7 @@ public class BooleanForm implements Form {
     }
    
     @Override
-    public Optional<FunctionForm> asFunction() {
+    public Optional<FunctionObject> asFunction() {
         return Optional.empty();
     }        
 }

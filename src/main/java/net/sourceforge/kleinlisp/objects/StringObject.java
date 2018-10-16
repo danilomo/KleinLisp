@@ -1,19 +1,17 @@
-package net.sourceforge.kleinlisp.forms;
+package net.sourceforge.kleinlisp.objects;
 
-import net.sourceforge.kleinlisp.Form;
 import java.util.Optional;
-import java.util.OptionalDouble;
-import java.util.OptionalInt;
+import net.sourceforge.kleinlisp.LispObject;
 
 /**
  *
  * @author daolivei
  */
-public final class StringForm implements Form {
+public final class StringObject implements LispObject {
 
     private final String value;
 
-    public StringForm(String value) {
+    public StringObject(String value) {
         this.value = value;
     }
 
@@ -32,7 +30,7 @@ public final class StringForm implements Form {
     }
 
     @Override
-    public Form evaluate() {
+    public LispObject evaluate() {
         return this;
     }
 
@@ -47,7 +45,7 @@ public final class StringForm implements Form {
     }
 
     @Override
-    public Optional<ListForm> asList() {
+    public Optional<ListObject> asList() {
         return Optional.empty();
     }
 
@@ -62,7 +60,12 @@ public final class StringForm implements Form {
     }
 
     @Override
-    public Optional<FunctionForm> asFunction() {
+    public Optional<FunctionObject> asFunction() {
         return Optional.empty();
     }
+    
+    @Override
+    public Optional<AtomObject> asAtom() {
+        return Optional.empty();
+    }     
 }

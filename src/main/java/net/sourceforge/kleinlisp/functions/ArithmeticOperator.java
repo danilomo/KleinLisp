@@ -5,15 +5,15 @@
  */
 package net.sourceforge.kleinlisp.functions;
 
-import net.sourceforge.kleinlisp.forms.DoubleForm;
-import net.sourceforge.kleinlisp.Form;
+import net.sourceforge.kleinlisp.objects.DoubleObject;
 import net.sourceforge.kleinlisp.Function;
-import net.sourceforge.kleinlisp.forms.IntForm;
-import net.sourceforge.kleinlisp.forms.ListForm;
+import net.sourceforge.kleinlisp.objects.IntObject;
+import net.sourceforge.kleinlisp.objects.ListObject;
+import net.sourceforge.kleinlisp.LispObject;
 
 /**
  *
- * @author daolivei
+ * @author Danilo Oliveira
  */
 public class ArithmeticOperator implements Function {
 
@@ -24,66 +24,66 @@ public class ArithmeticOperator implements Function {
     }
 
     @Override
-    public Form evaluate(ListForm parameters) {
+    public LispObject evaluate(ListObject parameters) {
         return evaluate(parameters.car(), parameters.cdr());
     }
 
-    private Form evaluate(Form car, ListForm cdr) {
-        if (cdr == ListForm.NIL) {
+    private LispObject evaluate(LispObject car, ListObject cdr) {
+        if (cdr == ListObject.NIL) {
             return car;
         }
 
-        Form op = cdr.car();
+        LispObject op = cdr.car();
 
-        if (car instanceof DoubleForm || op instanceof DoubleForm) {
-            Form result = evaluateDouble(car, op);
+        if (car instanceof DoubleObject || op instanceof DoubleObject) {
+            LispObject result = evaluateDouble(car, op);
 
             return evaluate(result, cdr.cdr());
         } else {
-            Form result = evaluateInt(car, op);
+            LispObject result = evaluateInt(car, op);
 
             return evaluate(result, cdr.cdr());
         }
     }
 
-    private Form evaluateDouble(Form a, Form b) {
+    private LispObject evaluateDouble(LispObject a, LispObject b) {
         double aval = a.asDouble().get();
         double bval = b.asDouble().get();
 
         switch (operator) {
             case PLUS:
-                return new DoubleForm(aval + bval);
+                return new DoubleObject(aval + bval);
             case MINUS:
-                return new DoubleForm(aval - bval);
+                return new DoubleObject(aval - bval);
             case TIMES:
-                return new DoubleForm(aval * bval);
+                return new DoubleObject(aval * bval);
             case DIV:
-                return new DoubleForm(aval / bval);
+                return new DoubleObject(aval / bval);
             case MOD:
-                return new DoubleForm(aval % bval);
+                return new DoubleObject(aval % bval);
         }
 
-        return new DoubleForm(Double.NaN);
+        return new DoubleObject(Double.NaN);
     }
 
-    private Form evaluateInt(Form a, Form b) {
+    private LispObject evaluateInt(LispObject a, LispObject b) {
         int aval = a.asInt().get();
         int bval = b.asInt().get();
 
         switch (operator) {
             case PLUS:
-                return new IntForm(aval + bval);
+                return new IntObject(aval + bval);
             case MINUS:
-                return new IntForm(aval - bval);
+                return new IntObject(aval - bval);
             case TIMES:
-                return new IntForm(aval * bval);
+                return new IntObject(aval * bval);
             case DIV:
-                return new IntForm(aval / bval);
+                return new IntObject(aval / bval);
             case MOD:
-                return new IntForm(aval % bval);
+                return new IntObject(aval % bval);
         }
 
-        return new IntForm(Integer.MIN_VALUE);
+        return new IntObject(Integer.MIN_VALUE);
     }
 
     public static enum Operator {

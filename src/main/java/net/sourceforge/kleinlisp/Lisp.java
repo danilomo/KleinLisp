@@ -18,11 +18,11 @@ public class Lisp {
         this.parser = parser;
     }
 
-    public Form evaluate(String expression) {
+    public LispObject evaluate(String expression) {
         return parser.parse(expression, environment).evaluate();
     }
 
-    public Form parse(String expression) {
+    public LispObject parse(String expression) {
         return parser.parse(expression, environment);
     }
     

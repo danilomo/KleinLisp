@@ -1,24 +1,25 @@
 package net.sourceforge.kleinlisp;
 
 import java.util.Optional;
-import net.sourceforge.kleinlisp.forms.FunctionForm;
-import net.sourceforge.kleinlisp.forms.ListForm;
+import net.sourceforge.kleinlisp.objects.AtomObject;
+import net.sourceforge.kleinlisp.objects.FunctionObject;
+import net.sourceforge.kleinlisp.objects.ListObject;
 
 /**
- * A Lisp "form", i.e., something that can be evaluated in Lisp programs: atoms,
+ * A Lisp object, i.e., something that can be evaluated in Lisp programs: atoms,
  * strings, number literals, lists, etc.
  *
  * @author Danilo Oliveira
  */
-public interface Form {
+public interface LispObject {
 
     /**
      * Return the form as a Java object, applying some conversion if necessary.
      *
      * AtomForm, StringForm -> String, IntForm -> Integer, DoubleForm -> Double,
-     * ListForm -> java.util.List, etc.
+ ListObject -> java.util.List, etc.
      *
-     * @return A java.lang.Object according to the Form concrete type
+     * @return A java.lang.Object according to the LispObject concrete type
      */
     public Object asObject();
     
@@ -58,7 +59,7 @@ public interface Form {
      *
      * @return see description
      */
-    public Optional<ListForm> asList();
+    public Optional<ListObject> asList();
     
     /**
      * If the form represents a list, returns an Optional.of(list), otherwise,
@@ -68,7 +69,13 @@ public interface Form {
      *
      * @return see description
      */
-    public Optional<FunctionForm> asFunction();    
+    public Optional<FunctionObject> asFunction(); 
+    
+
+    /**
+     * @return see description
+     */
+    public Optional<AtomObject> asAtom();       
 
     /**
      * Returns an Optional.of(reference) if it is an ObjectForm belonging to
@@ -90,5 +97,5 @@ public interface Form {
      *
      * @return An evaluated form.
      */
-    public Form evaluate();
+    public LispObject evaluate();
 }

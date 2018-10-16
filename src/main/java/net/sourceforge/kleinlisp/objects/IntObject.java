@@ -3,22 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package net.sourceforge.kleinlisp.forms;
+package net.sourceforge.kleinlisp.objects;
 
-import net.sourceforge.kleinlisp.Form;
 import java.util.Optional;
-import java.util.OptionalDouble;
-import java.util.OptionalInt;
+import net.sourceforge.kleinlisp.LispObject;
 
 /**
  *
  * @author daolivei
  */
-public final class IntForm implements NumericForm {
+public final class IntObject implements NumericObject {
 
-    private int value;
+    private final int value;
 
-    public IntForm(int value) {
+    public IntObject(int value) {
         this.value = value;
     }
 
@@ -47,7 +45,7 @@ public final class IntForm implements NumericForm {
     }
 
     @Override
-    public Form evaluate() {
+    public LispObject evaluate() {
         return this;
     }
 
@@ -62,7 +60,7 @@ public final class IntForm implements NumericForm {
     }
 
     @Override
-    public Optional<ListForm> asList() {
+    public Optional<ListObject> asList() {
         return Optional.empty();
     }
 
@@ -74,11 +72,16 @@ public final class IntForm implements NumericForm {
 
     @Override
     public boolean truthness() {
-        return true;
+        return ! (value == 0) ;
     }  
 
     @Override
-    public Optional<FunctionForm> asFunction() {
+    public Optional<FunctionObject> asFunction() {
         return Optional.empty();
-    }        
+    }   
+    
+    @Override
+    public Optional<AtomObject> asAtom() {
+        return Optional.empty();
+    }     
 }

@@ -3,23 +3,29 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package net.sourceforge.kleinlisp.forms;
+package net.sourceforge.kleinlisp.objects;
 
-import net.sourceforge.kleinlisp.Form;
 import java.util.Optional;
 import net.sourceforge.kleinlisp.Function;
+import net.sourceforge.kleinlisp.LispObject;
 
 /**
  *
  * @author daolivei
  */
-public class FunctionForm implements Form {
+public class FunctionObject implements LispObject {
 
     private final Function function;
 
-    public FunctionForm(Function function) {
+    public FunctionObject(Function function) {
         this.function = function;
     }
+
+    public Function function() {
+        return function;
+    }
+    
+    
 
     public Object object() {
         return function;
@@ -27,7 +33,7 @@ public class FunctionForm implements Form {
 
     @Override
     public String toString() {
-        return function.toString();
+        return "Function: " + function.toString();
     }
 
     @Override
@@ -36,7 +42,7 @@ public class FunctionForm implements Form {
     }
 
     @Override
-    public Form evaluate() {
+    public LispObject evaluate() {
         return this;
     }
 
@@ -51,7 +57,7 @@ public class FunctionForm implements Form {
     }
 
     @Override
-    public Optional<ListForm> asList() {
+    public Optional<ListObject> asList() {
         return Optional.empty();
     }
 
@@ -67,7 +73,12 @@ public class FunctionForm implements Form {
     }    
 
     @Override
-    public Optional<FunctionForm> asFunction() {
+    public Optional<FunctionObject> asFunction() {
         return Optional.of(this);
     }
+    
+    @Override
+    public Optional<AtomObject> asAtom() {
+        return Optional.empty();
+    }     
 }

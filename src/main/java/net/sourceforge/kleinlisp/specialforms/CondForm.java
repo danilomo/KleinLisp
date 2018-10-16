@@ -3,14 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package net.sourceforge.kleinlisp;
-
-import net.sourceforge.kleinlisp.objects.ListObject;
+package net.sourceforge.kleinlisp.specialforms;
 
 /**
  *
  * @author daolivei
  */
-public interface Function {
-    public LispObject evaluate(ListObject parameters);
+public class CondForm {
+    
 }

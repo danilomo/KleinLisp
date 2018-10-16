@@ -1,7 +1,8 @@
-package net.sourceforge.lon.parser;
+package net.sourceforge.kleinlisp.parser;
 
-import java_cup.runtime.*;
-import net.sourceforge.lon.*;
+import net.sourceforge.kleinlisp.parser.java_cup.*;
+import net.sourceforge.kleinlisp.*;
+import net.sourceforge.kleinlisp.objects.*;
 
 
 parser code {:
@@ -24,14 +25,13 @@ terminal QUOTE, OPEN_PAR, CLOSE_PAR, OPEN_BRACKET, CLOSE_BRACKET;
 terminal Integer INT_LITERAL;
 terminal Double  DOUBLE_LITERAL;
 
-non terminal Form self_evaluating_form;
-non terminal Form list_form;
-non terminal Form form_list;
-non terminal Form quoted_form;
-non terminal Form form;
+non terminal LispObject self_evaluating_form;
+non terminal LispObject list_form;
+non terminal LispObject form_list;
+non terminal LispObject quoted_form;
+non terminal LispObject form;
 
 start with form;
-
 
 form ::= 
     self_evaluating_form:f {: RESULT = f; :} |
@@ -39,22 +39,19 @@ form ::=
     quoted_form:f {: RESULT = f; :};
 
 self_evaluating_form ::=
-    INT_LITERAL:i    {: RESULT = new IntForm(i);    :} |
-    DOUBLE_LITERAL:d {: RESULT = new DoubleForm(d); :} |
-    STRING_LITERAL:s {: RESULT = new StringForm(s); :} |
-    ATOM:a           {: RESULT = new AtomForm(a);   :};
+    INT_LITERAL:i    {: RESULT = new IntObject(i);    :} |
+    DOUBLE_LITERAL:d {: RESULT = new DoubleObject(d); :} |
+    STRING_LITERAL:s {: RESULT = new StringObject(s); :} |
+    ATOM:a           {: RESULT = new AtomObject(a, parser.environment() );   :};
 
 list_form ::=
     OPEN_PAR     form_list:l   CLOSE_PAR     {: RESULT = l; :} |
-    OPEN_BRACKET form_list:l   CLOSE_BRACKET {: RESULT = new ListForm( new AtomForm("list"), l, parser.environment()  ); :} |
-    OPEN_PAR                   CLOSE_PAR     {: RESULT = ListForm.NIL;  :};
+    OPEN_BRACKET form_list:l   CLOSE_BRACKET {: RESULT = new ListObject( new AtomObject("list", parser.environment()), l); :} |
+    OPEN_PAR                   CLOSE_PAR     {: RESULT = ListObject.NIL;  :};
 
 form_list ::= 
-    form:head form_list:tail {: RESULT = new ListForm( head, tail, parser.environment() );         :} |
-    form:head                {: RESULT = new ListForm( head, ListForm.NIL, parser.environment() ); :};
+    form:head form_list:tail {: RESULT = new ListObject( head, tail );         :} |
+    form:head                {: RESULT = new ListObject( head, ListObject.NIL ); :};
 
 quoted_form ::= 
-    QUOTE form:f {: RESULT = new ListForm( new AtomForm("quote"),
-        new ListForm(f, ListForm.NIL, parser.environment())
-        , parser.environment()  );
-    :};
+    QUOTE form:f {: RESULT = new ListObject( new AtomObject("quote"), f ); :};

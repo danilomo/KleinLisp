@@ -22,7 +22,7 @@ public class LispTest {
         String expression = "(+ 10 20 30 40 50)";
         Lisp instance = new Lisp();
        
-        Form result = instance.evaluate(expression);
+        LispObject result = instance.evaluate(expression);
         assertEquals(new Integer(150), result.asInt().get());
     }
 
@@ -34,8 +34,8 @@ public class LispTest {
         System.out.println("parse");
         String expression = "(+ 10 20 30 40 50)";
         Lisp instance = new Lisp();
-        Form result = instance.parse(expression).asList().get();
-        List<Form> l = result.asList().get().toList();
+        LispObject result = instance.parse(expression).asList().get();
+        List<LispObject> l = result.asList().get().toList();
         Integer[] arr = {-1, 10, 20, 30, 40, 50 };
         
         for(int i = 1; i < arr.length; i++){

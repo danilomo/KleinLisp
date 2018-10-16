@@ -1,7 +1,7 @@
 package net.sourceforge.kleinlisp;
 
-import net.sourceforge.kleinlisp.forms.ObjectForm;
-import net.sourceforge.kleinlisp.forms.ListForm;
+import net.sourceforge.kleinlisp.objects.JavaObject;
+import net.sourceforge.kleinlisp.objects.ListObject;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -14,6 +14,7 @@ import net.sourceforge.kleinlisp.functions.ArithmeticOperator;
 import net.sourceforge.kleinlisp.functions.ArithmeticOperator.Operator;
 import net.sourceforge.kleinlisp.functions.ComparisonOperator;
 import net.sourceforge.kleinlisp.functions.ListFunctions;
+import net.sourceforge.kleinlisp.objects.FunctionObject;
 
 /**
  *
@@ -21,7 +22,7 @@ import net.sourceforge.kleinlisp.functions.ListFunctions;
  */
 public class LispEnv implements Environment {
 
-    private final Map<String, Function> functionTable = new HashMap<>();
+    private final Map<String, LispObject> objects = new HashMap<>();
 
     public LispEnv() {
         initFunctionTable();
@@ -34,19 +35,19 @@ public class LispEnv implements Environment {
                 PropertyDescriptor[] pds = info.getPropertyDescriptors();
                 Object o = clazz.getConstructors()[0].newInstance();
 
-                List<Form> list = p.toList();
+                List<LispObject> list = p.toList();
 
                 for (int i = 1; i < pds.length; i++) {
                     pds[i].getWriteMethod().invoke(o, list.get(i - 1).asObject());
                 }
 
-                return new ObjectForm(o);
+                return new JavaObject(o);
 
             } catch (Exception ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-            return ListForm.NIL;
+            return ListObject.NIL;
         };
 
         this.addFunction(clazz.getSimpleName(), f);
@@ -57,7 +58,7 @@ public class LispEnv implements Environment {
     }
 
     public void removeFunction(String name) {
-        functionTable.remove(name);
+        objects.remove(name);
     }
 
     private void initFunctionTable() {
@@ -76,17 +77,23 @@ public class LispEnv implements Environment {
         registerFunction("=", new ComparisonOperator(ComparisonOperator.Operator.EQ));
         registerFunction("!=", new ComparisonOperator(ComparisonOperator.Operator.NEQ));
 
+        registerFunction("list", ListFunctions::list);
         registerFunction("length", ListFunctions::length);
         registerFunction("car", ListFunctions::car);
         registerFunction("cdr", ListFunctions::cdr);
+        
+        registerFunction("log", (parameters) -> {
+            System.out.println("LOG::" + parameters);
+            return parameters;
+        });
     }
 
     private void registerFunction(String name, Function func) {
-        functionTable.put(name, func);
+        objects.put(name, new FunctionObject(func));
     }
 
     @Override
-    public Function lookup(String name) {
-        return functionTable.get(name);
+    public LispObject lookup(String name) {
+        return objects.get(name);
     }
 }
