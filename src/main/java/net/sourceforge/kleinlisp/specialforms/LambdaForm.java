@@ -92,6 +92,8 @@ public class LambdaForm implements Function {
         public Set<String> symbols(LispObject obj) {
             obj.accept(this);
             symbols.remove("lambda");
+            symbols.remove("set!");
+            symbols.remove("begin");
             return symbols;
         }
 

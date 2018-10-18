@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import net.sourceforge.kleinlisp.functions.ArithmeticOperator;
 import net.sourceforge.kleinlisp.functions.ArithmeticOperator.Operator;
 import net.sourceforge.kleinlisp.functions.ComparisonOperator;
+import net.sourceforge.kleinlisp.functions.IOFunctions;
 import net.sourceforge.kleinlisp.functions.ListFunctions;
 import net.sourceforge.kleinlisp.objects.FunctionObject;
 
@@ -90,6 +91,8 @@ public class LispEnvironment implements Environment {
             System.out.println("LOG::" + parameters);
             return parameters;
         });
+        
+        registerFunction("print", IOFunctions::print );
     }
 
     private void registerFunction(String name, Function func) {

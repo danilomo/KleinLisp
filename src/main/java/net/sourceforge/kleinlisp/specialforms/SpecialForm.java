@@ -19,6 +19,8 @@ public class SpecialForm {
             case "quote": return Optional.of(QuoteForm.instance());
             case "if" : return Optional.of(IfForm.instance());
             case "lambda": return Optional.of(new LambdaForm(env));
+            case "set!": return Optional.of(new SetForm(env));
+            case "begin": return Optional.of(BeginForm.instance());
         }
         
         return Optional.empty();

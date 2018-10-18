@@ -47,6 +47,11 @@ public class DefaultVisitor implements LispVisitor<LispObject>{
 
     @Override
     public LispObject visit(ListObject obj) {
+        
+        if(obj == ListObject.NIL){
+            return obj;
+        }
+        
         if (obj.tail() != ListObject.NIL) {
             return new ListObject(obj.head().accept(this), obj.tail().accept(this));
         } else {
