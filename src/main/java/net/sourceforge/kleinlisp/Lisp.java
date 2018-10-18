@@ -30,4 +30,9 @@ public class Lisp {
         ((LispEnvironment) environment).addClass(clazz);
     }
 
+    public Environment environment() {
+        return environment;
+    }
+    
+    
 }

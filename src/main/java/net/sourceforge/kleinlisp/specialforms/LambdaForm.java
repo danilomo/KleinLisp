@@ -6,9 +6,14 @@
 package net.sourceforge.kleinlisp.specialforms;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import net.sourceforge.kleinlisp.CompositeEnvironment;
+import net.sourceforge.kleinlisp.DefaultVisitor;
 import net.sourceforge.kleinlisp.Environment;
 import net.sourceforge.kleinlisp.Function;
+import net.sourceforge.kleinlisp.LispEnvironment;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.FunctionObject;
@@ -24,20 +29,117 @@ public class LambdaForm implements Function {
 
     public LambdaForm(Environment environment) {
         this.environment = environment;
-    }        
+    }
 
     @Override
     public LispObject evaluate(ListObject parameters) {
         ListObject paramList = parameters.car().asList().get();
         ListObject body = parameters.cdr().car().asList().get();
-        
+
         List<AtomObject> parameterList = new ArrayList<>();
-        
-        for(LispObject obj: paramList){
+
+        for (LispObject obj : paramList) {
             parameterList.add(obj.asAtom().get());
         }
+
+        Environment closuredEnv = createClosure(parameterList, body, environment);
         
+        WithNewEnvironment visitor = new WithNewEnvironment(closuredEnv);
+        
+        body = body.accept(visitor).asList().get();
+
         return new FunctionObject(new LambdaFunction(parameterList, body, environment));
+    }
+
+    private Environment createClosure(List<AtomObject> paramList
+            , ListObject body, Environment env) {
+
+        Set<String> defined = new DefinedSymbolCollector().symbols(body);
+        Set<String> used = new UsedSymbolCollector().symbols(body);
+
+        paramList.forEach((ao) -> {
+            defined.add(ao.toString());
+        });
+
+        Set<String> diff = new HashSet<>();
+        
+        for(String s: used){
+            if(!defined.contains(s)){
+                diff.add(s);
+            }
+        }
+
+        Environment newEnv = new LispEnvironment();
+        
+        for(String symbol: diff){
+            LispObject obj = env.lookup(symbol);
+            newEnv.define(symbol, obj);
+        }
+
+        return new CompositeEnvironment(newEnv, env);
+    }
+
+    static class UsedSymbolCollector extends DefaultVisitor {
+
+        private final Set<String> symbols = new HashSet<>();
+
+        @Override
+        public LispObject visit(AtomObject obj) {
+            symbols.add(obj.toString());
+            return obj;
+        }
+
+        public Set<String> symbols(LispObject obj) {
+            obj.accept(this);
+            symbols.remove("lambda");
+            return symbols;
+        }
+
+    }
+
+    static class DefinedSymbolCollector extends DefaultVisitor {
+
+        private final Set<String> symbols = new HashSet<>();
+
+        @Override
+        public LispObject visit(ListObject obj) {
+            if (!obj.head().asAtom().isPresent()) {
+                return super.visit(obj);
+            }
+
+            String symbol = obj.head().asAtom().get().toString();
+
+            if (!"lambda".equals(symbol)) {
+                return super.visit(obj);
+            }
+
+            ListObject parameters = obj.cdr().car().asList().get();
+
+            for (LispObject par : parameters) {
+                symbols.add(par.toString());
+            }
+
+            return super.visit(obj.cdr().cdr());
+        }
+
+        public Set<String> symbols(LispObject obj) {
+            obj.accept(this);
+            return symbols;
+        }
+    }
+    
+    static class WithNewEnvironment extends DefaultVisitor {
+        private final Environment environment;
+
+        public WithNewEnvironment(Environment environment) {
+            this.environment = environment;
+        }
+
+        @Override
+        public LispObject visit(AtomObject obj) {
+            return new AtomObject(obj.toString(), environment);
+        }
+        
     }
 
 }
