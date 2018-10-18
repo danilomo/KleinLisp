@@ -5,11 +5,11 @@ package net.sourceforge.kleinlisp;
  * @author daolivei
  */
 public class Lisp {
-    private final LispEnv environment;
+    private final Environment environment;
     private final Parser parser;
 
     public Lisp() {
-        this.environment = new LispEnv();
+        this.environment = new LispEnvironment();
         this.parser = Parser.defaultParser();
     }
 
@@ -27,7 +27,7 @@ public class Lisp {
     }
     
     public void addClass(Class clazz){
-        environment.addClass(clazz);
+        ((LispEnvironment) environment).addClass(clazz);
     }
 
 }

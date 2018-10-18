@@ -8,6 +8,7 @@ package net.sourceforge.kleinlisp.objects;
 import java.util.Optional;
 import net.sourceforge.kleinlisp.Environment;
 import net.sourceforge.kleinlisp.LispObject;
+import net.sourceforge.kleinlisp.LispVisitor;
 
 /**
  *
@@ -17,7 +18,7 @@ public final class AtomObject implements LispObject {
 
     private final String value;
     private Environment env;
-    
+
     public AtomObject(String value) {
         this.value = value;
     }
@@ -25,7 +26,7 @@ public final class AtomObject implements LispObject {
     public AtomObject(String value, Environment env) {
         this.value = value;
         this.env = env;
-    } 
+    }
 
     public Environment environment() {
         return env;
@@ -69,12 +70,12 @@ public final class AtomObject implements LispObject {
     public boolean truthness() {
         return true;
     }
-    
+
     @Override
     public Optional<FunctionObject> asFunction() {
         return Optional.empty();
-    } 
-    
+    }
+
     @Override
     public LispObject evaluate() {
         try {
@@ -84,10 +85,15 @@ public final class AtomObject implements LispObject {
             e.printStackTrace();
             throw e;
         }
-    } 
-    
+    }
+
     @Override
     public Optional<AtomObject> asAtom() {
         return Optional.of(this);
-    }     
+    }
+
+    @Override
+    public <T> T accept(LispVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
 }

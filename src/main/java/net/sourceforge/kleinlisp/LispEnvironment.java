@@ -21,13 +21,20 @@ import net.sourceforge.kleinlisp.objects.FunctionObject;
  *
  * @author daolivei
  */
-public class LispEnv implements Environment {    
+public class LispEnvironment implements Environment {    
 
-    private final Map<String, LispObject> objects = new HashMap<>();
+    private final Map<String, BindingList> objects = new HashMap<>();
 
-    public LispEnv() {
+    public LispEnvironment() {
         initFunctionTable();
     }
+
+    @Override
+    public String toString() {
+        return objects.toString(); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    
 
     public void addClass(Class clazz) {
         Function f = (p) -> {
@@ -58,10 +65,6 @@ public class LispEnv implements Environment {
         registerFunction(name, function);
     }
 
-    public void removeFunction(String name) {
-        objects.remove(name);
-    }
-
     private void initFunctionTable() {
         registerFunction("+", new ArithmeticOperator(Operator.PLUS));
         registerFunction("-", new ArithmeticOperator(Operator.MINUS));
@@ -90,27 +93,29 @@ public class LispEnv implements Environment {
     }
 
     private void registerFunction(String name, Function func) {
-        objects.put(name, new FunctionObject(func));
+        this.define(name, new FunctionObject(func));
     }
 
     @Override
     public LispObject lookup(String name) {
-        return objects.get(name);
+        return this.objects.get(name).head().value();
     }
 
     @Override
-    public void set(String name, LispObject obj) {
-        objects.put(name, obj);
+    public void set(String name, LispObject obj) {        
+        this.objects.get(name).head().set(obj);
     }
 
     @Override
     public void define(String name, LispObject obj) {
-        set(name, obj);
+        BindingList bl = this.objects.get(name);
+        this.objects.put(name, new BindingList(new Binding(obj), bl));
     }
 
     @Override
     public void undefine(String name) {
-        objects.remove(name);
+        BindingList bl = this.objects.get(name);
+        this.objects.put(name, bl.tail());
     }
 
     @Override
@@ -118,7 +123,7 @@ public class LispEnv implements Environment {
         return objects.containsKey(name);
     }
     
-        
+    
     
     private static class Binding{
         private LispObject value;
@@ -134,18 +139,25 @@ public class LispEnv implements Environment {
         public void set(LispObject value) {
             this.value = value;
         }  
+
+        @Override
+        public String toString() {
+            return value.toString();
+        }
+        
+        
     }
     
     private static class BindingList{
-        private final LispObject head;
+        private final Binding head;
         private final BindingList tail;
 
-        public BindingList(LispObject head, BindingList tail) {
+        public BindingList(Binding head, BindingList tail) {
             this.head = head;
             this.tail = tail;
         }
 
-        public LispObject head() {
+        public Binding head() {
             return head;
         }
 

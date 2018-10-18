@@ -1,6 +1,7 @@
-package net.sourceforge.kleinlisp;
+package net.sourceforge.kleinlisp.playground;
 
 import java.util.List;
+import net.sourceforge.kleinlisp.Lisp;
 
 /**
  *
@@ -15,9 +16,9 @@ public class Main {
         
         code = "((lambda (x y) (+ x y)) 10 20)";
         
-        System.out.println(runtime.parse(code));
-        System.out.println("");
-        System.out.println(runtime.evaluate(code));
+//        System.out.println(runtime.parse(code));
+//        System.out.println("");
+//        System.out.println(runtime.evaluate(code));
     }
 }
 

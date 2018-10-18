@@ -2,6 +2,7 @@ package net.sourceforge.kleinlisp.objects;
 
 import java.util.Optional;
 import net.sourceforge.kleinlisp.LispObject;
+import net.sourceforge.kleinlisp.LispVisitor;
 
 /**
  *
@@ -68,4 +69,9 @@ public final class StringObject implements LispObject {
     public Optional<AtomObject> asAtom() {
         return Optional.empty();
     }     
+    
+    @Override
+    public <T> T accept(LispVisitor<T> visitor) {
+        return visitor.visit(this);
+    }    
 }

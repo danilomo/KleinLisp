@@ -8,6 +8,7 @@ package net.sourceforge.kleinlisp.objects;
 import java.util.Optional;
 import net.sourceforge.kleinlisp.Function;
 import net.sourceforge.kleinlisp.LispObject;
+import net.sourceforge.kleinlisp.LispVisitor;
 
 /**
  *
@@ -24,8 +25,6 @@ public class FunctionObject implements LispObject {
     public Function function() {
         return function;
     }
-    
-    
 
     public Object object() {
         return function;
@@ -80,5 +79,11 @@ public class FunctionObject implements LispObject {
     @Override
     public Optional<AtomObject> asAtom() {
         return Optional.empty();
-    }     
+    }   
+    
+    @Override
+    public <T> T accept(LispVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
+  
 }

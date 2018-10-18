@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import net.sourceforge.kleinlisp.Function;
 import net.sourceforge.kleinlisp.LispObject;
+import net.sourceforge.kleinlisp.LispVisitor;
 import net.sourceforge.kleinlisp.specialforms.SpecialForm;
 
 /**
@@ -211,4 +212,9 @@ public class ListObject implements LispObject, Iterable<LispObject> {
     public Optional<AtomObject> asAtom() {
         return Optional.empty();
     }
+    
+    @Override
+    public <T> T accept(LispVisitor<T> visitor) {
+        return visitor.visit(this);
+    }    
 }

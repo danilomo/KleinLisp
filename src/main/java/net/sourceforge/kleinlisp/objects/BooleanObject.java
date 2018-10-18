@@ -7,6 +7,7 @@ package net.sourceforge.kleinlisp.objects;
 
 import java.util.Optional;
 import net.sourceforge.kleinlisp.LispObject;
+import net.sourceforge.kleinlisp.LispVisitor;
 
 /**
  *
@@ -68,5 +69,10 @@ public class BooleanObject implements LispObject {
     @Override
     public Optional<FunctionObject> asFunction() {
         return Optional.empty();
-    }        
+    }  
+    
+    @Override
+    public <T> T accept(LispVisitor<T> visitor) {
+        return visitor.visit(this);
+    }    
 }

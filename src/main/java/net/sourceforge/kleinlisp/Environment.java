@@ -14,4 +14,5 @@ public interface Environment {
     public void set(String name, LispObject obj);
     public void define(String name, LispObject obj);
     public void undefine(String name);
+    public boolean exists(String name);
 }
