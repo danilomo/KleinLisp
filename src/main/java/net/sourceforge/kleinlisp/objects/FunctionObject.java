@@ -9,12 +9,13 @@ import java.util.Optional;
 import net.sourceforge.kleinlisp.Function;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.LispVisitor;
+import net.sourceforge.kleinlisp.functions.ListFunctions;
 
 /**
  *
  * @author daolivei
  */
-public class FunctionObject implements LispObject {
+public final class FunctionObject implements LispObject {
 
     private final Function function;
 
@@ -64,26 +65,64 @@ public class FunctionObject implements LispObject {
     public <T> Optional<T> asObject(Class<T> clazz) {
         return Optional.empty();
     }
-    
 
     @Override
     public boolean truthness() {
         return true;
-    }    
+    }
 
     @Override
     public Optional<FunctionObject> asFunction() {
         return Optional.of(this);
     }
-    
+
     @Override
     public Optional<AtomObject> asAtom() {
         return Optional.empty();
-    }   
-    
+    }
+
     @Override
     public <T> T accept(LispVisitor<T> visitor) {
         return visitor.visit(this);
     }
-  
+
+    public LispObject call(Object... args) {
+
+        ListObject list = ListObject.NIL;
+
+        for (Object obj : args) {
+
+            LispObject parameter;
+
+            if (obj instanceof Integer) {
+                parameter = new IntObject((int) obj);
+            } else if (obj instanceof Double) {
+                parameter = new DoubleObject((double) obj);
+            } else {
+                parameter = new JavaObject(obj);
+            }
+
+            list = new ListObject(parameter, list);
+        }
+
+        list = ListFunctions.reverse(list).asList().get();
+
+        return function.evaluate(list);
+    }
+
+    public LispObject call(LispObject... args) {
+
+        ListObject list = ListObject.NIL;
+
+        for (int i = args.length - 1; i >= 0; i--) {
+            list = new ListObject(args[i], list);
+        }
+
+        return function.evaluate(list);
+    }
+
+    @Override
+    public boolean error() {
+        return false;
+    }
 }

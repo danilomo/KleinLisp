@@ -10,6 +10,8 @@ import net.sourceforge.kleinlisp.Function;
 import net.sourceforge.kleinlisp.objects.IntObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 import net.sourceforge.kleinlisp.LispObject;
+import net.sourceforge.kleinlisp.objects.ErrorObject;
+import net.sourceforge.kleinlisp.objects.NumericObject;
 
 /**
  *
@@ -35,12 +37,26 @@ public class ArithmeticOperator implements Function {
 
         LispObject op = cdr.car();
 
+        if (!((car instanceof NumericObject) && (op instanceof NumericObject))) {
+            return new ErrorObject("Non-numeric argument given to "
+                    + operator.toString()
+                    + "");
+        }
+
         if (car instanceof DoubleObject || op instanceof DoubleObject) {
             LispObject result = evaluateDouble(car, op);
+
+            if (result.error()) {
+                return result;
+            }
 
             return evaluate(result, cdr.cdr());
         } else {
             LispObject result = evaluateInt(car, op);
+
+            if (result.error()) {
+                return result;
+            }
 
             return evaluate(result, cdr.cdr());
         }
@@ -58,6 +74,9 @@ public class ArithmeticOperator implements Function {
             case TIMES:
                 return new DoubleObject(aval * bval);
             case DIV:
+                if (bval == 0) {
+                    return new ErrorObject("Division by zero.");
+                }
                 return new DoubleObject(aval / bval);
             case MOD:
                 return new DoubleObject(aval % bval);
@@ -78,6 +97,10 @@ public class ArithmeticOperator implements Function {
             case TIMES:
                 return new IntObject(aval * bval);
             case DIV:
+                if (bval == 0) {
+                    return new ErrorObject("Division by zero.");
+                }
+
                 return new IntObject(aval / bval);
             case MOD:
                 return new IntObject(aval % bval);

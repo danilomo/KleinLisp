@@ -13,14 +13,14 @@ import net.sourceforge.kleinlisp.LispVisitor;
  *
  * @author danilo
  */
-public class BooleanObject implements LispObject {
+public final class BooleanObject implements LispObject {
 
     private boolean value;
 
     public BooleanObject(boolean value) {
         this.value = value;
-    }        
-    
+    }
+
     @Override
     public Object asObject() {
         return new Boolean(value);
@@ -49,7 +49,7 @@ public class BooleanObject implements LispObject {
     @Override
     public Optional<AtomObject> asAtom() {
         return Optional.empty();
-    }        
+    }
 
     @Override
     public LispObject evaluate() {
@@ -59,20 +59,25 @@ public class BooleanObject implements LispObject {
     @Override
     public boolean truthness() {
         return value;
-    } 
+    }
 
     @Override
     public String toString() {
         return "" + value;
     }
-   
+
     @Override
     public Optional<FunctionObject> asFunction() {
         return Optional.empty();
-    }  
-    
+    }
+
     @Override
     public <T> T accept(LispVisitor<T> visitor) {
         return visitor.visit(this);
-    }    
+    }
+
+    @Override
+    public boolean error() {
+        return false;
+    }
 }

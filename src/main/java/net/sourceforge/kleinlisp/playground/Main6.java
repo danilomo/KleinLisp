@@ -23,19 +23,21 @@ public class Main6 {
 
         FunctionObject counter = lisp.evaluate(code).asFunction().get();
 
-        FunctionObject myCounter = call(counter, 0).asFunction().get();
+        FunctionObject myCounter = counter.call(1).asFunction().get();
 
-        System.out.println(call(myCounter));
-        System.out.println(call(myCounter));
-        System.out.println(call(myCounter));
-        System.out.println(call(myCounter));
+        System.out.println(myCounter.call());
+        System.out.println(myCounter.call());
+        System.out.println(myCounter.call());
+        System.out.println(myCounter.call());
+        System.out.println(myCounter.call());
 
-        FunctionObject myCounter2 = call(counter, 1000).asFunction().get();
+        FunctionObject myCounter2 = counter.call(5000).asFunction().get();
 
-        System.out.println(call(myCounter2));
-        System.out.println(call(myCounter2));
-        System.out.println(call(myCounter2));
-        System.out.println(call(myCounter2));
+        System.out.println(myCounter2.call());
+        System.out.println(myCounter2.call());
+        System.out.println(myCounter2.call());
+        System.out.println(myCounter2.call());
+        System.out.println(myCounter2.call());
 
     }
 

@@ -85,6 +85,32 @@ public interface LispObject {
      * @return see description
      */
     public <T> Optional<T> asObject(Class<T> clazz);
+    
+
+    public default <T> Optional<T> as(Class<T> clazz) {
+        if(clazz.equals(this.getClass())){
+            return Optional.of((T) this);
+        }
+        
+        if(clazz.equals(Integer.class)){
+            return (Optional<T>) this.asInt();
+        }
+        
+        if(clazz.equals(Double.class)){
+            return (Optional<T>) this.asDouble();
+        }
+        
+        if(clazz.equals(String.class)){            
+            return (Optional<T>) Optional.of(this.toString());
+        }        
+
+        if(clazz.equals(Function.class)){
+            Optional<Function> func = this.asFunction().flatMap( f -> Optional.of(f.function()) );
+            return (Optional<T>) func;
+        }
+        
+        return Optional.empty();
+    }
 
     /**
      * Evaluates the form.
@@ -99,4 +125,6 @@ public interface LispObject {
     public LispObject evaluate();
 
     public <T> T accept(LispVisitor<T> visitor);
+    
+    public boolean error();
 }

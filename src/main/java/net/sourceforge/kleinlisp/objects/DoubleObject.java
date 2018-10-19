@@ -79,14 +79,19 @@ public final class DoubleObject implements NumericObject {
     public Optional<FunctionObject> asFunction() {
         return Optional.empty();
     }
-    
+
     @Override
     public Optional<AtomObject> asAtom() {
         return Optional.empty();
-    }  
-    
+    }
+
     @Override
     public <T> T accept(LispVisitor<T> visitor) {
         return visitor.visit(this);
-    }    
+    }
+
+    @Override
+    public boolean error() {
+        return false;
+    }
 }

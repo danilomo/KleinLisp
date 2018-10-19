@@ -27,12 +27,12 @@ public class LispEnvironment implements Environment {
     private final Map<String, BindingList> objects = new HashMap<>();
 
     public LispEnvironment() {
-        initFunctionTable();
+        initFunctionTable();        
     }
 
     @Override
     public String toString() {
-        return objects.toString(); //To change body of generated methods, choose Tools | Templates.
+        return objects.toString(); 
     }
     
     
@@ -86,6 +86,9 @@ public class LispEnvironment implements Environment {
         registerFunction("length", ListFunctions::length);
         registerFunction("car", ListFunctions::car);
         registerFunction("cdr", ListFunctions::cdr);
+        registerFunction("map", ListFunctions::map);
+        registerFunction("filter", ListFunctions::filter);
+        registerFunction("takewhile", ListFunctions::takewhile);
         
         registerFunction("log", (parameters) -> {
             System.out.println("LOG::" + parameters);

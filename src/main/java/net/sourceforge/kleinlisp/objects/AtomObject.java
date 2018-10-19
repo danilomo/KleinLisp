@@ -95,5 +95,12 @@ public final class AtomObject implements LispObject {
     @Override
     public <T> T accept(LispVisitor<T> visitor) {
         return visitor.visit(this);
+    }  
+
+    @Override
+    public boolean error() {
+        return false;
     }
+
+    
 }

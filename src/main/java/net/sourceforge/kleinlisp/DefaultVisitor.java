@@ -8,6 +8,7 @@ package net.sourceforge.kleinlisp;
 import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.BooleanObject;
 import net.sourceforge.kleinlisp.objects.DoubleObject;
+import net.sourceforge.kleinlisp.objects.ErrorObject;
 import net.sourceforge.kleinlisp.objects.FunctionObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
 import net.sourceforge.kleinlisp.objects.JavaObject;
@@ -68,5 +69,11 @@ public class DefaultVisitor implements LispVisitor<LispObject>{
     public LispObject visit(FunctionObject obj) {
         return obj;
     }
+
+    @Override
+    public LispObject visit(ErrorObject obj) {
+        return obj;
+    }
+        
     
 }

@@ -3,8 +3,8 @@ package net.sourceforge.kleinlisp.parser;
 import net.sourceforge.kleinlisp.Parser;
 import java.io.ByteArrayInputStream;
 import net.sourceforge.kleinlisp.Environment;
-import net.sourceforge.kleinlisp.objects.ListObject;
 import net.sourceforge.kleinlisp.LispObject;
+import net.sourceforge.kleinlisp.objects.ErrorObject;
 
 /**
  *
@@ -21,7 +21,7 @@ public class CUPParser implements Parser{
 
             return (LispObject) p.parse().value;
         } catch (Exception ex) {
-            return ListObject.NIL;
+            return new ErrorObject(ex);
         }
     }
 

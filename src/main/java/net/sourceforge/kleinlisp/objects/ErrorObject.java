@@ -13,66 +13,41 @@ import net.sourceforge.kleinlisp.LispVisitor;
  *
  * @author daolivei
  */
-public final class IntObject implements NumericObject {
+public final class ErrorObject implements LispObject {
 
-    private final int value;
+    private final Exception error;
 
-    public IntObject(int value) {
-        this.value = value;
+    public ErrorObject(String message) {
+        this.error = new Exception(message);
     }
 
-    public int value() {
-        return value;
-    }
-
-    @Override
-    public int toInt() {
-        return value;
-    }
-
-    @Override
-    public double toDouble() {
-        return value;
-    }
-
-    @Override
-    public String toString() {
-        return Integer.toString(value);
+    public ErrorObject( Exception error) {
+        this.error = error;
     }
 
     @Override
     public Object asObject() {
-        return new Integer(value);
+        return error;
     }
 
     @Override
-    public LispObject evaluate() {
-        return this;
+    public boolean truthness() {
+        throw new RuntimeException("Cannot evaluate error as boolean");
     }
 
     @Override
     public Optional<Integer> asInt() {
-        return Optional.of(value);
+        return Optional.empty();
     }
 
     @Override
     public Optional<Double> asDouble() {
-        return Optional.of((double) value);
+        return Optional.empty();
     }
 
     @Override
     public Optional<ListObject> asList() {
         return Optional.empty();
-    }
-
-    @Override
-    public <T> Optional<T> asObject(Class<T> clazz) {
-        return Optional.empty();
-    }
-
-    @Override
-    public boolean truthness() {
-        return !(value == 0);
     }
 
     @Override
@@ -86,12 +61,31 @@ public final class IntObject implements NumericObject {
     }
 
     @Override
+    public <T> Optional<T> asObject(Class<T> clazz) {
+        return Optional.empty();
+    }
+
+    @Override
+    public LispObject evaluate() {
+        return this;
+    }
+
+    @Override
     public <T> T accept(LispVisitor<T> visitor) {
         return visitor.visit(this);
+    }  
+
+    @Override
+    public String toString() {
+        return "LispError: " + error.getMessage();
     }
 
     @Override
     public boolean error() {
-        return false;
+        return true;
     }
+    
+    
+    
+    
 }

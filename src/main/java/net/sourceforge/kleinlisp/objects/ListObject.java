@@ -8,6 +8,10 @@ import java.util.stream.Collectors;
 import net.sourceforge.kleinlisp.Function;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.LispVisitor;
+import net.sourceforge.kleinlisp.functional.Tuple2;
+import net.sourceforge.kleinlisp.functional.Tuple3;
+import net.sourceforge.kleinlisp.functional.Tuple4;
+import net.sourceforge.kleinlisp.functional.Tuple5;
 import net.sourceforge.kleinlisp.specialforms.SpecialForm;
 
 /**
@@ -36,6 +40,12 @@ public class ListObject implements LispObject, Iterable<LispObject> {
             this.length = 2;
         }
 
+    }
+
+    public ListObject(LispObject head) {
+        this.head = head;
+        this.tail = ListObject.NIL;
+        this.length = 1;
     }
 
     public LispObject head() {
@@ -168,14 +178,6 @@ public class ListObject implements LispObject, Iterable<LispObject> {
         ListObject parameters = cdr().evaluateContents();
         FunctionObject obj = car().evaluate().asFunction().get();
         return obj.function().evaluate(parameters);
-
-//        try {
-//            return environment.lookup(fname).evaluate(parameters);
-//        } catch (Exception e) {
-//            System.out.println(fname);
-//            System.out.println(parameters);
-//            throw e;
-//        }
     }
 
     @Override
@@ -212,9 +214,93 @@ public class ListObject implements LispObject, Iterable<LispObject> {
     public Optional<AtomObject> asAtom() {
         return Optional.empty();
     }
-    
+
     @Override
     public <T> T accept(LispVisitor<T> visitor) {
         return visitor.visit(this);
-    }    
+    }
+
+    @Override
+    public boolean error() {
+        return false;
+    }
+
+    public <K, V> Optional<Tuple2<K, V>> unpack(Class<K> c1, Class<V> c2) {
+        if (this.length() < 2) {
+            return Optional.empty();
+        }
+
+        Optional<K> first = this.car().as(c1);
+        Optional<V> second = this.cdr().car().as(c2);
+
+        if (first.isPresent() && second.isPresent()) {
+            return Optional.of(new Tuple2(first.get(), second.get()));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public <K, V, T> Optional<Tuple3<K, V, T>> unpack(Class<K> c1, Class<V> c2, Class<T> c3) {
+
+        if (this.length() < 3) {
+            return Optional.empty();
+        }
+
+        Optional<K> first = this.car().as(c1);
+        Optional<V> second = this.cdr().car().as(c2);
+        Optional<T> third = this.cdr().cdr().car().as(c3);
+        
+        System.out.println(first);
+        System.out.println(second);
+        System.out.println(third);
+
+        if (first.isPresent() && second.isPresent() && third.isPresent()) {
+            return Optional.of(new Tuple3(first.get(), second.get(), third.get()));
+        } else {
+            return Optional.empty();
+        }
+    }
+    
+    public <K, V, T, X> Optional<Tuple4<K, V, T, X>> unpack(Class<K> c1, Class<V> c2,
+            Class<T> c3, Class<X> c4) {
+
+        if (this.length() < 4) {
+            return Optional.empty();
+        }
+
+        Optional<K> first = this.car().as(c1);
+        Optional<V> second = this.cdr().car().as(c2);
+        Optional<T> third = this.cdr().cdr().car().as(c3);
+        Optional<X> fourth = this.cdr().cdr().cdr().car().as(c4);
+
+        if (first.isPresent() && second.isPresent() 
+                && third.isPresent() && fourth.isPresent()) {
+            return Optional.of(new Tuple4(first.get(), second.get(), third.get(), fourth.get()));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public <K, V, T, X, Z> Optional<Tuple5<K, V, T, X, Z>> unpack(Class<K> c1, Class<V> c2,
+            Class<T> c3, Class<X> c4, Class<Z> c5) {
+
+        if (this.length() < 5) {
+            return Optional.empty();
+        }
+
+        Optional<K> first = this.car().as(c1);
+        Optional<V> second = this.cdr().car().as(c2);
+        Optional<T> third = this.cdr().cdr().car().as(c3);
+        Optional<X> fourth = this.cdr().cdr().cdr().car().as(c4);
+        Optional<Z> fifth = this.cdr().cdr().cdr().cdr().car().as(c5);
+
+        if (first.isPresent() && second.isPresent() 
+                && third.isPresent() && fourth.isPresent()
+                && fifth.isPresent()) {
+            return Optional.of(new Tuple5(first.get(), 
+                    second.get(), third.get(), fourth.get(), fifth.get()));
+        } else {
+            return Optional.empty();
+        }
+    }     
 }

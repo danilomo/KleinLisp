@@ -8,6 +8,7 @@ package net.sourceforge.kleinlisp;
 import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.BooleanObject;
 import net.sourceforge.kleinlisp.objects.DoubleObject;
+import net.sourceforge.kleinlisp.objects.ErrorObject;
 import net.sourceforge.kleinlisp.objects.FunctionObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
 import net.sourceforge.kleinlisp.objects.JavaObject;
@@ -28,6 +29,7 @@ public interface LispVisitor<T> {
     public T visit(ListObject obj);
     public T visit(StringObject obj);
     public T visit(FunctionObject obj);
+    public T visit(ErrorObject obj);
     
     public static class Void{}
     public static Void NONE = new Void();

@@ -1,10 +1,20 @@
+
 \documentclass{article}
-\title{The Comprehensive LaTeX Symbol List}
+\title{KleinLisp Manual}
 \usepackage{pdfpages}
 \begin{document}
 
+\maketitle
+\tableofcontents
+
 \section{Introduction}
 
-This is an introduction.
+KleinLisp is a partial implementation of the Scheme programming language in Java. It is an purely interpreted language (no bytecode generation), therefore, performance isn't intended to be fantastic. It is intended to be a small dependency (jar size $<$ 1mb) without transient dependencies.
+
+KleinLisp targets being a scripting engine for host Java/Scala applications. It employs Java 1.8 capabilities (lambdas and optionals) to make  Scheme's dynamically typed objects safer to be used inside a statically typed Java/Scala application. We also plan to write a set of Scala wrappers (and implicits) for making usage from Scala even more convenient. If you are looking for a production-ready Lisp dialect for the JVM platform, you may take a look at Clojure, Armed Bear Common Lisp, or Kawa Scheme.
+
+\subsection{What about Android?}
+
+It would be nice to have such small scripting engine for Android applications. Unfortunately, KleinLisp heavily adopts Java 1.8 features, so, I'm not sure if it is going to work within Android.
 
 \end{document}
