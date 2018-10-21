@@ -34,7 +34,7 @@ public class LambdaForm implements Function {
     @Override
     public LispObject evaluate(ListObject parameters) {
         ListObject paramList = parameters.car().asList().get();
-        ListObject body = parameters.cdr().car().asList().get();
+        ListObject body = parameters.cdr().asList().get();
 
         List<AtomObject> parameterList = new ArrayList<>();
 
@@ -94,6 +94,7 @@ public class LambdaForm implements Function {
             symbols.remove("lambda");
             symbols.remove("set!");
             symbols.remove("begin");
+            symbols.remove("cond");
             return symbols;
         }
 

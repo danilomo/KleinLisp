@@ -18,10 +18,10 @@ import net.sourceforge.kleinlisp.objects.ListObject;
  */
 public class LambdaFunction implements Function{
     private final List<AtomObject> parameterList;
-    private final LispObject body;
+    private final ListObject body;
     private final Environment env;
 
-    public LambdaFunction(List<AtomObject> parameterList, LispObject body, Environment env) {
+    public LambdaFunction(List<AtomObject> parameterList, ListObject body, Environment env) {
         this.parameterList = parameterList;
         this.body = body;
         this.env = env;
@@ -31,7 +31,11 @@ public class LambdaFunction implements Function{
     public LispObject evaluate(ListObject parameters) {
         setParameters(parameters);
         
-        LispObject result = body.evaluate();
+        LispObject result = ListObject.NIL;
+        
+        for(LispObject obj: body){
+            result = obj.evaluate();
+        }
         
         unsetParameters(parameters);
         

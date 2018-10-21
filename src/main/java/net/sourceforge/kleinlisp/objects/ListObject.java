@@ -134,6 +134,11 @@ public class ListObject implements LispObject, Iterable<LispObject> {
     }
 
     private ListObject evaluateContents() {
+        
+        if(this == NIL){
+            return this;
+        }
+        
         if (cdr() != NIL) {
             return new ListObject(car().evaluate(), cdr().evaluateContents());
         } else {

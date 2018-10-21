@@ -88,6 +88,11 @@ public interface LispObject {
     
 
     public default <T> Optional<T> as(Class<T> clazz) {
+        
+        if(clazz.equals(LispObject.class)){
+            return Optional.of((T) this); 
+        }
+        
         if(clazz.equals(this.getClass())){
             return Optional.of((T) this);
         }

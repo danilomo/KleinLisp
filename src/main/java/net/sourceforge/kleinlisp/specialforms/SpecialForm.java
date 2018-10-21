@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.sourceforge.kleinlisp.specialforms;
 
 import java.util.Optional;
@@ -21,6 +16,8 @@ public class SpecialForm {
             case "lambda": return Optional.of(new LambdaForm(env));
             case "set!": return Optional.of(new SetForm(env));
             case "begin": return Optional.of(BeginForm.instance());
+            case "define": return Optional.of(new DefineForm(env));
+            case "cond": return Optional.of(CondForm.instance());
         }
         
         return Optional.empty();
