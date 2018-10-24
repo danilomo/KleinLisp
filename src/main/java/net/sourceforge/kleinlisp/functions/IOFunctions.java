@@ -18,7 +18,7 @@ public class IOFunctions {
     public static LispObject print(ListObject parameters){
         
         for(LispObject obj: parameters){
-            System.out.print(obj);
+            System.out.print("---> " + obj);
         }
         
         System.out.println("");

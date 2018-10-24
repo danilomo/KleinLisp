@@ -102,5 +102,56 @@ public final class AtomObject implements LispObject {
         return false;
     }
 
+    @Override
+    public boolean isBoolean() {
+        return false;
+    }
+    
+    @Override
+    public boolean isAtom() {
+        return true;
+    }
+
+    @Override
+    public boolean isString() {
+        return false;
+    }
+
+    @Override
+    public boolean isNumeric() {
+        return false;
+    }
+
+    @Override
+    public boolean isDouble() {
+        return false;
+    }
+
+    @Override
+    public boolean isInt() {
+        return false;
+    }
+
+    @Override
+    public boolean isList() {
+        return false;
+    }
+
+    @Override
+    public boolean isObject() {
+        return false;
+    }
+
+    @Override
+    public boolean isVoid() {
+        return false;
+    }
+
+    @Override
+    public boolean isFunction() {
+        return false;
+    }
+
+    
     
 }

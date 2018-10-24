@@ -104,7 +104,12 @@ public class LispEnvironment implements Environment {
 
     @Override
     public LispObject lookup(String name) {
-        return this.objects.get(name).head().value();
+        try {
+            return this.objects.get(name).head().value();
+        } catch (Exception e) {
+            System.out.println("Failed to look up: " + name);
+            throw e;
+        }
     }
 
     @Override

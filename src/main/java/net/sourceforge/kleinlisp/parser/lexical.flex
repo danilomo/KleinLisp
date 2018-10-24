@@ -16,7 +16,7 @@ digit		= [0-9]
 symbol          = 
                     [+] | [-] | [%] | [/] |
                     [*] | [$] | [_] | [:] | [>] | [<] | [=] |
-                    [!] | [?]
+                    [!] | [\?]
 
 letter		= {lowercase} | {uppercase}
 lowercase	= [a-z]

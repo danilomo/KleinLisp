@@ -14,6 +14,7 @@ import net.sourceforge.kleinlisp.objects.IntObject;
 import net.sourceforge.kleinlisp.objects.JavaObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 import net.sourceforge.kleinlisp.objects.StringObject;
+import net.sourceforge.kleinlisp.objects.VoidObject;
 
 /**
  *
@@ -30,6 +31,7 @@ public interface LispVisitor<T> {
     public T visit(StringObject obj);
     public T visit(FunctionObject obj);
     public T visit(ErrorObject obj);
+    public T visit(VoidObject obj);
     
     public static class Void{}
     public static Void NONE = new Void();

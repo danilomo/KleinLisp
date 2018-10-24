@@ -5,28 +5,21 @@
  */
 package net.sourceforge.kleinlisp.playground;
 
-import java.util.Optional;
 import net.sourceforge.kleinlisp.Lisp;
-import net.sourceforge.kleinlisp.functional.Tuple3;
-import net.sourceforge.kleinlisp.objects.ListObject;
 
 /**
  *
  * @author daolivei
  */
 public class Main7 {
+
     public static void main(String[] args) {
         Lisp lisp = new Lisp();
-        
-        
-        Optional<ListObject> list = lisp.evaluate("[1 2 \"3\"]").asList();
-        
-        Optional<Tuple3<Integer,Integer,String>> tuple = list.flatMap(
-                t -> t.unpack(Integer.class, Integer.class, String.class) 
-        );
-        
-        System.out.println(tuple.get());
-        
-        
+
+        lisp.evaluate("(define else 1)");
+        lisp.evaluate("(define (fib n)(cond((= n 0) 1)((= n 1) 1)(else(+ (fib (- n 1))(fib (- n 2))))))");                
+
+        System.out.println(lisp.evaluate("(fib 34)"));
+
     }
 }

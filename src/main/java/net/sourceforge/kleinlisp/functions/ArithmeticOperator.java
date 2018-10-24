@@ -26,7 +26,7 @@ public class ArithmeticOperator implements Function {
     }
 
     @Override
-    public LispObject evaluate(ListObject parameters) {
+    public LispObject evaluate(ListObject parameters) {       
         return evaluate(parameters.car(), parameters.cdr());
     }
 

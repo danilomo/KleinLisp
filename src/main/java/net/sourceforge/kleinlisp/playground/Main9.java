@@ -9,9 +9,9 @@ import java.io.PrintWriter;
 
 public class Main9 {
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
 
-        try (ConsoleReader reader = new ConsoleReader()) {
+        try (ConsoleReader reader = new ConsoleReader(System.in, System.out)) {
             Lisp lisp = new Lisp();
             reader.setPrompt("prompt> ");
 
@@ -26,7 +26,9 @@ public class Main9 {
                     e.printStackTrace();
                     continue;
                 }
-                System.out.println("==> " + result);
+                if (!result.isVoid()) {
+                    System.out.println("==> " + result);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

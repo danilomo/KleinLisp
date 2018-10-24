@@ -134,11 +134,11 @@ public class ListObject implements LispObject, Iterable<LispObject> {
     }
 
     private ListObject evaluateContents() {
-        
-        if(this == NIL){
+
+        if (this == NIL) {
             return this;
         }
-        
+
         if (cdr() != NIL) {
             return new ListObject(car().evaluate(), cdr().evaluateContents());
         } else {
@@ -254,7 +254,7 @@ public class ListObject implements LispObject, Iterable<LispObject> {
         Optional<K> first = this.car().as(c1);
         Optional<V> second = this.cdr().car().as(c2);
         Optional<T> third = this.cdr().cdr().car().as(c3);
-        
+
         System.out.println(first);
         System.out.println(second);
         System.out.println(third);
@@ -265,7 +265,7 @@ public class ListObject implements LispObject, Iterable<LispObject> {
             return Optional.empty();
         }
     }
-    
+
     public <K, V, T, X> Optional<Tuple4<K, V, T, X>> unpack(Class<K> c1, Class<V> c2,
             Class<T> c3, Class<X> c4) {
 
@@ -278,7 +278,7 @@ public class ListObject implements LispObject, Iterable<LispObject> {
         Optional<T> third = this.cdr().cdr().car().as(c3);
         Optional<X> fourth = this.cdr().cdr().cdr().car().as(c4);
 
-        if (first.isPresent() && second.isPresent() 
+        if (first.isPresent() && second.isPresent()
                 && third.isPresent() && fourth.isPresent()) {
             return Optional.of(new Tuple4(first.get(), second.get(), third.get(), fourth.get()));
         } else {
@@ -299,13 +299,63 @@ public class ListObject implements LispObject, Iterable<LispObject> {
         Optional<X> fourth = this.cdr().cdr().cdr().car().as(c4);
         Optional<Z> fifth = this.cdr().cdr().cdr().cdr().car().as(c5);
 
-        if (first.isPresent() && second.isPresent() 
+        if (first.isPresent() && second.isPresent()
                 && third.isPresent() && fourth.isPresent()
                 && fifth.isPresent()) {
-            return Optional.of(new Tuple5(first.get(), 
+            return Optional.of(new Tuple5(first.get(),
                     second.get(), third.get(), fourth.get(), fifth.get()));
         } else {
             return Optional.empty();
         }
-    }     
+    }
+
+    @Override
+    public boolean isBoolean() {
+        return false;
+    }
+
+    @Override
+    public boolean isAtom() {
+        return false;
+    }
+
+    @Override
+    public boolean isString() {
+        return false;
+    }
+
+    @Override
+    public boolean isNumeric() {
+        return false;
+    }
+
+    @Override
+    public boolean isDouble() {
+        return false;
+    }
+
+    @Override
+    public boolean isInt() {
+        return false;
+    }
+
+    @Override
+    public boolean isList() {
+        return true;
+    }
+
+    @Override
+    public boolean isObject() {
+        return false;
+    }
+
+    @Override
+    public boolean isVoid() {
+        return false;
+    }
+
+    @Override
+    public boolean isFunction() {
+        return false;
+    }
 }

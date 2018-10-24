@@ -27,7 +27,7 @@ public class IfForm implements Function {
         LispObject trueForm = parameters.cdr().car();
         LispObject elseForm = parameters.cdr().cdr().car();
 
-        if (cond.truthness()) {
+        if (cond.evaluate().truthness()) {
             return trueForm.evaluate();
         } else {
             return elseForm.evaluate();

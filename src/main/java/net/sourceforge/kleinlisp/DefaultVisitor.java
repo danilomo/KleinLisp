@@ -14,6 +14,7 @@ import net.sourceforge.kleinlisp.objects.IntObject;
 import net.sourceforge.kleinlisp.objects.JavaObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 import net.sourceforge.kleinlisp.objects.StringObject;
+import net.sourceforge.kleinlisp.objects.VoidObject;
 
 /**
  *
@@ -43,6 +44,11 @@ public class DefaultVisitor implements LispVisitor<LispObject>{
 
     @Override
     public LispObject visit(JavaObject obj) {
+        return obj;
+    }
+
+    @Override
+    public LispObject visit(VoidObject obj) {
         return obj;
     }
 

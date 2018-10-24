@@ -26,10 +26,17 @@ import net.sourceforge.kleinlisp.objects.ListObject;
 public class LambdaForm implements Function {
 
     private final Environment environment;
+    private final String name;
 
     public LambdaForm(Environment environment) {
         this.environment = environment;
+        this.name = "";
     }
+
+    public LambdaForm(Environment environment, String name) {
+        this.environment = environment;
+        this.name = name;
+    }        
 
     @Override
     public LispObject evaluate(ListObject parameters) {
@@ -56,6 +63,11 @@ public class LambdaForm implements Function {
 
         Set<String> defined = new DefinedSymbolCollector().symbols(body);
         Set<String> used = new UsedSymbolCollector().symbols(body);
+        
+        if(! name.isEmpty() ){
+            defined.add(name);
+            used.remove(name);
+        }
 
         paramList.forEach((ao) -> {
             defined.add(ao.toString());
@@ -95,6 +107,7 @@ public class LambdaForm implements Function {
             symbols.remove("set!");
             symbols.remove("begin");
             symbols.remove("cond");
+            symbols.remove("if");            
             return symbols;
         }
 

@@ -1,9 +1,14 @@
 package net.sourceforge.kleinlisp.specialforms;
 
+import java.util.Optional;
 import net.sourceforge.kleinlisp.Environment;
 import net.sourceforge.kleinlisp.Function;
 import net.sourceforge.kleinlisp.LispObject;
+import net.sourceforge.kleinlisp.functional.Tuple2;
+import net.sourceforge.kleinlisp.objects.AtomObject;
+import net.sourceforge.kleinlisp.objects.ErrorObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
+import net.sourceforge.kleinlisp.objects.VoidObject;
 
 public class DefineForm implements Function {
 
@@ -15,11 +20,49 @@ public class DefineForm implements Function {
 
     @Override
     public LispObject evaluate(ListObject parameters) {
-        String symbol = parameters.car().asAtom().get().toString();
-        LispObject obj = parameters.cdr().car().evaluate();
+//        String symbol = parameters.car().asAtom().get().toString();
+//        LispObject obj = parameters.cdr().car().evaluate();
+//
+//        this.environment.define(symbol, obj);
+//
+//        return ListObject.NIL;
 
-        this.environment.define(symbol, obj);
+        Optional<Tuple2<AtomObject, LispObject>> tuple1 = parameters.unpack(AtomObject.class, LispObject.class);
 
-        return ListObject.NIL;
+        if (tuple1.isPresent()) {
+            defineSymbol(tuple1.get().first(), tuple1.get().second());
+        } else {
+            if (parameters.car().isList()) {
+                return defineFunction(parameters.car().asList().get(), parameters.cdr());
+            }
+        }
+
+        return VoidObject.VOID;
+    }
+
+    private void defineSymbol(AtomObject first, LispObject second) {
+        String s = first.toString();
+        LispObject obj = second.evaluate();
+
+        this.environment.define(s, obj);
+    }
+
+    private LispObject defineFunction(ListObject first, ListObject body) {
+        Optional<AtomObject> symbol = first.car().as(AtomObject.class);
+
+        if (symbol.isPresent()) {
+            String s = symbol.get().toString();
+
+            LambdaForm form = new LambdaForm(this.environment, s);
+            ListObject parameterList = first.cdr();
+            ListObject paramLambda = new ListObject(parameterList, body);
+
+            LispObject obj = form.evaluate(paramLambda);
+            this.environment.define(s, obj);
+
+            return VoidObject.VOID;
+        } else {
+            return new ErrorObject("Invalid parameter list");
+        }
     }
 }

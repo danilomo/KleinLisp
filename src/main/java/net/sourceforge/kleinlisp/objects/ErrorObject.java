@@ -21,7 +21,7 @@ public final class ErrorObject implements LispObject {
         this.error = new Exception(message);
     }
 
-    public ErrorObject( Exception error) {
+    public ErrorObject(Exception error) {
         this.error = error;
     }
 
@@ -73,7 +73,7 @@ public final class ErrorObject implements LispObject {
     @Override
     public <T> T accept(LispVisitor<T> visitor) {
         return visitor.visit(this);
-    }  
+    }
 
     @Override
     public String toString() {
@@ -84,8 +84,54 @@ public final class ErrorObject implements LispObject {
     public boolean error() {
         return true;
     }
-    
-    
-    
-    
+
+    @Override
+    public boolean isBoolean() {
+        return false;
+    }
+
+    @Override
+    public boolean isAtom() {
+        return false;
+    }
+
+    @Override
+    public boolean isString() {
+        return false;
+    }
+
+    @Override
+    public boolean isNumeric() {
+        return false;
+    }
+
+    @Override
+    public boolean isDouble() {
+        return false;
+    }
+
+    @Override
+    public boolean isInt() {
+        return false;
+    }
+
+    @Override
+    public boolean isList() {
+        return false;
+    }
+
+    @Override
+    public boolean isObject() {
+        return false;
+    }
+
+    @Override
+    public boolean isVoid() {
+        return false;
+    }
+
+    @Override
+    public boolean isFunction() {
+        return false;
+    }
 }

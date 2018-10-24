@@ -13,66 +13,33 @@ import net.sourceforge.kleinlisp.LispVisitor;
  *
  * @author daolivei
  */
-public final class DoubleObject implements NumericObject {
+public class VoidObject implements LispObject {
 
-    private final double value;
-
-    public DoubleObject(double value) {
-        this.value = value;
-    }
-
-    public double value() {
-        return value;
-    }
-
-    @Override
-    public int toInt() {
-        return (int) value;
-    }
-
-    @Override
-    public double toDouble() {
-        return value;
-    }
-
-    @Override
-    public String toString() {
-        return Double.toString(value);
-    }
-
+    public static final VoidObject VOID = new VoidObject();
+    
     @Override
     public Object asObject() {
-        return value;
-    }
-
-    @Override
-    public LispObject evaluate() {
         return this;
     }
 
     @Override
+    public boolean truthness() {
+        return false;
+    }
+
+    @Override
     public Optional<Integer> asInt() {
-        return Optional.of((int) value);
+        return Optional.empty();
     }
 
     @Override
     public Optional<Double> asDouble() {
-        return Optional.of(value);
+        return Optional.empty();
     }
 
     @Override
     public Optional<ListObject> asList() {
         return Optional.empty();
-    }
-
-    @Override
-    public <T> Optional<T> asObject(Class<T> clazz) {
-        return Optional.empty();
-    }
-
-    @Override
-    public boolean truthness() {
-        return true;
     }
 
     @Override
@@ -82,12 +49,22 @@ public final class DoubleObject implements NumericObject {
 
     @Override
     public Optional<AtomObject> asAtom() {
+     return Optional.empty();
+    }
+
+    @Override
+    public <T> Optional<T> asObject(Class<T> clazz) {
         return Optional.empty();
     }
 
     @Override
+    public LispObject evaluate() {
+       return this;
+    }
+
+    @Override
     public <T> T accept(LispVisitor<T> visitor) {
-        return visitor.visit(this);
+       return visitor.visit(this);
     }
 
     @Override
@@ -97,51 +74,52 @@ public final class DoubleObject implements NumericObject {
 
     @Override
     public boolean isBoolean() {
-        return false;
+       return false;
     }
 
     @Override
     public boolean isAtom() {
-        return false;
+       return false;
     }
 
     @Override
     public boolean isString() {
-        return false;
+       return false;
     }
 
     @Override
     public boolean isNumeric() {
-        return true;
+       return false;
     }
 
     @Override
     public boolean isDouble() {
-        return true;
+       return false;
     }
 
     @Override
     public boolean isInt() {
-        return false;
+       return false;
     }
 
     @Override
     public boolean isList() {
-        return false;
+       return false;
     }
 
     @Override
     public boolean isObject() {
-        return false;
+       return false;
     }
 
     @Override
     public boolean isVoid() {
-        return false;
+       return true;
     }
-    
+
     @Override
     public boolean isFunction() {
-        return false;
-    }    
+       return false;
+    }
+    
 }
