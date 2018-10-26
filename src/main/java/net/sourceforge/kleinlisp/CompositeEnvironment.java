@@ -20,11 +20,11 @@ public class CompositeEnvironment implements Environment {
     }
 
     @Override
-    public LispObject lookup(String name) {
+    public LispObject lookupValue(String name) {
         if (first.exists(name)) {
-            return first.lookup(name);
+            return first.lookupValue(name);
         } else {
-            return second.lookup(name);
+            return second.lookupValue(name);
         }
     }
 
@@ -54,6 +54,15 @@ public class CompositeEnvironment implements Environment {
     @Override
     public boolean exists(String name) {
         return first.exists(name) || second.exists(name);
+    }
+    
+        @Override
+    public Binding lookup(String name) {
+        if (first.exists(name)) {
+            return first.lookup(name);
+        } else {
+            return second.lookup(name);
+        }
     }
 
 }

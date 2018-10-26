@@ -10,9 +10,11 @@ package net.sourceforge.kleinlisp;
  * @author daolivei
  */
 public interface Environment {
-    public LispObject lookup(String name);
+    public LispObject lookupValue(String name);
     public void set(String name, LispObject obj);
     public void define(String name, LispObject obj);
     public void undefine(String name);
     public boolean exists(String name);
+    
+    public Binding lookup(String name);
 }

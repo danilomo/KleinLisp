@@ -84,7 +84,7 @@ public class LambdaForm implements Function {
         Environment newEnv = new LispEnvironment();
         
         for(String symbol: diff){
-            LispObject obj = env.lookup(symbol);
+            LispObject obj = env.lookupValue(symbol);
             newEnv.define(symbol, obj);
         }
 

@@ -94,7 +94,7 @@ public class LispEnv implements Environment {
     }
 
     @Override
-    public LispObject lookup(String name) {
+    public LispObject lookupValue(String name) {
         return objects.get(name);
     }
 
@@ -116,25 +116,7 @@ public class LispEnv implements Environment {
     @Override
     public boolean exists(String name) {
         return objects.containsKey(name);
-    }
-    
-        
-    
-    private static class Binding{
-        private LispObject value;
-
-        public Binding(LispObject value) {
-            this.value = value;
-        }
-
-        public LispObject value() {
-            return value;
-        }
-
-        public void set(LispObject value) {
-            this.value = value;
-        }  
-    }
+    }            
     
     private static class BindingList{
         private final LispObject head;
@@ -167,4 +149,11 @@ public class LispEnv implements Environment {
         
         
     }
+
+    @Override
+    public Binding lookup(String name) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    
 }

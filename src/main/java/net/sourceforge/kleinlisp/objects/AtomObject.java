@@ -79,7 +79,7 @@ public final class AtomObject implements LispObject {
     @Override
     public LispObject evaluate() {
         try {
-            return env.lookup(value);
+            return env.lookupValue(value);
         } catch (Exception e) {
             System.out.println(">>> " + value);
             e.printStackTrace();

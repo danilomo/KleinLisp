@@ -22,20 +22,18 @@ import net.sourceforge.kleinlisp.objects.FunctionObject;
  *
  * @author daolivei
  */
-public class LispEnvironment implements Environment {    
+public class LispEnvironment implements Environment {
 
     private final Map<String, BindingList> objects = new HashMap<>();
 
     public LispEnvironment() {
-        initFunctionTable();        
+        initFunctionTable();
     }
 
     @Override
     public String toString() {
-        return objects.toString(); 
+        return objects.toString();
     }
-    
-    
 
     public void addClass(Class clazz) {
         Function f = (p) -> {
@@ -89,13 +87,13 @@ public class LispEnvironment implements Environment {
         registerFunction("map", ListFunctions::map);
         registerFunction("filter", ListFunctions::filter);
         registerFunction("takewhile", ListFunctions::takewhile);
-        
+
         registerFunction("log", (parameters) -> {
             System.out.println("LOG::" + parameters);
             return parameters;
         });
-        
-        registerFunction("print", IOFunctions::print );
+
+        registerFunction("print", IOFunctions::print);
     }
 
     private void registerFunction(String name, Function func) {
@@ -103,7 +101,7 @@ public class LispEnvironment implements Environment {
     }
 
     @Override
-    public LispObject lookup(String name) {
+    public LispObject lookupValue(String name) {
         try {
             return this.objects.get(name).head().value();
         } catch (Exception e) {
@@ -113,7 +111,7 @@ public class LispEnvironment implements Environment {
     }
 
     @Override
-    public void set(String name, LispObject obj) {        
+    public void set(String name, LispObject obj) {
         this.objects.get(name).head().set(obj);
     }
 
@@ -133,33 +131,9 @@ public class LispEnvironment implements Environment {
     public boolean exists(String name) {
         return objects.containsKey(name);
     }
-    
-    
-    
-    private static class Binding{
-        private LispObject value;
 
-        public Binding(LispObject value) {
-            this.value = value;
-        }
+    private static class BindingList {
 
-        public LispObject value() {
-            return value;
-        }
-
-        public void set(LispObject value) {
-            this.value = value;
-        }  
-
-        @Override
-        public String toString() {
-            return value.toString();
-        }
-        
-        
-    }
-    
-    private static class BindingList{
         private final Binding head;
         private final BindingList tail;
 
@@ -180,14 +154,24 @@ public class LispEnvironment implements Environment {
         public String toString() {
             BindingList bl = this;
             StringBuilder builder = new StringBuilder().append("[");
-            while(bl != null){
+            while (bl != null) {
                 builder.append(bl.head).append(", ");
                 bl = bl.tail;
             }
             builder.append("]");
             return builder.toString();
         }
-        
-        
+
     }
+
+    @Override
+    public Binding lookup(String name) {
+        try {
+            return this.objects.get(name).head();
+        } catch (Exception e) {
+            System.out.println("Failed to look up: " + name);
+            throw e;
+        }
+    }
+
 }
