@@ -15,7 +15,7 @@ import net.sourceforge.kleinlisp.LispVisitor;
  */
 public final class IntObject implements NumericObject {
 
-    private final int value;
+    public final int value;
 
     public IntObject(int value) {
         this.value = value;

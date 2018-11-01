@@ -43,10 +43,10 @@ public class LambdaForm implements Function {
         ListObject paramList = parameters.car().asList().get();
         ListObject body = parameters.cdr().asList().get();
 
-        List<AtomObject> parameterList = new ArrayList<>();
+        List<String> parameterList = new ArrayList<>();
 
         for (LispObject obj : paramList) {
-            parameterList.add(obj.asAtom().get());
+            parameterList.add(obj.asAtom().get().toString());
         }
 
         Environment closuredEnv = createClosure(parameterList, body, environment);
@@ -58,7 +58,7 @@ public class LambdaForm implements Function {
         return new FunctionObject(new LambdaFunction(parameterList, body, environment));
     }
 
-    private Environment createClosure(List<AtomObject> paramList
+    private Environment createClosure(List<String> paramList
             , ListObject body, Environment env) {
 
         Set<String> defined = new DefinedSymbolCollector().symbols(body);

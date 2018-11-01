@@ -14,6 +14,9 @@ import net.sourceforge.kleinlisp.LispVisitor;
  * @author danilo
  */
 public final class BooleanObject implements LispObject {
+    
+    public static final BooleanObject TRUE  = new BooleanObject(true);
+    public static final BooleanObject FALSE = new BooleanObject(true);
 
     private boolean value;
 

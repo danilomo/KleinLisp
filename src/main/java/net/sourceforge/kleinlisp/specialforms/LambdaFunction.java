@@ -5,13 +5,10 @@
  */
 package net.sourceforge.kleinlisp.specialforms;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import net.sourceforge.kleinlisp.Environment;
 import net.sourceforge.kleinlisp.Function;
 import net.sourceforge.kleinlisp.LispObject;
-import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 
 /**
@@ -20,18 +17,12 @@ import net.sourceforge.kleinlisp.objects.ListObject;
  */
 public class LambdaFunction implements Function {
 
-    private final List<AtomObject> parameterList;
+    private final List<String> parameterList;
     private final ListObject body;
     private final Environment env;
 
-    public LambdaFunction(List<AtomObject> parameterList, ListObject body, Environment env) {
+    public LambdaFunction(List<String> parameterList, ListObject body, Environment env) {
         this.parameterList = parameterList;
-        this.body = body;
-        this.env = env;
-    }
-
-    public LambdaFunction(ArrayList<String> pl, ListObject body, Environment env) {
-        this.parameterList = pl.stream().map(s -> new AtomObject(s)).collect(Collectors.toList());
         this.body = body;
         this.env = env;
     }
@@ -46,7 +37,7 @@ public class LambdaFunction implements Function {
             result = obj.evaluate();
         }
 
-        unsetParameters(parameters);
+        unsetParameters();
 
         return result;
     }
@@ -54,15 +45,15 @@ public class LambdaFunction implements Function {
     private void setParameters(ListObject parameters) {
         ListObject iter = parameters;
 
-        for (AtomObject atom : parameterList) {
-            env.define(atom.toString(), iter.car());
+        for (String par : parameterList) {
+            env.define(par, iter.car());
             iter = iter.cdr();
         }
     }
 
-    private void unsetParameters(ListObject parameters) {
-        for (AtomObject atom : parameterList) {
-            env.undefine(atom.toString());
+    private void unsetParameters() {
+        for (String par : parameterList) {
+            env.undefine(par);
         }
     }
 }

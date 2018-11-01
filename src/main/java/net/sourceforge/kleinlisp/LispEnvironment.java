@@ -6,7 +6,7 @@ import net.sourceforge.kleinlisp.objects.ListObject;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -16,6 +16,7 @@ import net.sourceforge.kleinlisp.functions.ArithmeticOperator.Operator;
 import net.sourceforge.kleinlisp.functions.ComparisonOperator;
 import net.sourceforge.kleinlisp.functions.IOFunctions;
 import net.sourceforge.kleinlisp.functions.ListFunctions;
+import net.sourceforge.kleinlisp.functions.MiscFunctions;
 import net.sourceforge.kleinlisp.objects.FunctionObject;
 
 /**
@@ -24,7 +25,7 @@ import net.sourceforge.kleinlisp.objects.FunctionObject;
  */
 public class LispEnvironment implements Environment {
 
-    private final Map<String, BindingList> objects = new HashMap<>();
+    private final Map<String, BindingList> objects = new  LinkedHashMap<>();
 
     public LispEnvironment() {
         initFunctionTable();
@@ -65,8 +66,12 @@ public class LispEnvironment implements Environment {
     }
 
     private void initFunctionTable() {
-        registerFunction("+", new ArithmeticOperator(Operator.PLUS));
-        registerFunction("-", new ArithmeticOperator(Operator.MINUS));
+//        registerFunction("+", new ArithmeticOperator(Operator.PLUS));
+//        registerFunction("-", new ArithmeticOperator(Operator.MINUS));
+
+        registerFunction("+", MiscFunctions::sum);
+        registerFunction("-", MiscFunctions::minus);
+
         registerFunction("*", new ArithmeticOperator(Operator.TIMES));
         registerFunction("/", new ArithmeticOperator(Operator.DIV));
         registerFunction("%", new ArithmeticOperator(Operator.MOD));
