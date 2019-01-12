@@ -47,6 +47,13 @@ public final class AtomObject implements LispObject {
     }
 
     @Override
+    public Optional<AtomObject> asAtom() {
+        return Optional.of(this);
+    }
+    
+    
+
+    @Override
     public boolean truthness() {
         return true;
     }

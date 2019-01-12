@@ -14,7 +14,7 @@ import net.sourceforge.kleinlisp.objects.IntObject;
  */
 public class Main5 {
     public static void main(String[] args) {
-        String code = "(begin (print 1) (print 2) (print 3) 4 5)";
+        String code = " ";
         Lisp lisp = new Lisp();
         
         System.out.println(lisp.evaluate(code));

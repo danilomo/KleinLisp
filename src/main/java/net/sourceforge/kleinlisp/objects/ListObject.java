@@ -176,6 +176,7 @@ public class ListObject implements LispObject, Iterable<LispObject> {
                     .of(atom.get().toString(), atom.get().environment());
 
             if (specialForm.isPresent()) {
+                System.out.println(">>>> ae caralho");
                 return specialForm.get().evaluate(cdr());
             }
         }

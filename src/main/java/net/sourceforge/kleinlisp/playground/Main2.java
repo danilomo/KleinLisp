@@ -21,11 +21,13 @@ public class Main2 {
     public static void main(String[] args) {
         Lisp runtime = new Lisp();
 
-        String code = "((lambda (x y) (+ x y)) 10 20)";
+        String code = "((lambda (x y) (+ x y)) 10 10)";
+        
+        System.out.println(runtime.evaluate(code));
 
-        LispObject tree = runtime.parse(code);
-
-        System.out.println(tree.accept(new UppercaseVisitor()));
+//        LispObject tree = runtime.parse(code);
+//
+//        System.out.println(tree.accept(new UppercaseVisitor()));
     }
 
 }
