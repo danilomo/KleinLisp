@@ -60,29 +60,10 @@ public final class DoubleObject implements NumericObject {
         return Optional.of(value);
     }
 
-    @Override
-    public Optional<ListObject> asList() {
-        return Optional.empty();
-    }
-
-    @Override
-    public <T> Optional<T> asObject(Class<T> clazz) {
-        return Optional.empty();
-    }
 
     @Override
     public boolean truthness() {
         return true;
-    }
-
-    @Override
-    public Optional<FunctionObject> asFunction() {
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<AtomObject> asAtom() {
-        return Optional.empty();
     }
 
     @Override
@@ -95,53 +76,4 @@ public final class DoubleObject implements NumericObject {
         return false;
     }
 
-    @Override
-    public boolean isBoolean() {
-        return false;
-    }
-
-    @Override
-    public boolean isAtom() {
-        return false;
-    }
-
-    @Override
-    public boolean isString() {
-        return false;
-    }
-
-    @Override
-    public boolean isNumeric() {
-        return true;
-    }
-
-    @Override
-    public boolean isDouble() {
-        return true;
-    }
-
-    @Override
-    public boolean isInt() {
-        return false;
-    }
-
-    @Override
-    public boolean isList() {
-        return false;
-    }
-
-    @Override
-    public boolean isObject() {
-        return false;
-    }
-
-    @Override
-    public boolean isVoid() {
-        return false;
-    }
-    
-    @Override
-    public boolean isFunction() {
-        return false;
-    }    
 }

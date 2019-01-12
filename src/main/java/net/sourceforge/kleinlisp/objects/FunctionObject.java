@@ -47,26 +47,6 @@ public final class FunctionObject implements LispObject {
     }
 
     @Override
-    public Optional<Integer> asInt() {
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<Double> asDouble() {
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<ListObject> asList() {
-        return Optional.empty();
-    }
-
-    @Override
-    public <T> Optional<T> asObject(Class<T> clazz) {
-        return Optional.empty();
-    }
-
-    @Override
     public boolean truthness() {
         return true;
     }
@@ -74,11 +54,6 @@ public final class FunctionObject implements LispObject {
     @Override
     public Optional<FunctionObject> asFunction() {
         return Optional.of(this);
-    }
-
-    @Override
-    public Optional<AtomObject> asAtom() {
-        return Optional.empty();
     }
 
     @Override
@@ -125,54 +100,5 @@ public final class FunctionObject implements LispObject {
     public boolean error() {
         return false;
     }
-    
-    @Override
-    public boolean isBoolean() {
-        return false;
-    }
-        
-    @Override
-    public boolean isAtom() {
-        return false;
-    }
 
-    @Override
-    public boolean isString() {
-        return false;
-    }
-
-    @Override
-    public boolean isNumeric() {
-        return false;
-    }
-
-    @Override
-    public boolean isDouble() {
-        return false;
-    }
-
-    @Override
-    public boolean isInt() {
-        return false;
-    }
-
-    @Override
-    public boolean isList() {
-        return false;
-    }
-
-    @Override
-    public boolean isObject() {
-        return false;
-    }
-
-    @Override
-    public boolean isVoid() {
-        return false;
-    }
-    
-    @Override
-    public boolean isFunction() {
-        return true;
-    }    
 }

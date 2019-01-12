@@ -186,39 +186,16 @@ public class ListObject implements LispObject, Iterable<LispObject> {
     }
 
     @Override
-    public Optional<Integer> asInt() {
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<Double> asDouble() {
-        return Optional.empty();
-    }
-
-    @Override
     public Optional<ListObject> asList() {
         return Optional.of(this);
     }
 
-    @Override
-    public <T> Optional<T> asObject(Class<T> clazz) {
-        return Optional.empty();
-    }
 
     @Override
     public boolean truthness() {
         return true;
     }
 
-    @Override
-    public Optional<FunctionObject> asFunction() {
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<AtomObject> asAtom() {
-        return Optional.empty();
-    }
 
     @Override
     public <T> T accept(LispVisitor<T> visitor) {
@@ -307,55 +284,5 @@ public class ListObject implements LispObject, Iterable<LispObject> {
         } else {
             return Optional.empty();
         }
-    }
-
-    @Override
-    public boolean isBoolean() {
-        return false;
-    }
-
-    @Override
-    public boolean isAtom() {
-        return false;
-    }
-
-    @Override
-    public boolean isString() {
-        return false;
-    }
-
-    @Override
-    public boolean isNumeric() {
-        return false;
-    }
-
-    @Override
-    public boolean isDouble() {
-        return false;
-    }
-
-    @Override
-    public boolean isInt() {
-        return false;
-    }
-
-    @Override
-    public boolean isList() {
-        return true;
-    }
-
-    @Override
-    public boolean isObject() {
-        return false;
-    }
-
-    @Override
-    public boolean isVoid() {
-        return false;
-    }
-
-    @Override
-    public boolean isFunction() {
-        return false;
     }
 }

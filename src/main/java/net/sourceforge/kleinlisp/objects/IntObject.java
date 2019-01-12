@@ -42,7 +42,7 @@ public final class IntObject implements NumericObject {
 
     @Override
     public Object asObject() {
-        return new Integer(value);
+        return value;
     }
 
     @Override
@@ -60,30 +60,12 @@ public final class IntObject implements NumericObject {
         return Optional.of((double) value);
     }
 
-    @Override
-    public Optional<ListObject> asList() {
-        return Optional.empty();
-    }
-
-    @Override
-    public <T> Optional<T> asObject(Class<T> clazz) {
-        return Optional.empty();
-    }
 
     @Override
     public boolean truthness() {
         return !(value == 0);
     }
 
-    @Override
-    public Optional<FunctionObject> asFunction() {
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<AtomObject> asAtom() {
-        return Optional.empty();
-    }
 
     @Override
     public <T> T accept(LispVisitor<T> visitor) {
@@ -94,54 +76,5 @@ public final class IntObject implements NumericObject {
     public boolean error() {
         return false;
     }
-    
-    @Override
-    public boolean isBoolean() {
-        return false;
-    }
-        
-    @Override
-    public boolean isAtom() {
-        return false;
-    }
 
-    @Override
-    public boolean isString() {
-        return false;
-    }
-
-    @Override
-    public boolean isNumeric() {
-        return true;
-    }
-
-    @Override
-    public boolean isDouble() {
-        return false;
-    }
-
-    @Override
-    public boolean isInt() {
-        return true;
-    }
-
-    @Override
-    public boolean isList() {
-        return false;
-    }
-
-    @Override
-    public boolean isObject() {
-        return false;
-    }
-
-    @Override
-    public boolean isVoid() {
-        return false;
-    }  
-    
-    @Override
-    public boolean isFunction() {
-        return false;
-    }    
 }

@@ -39,7 +39,7 @@ public interface LispObject {
      *
      * @return see description
      */
-    public Optional<Integer> asInt();
+    public default Optional<Integer> asInt(){ return Optional.empty(); }
 
     /**
      * If the form represents a numeric value, returns Optional.of(number),
@@ -49,7 +49,7 @@ public interface LispObject {
      *
      * @return see description
      */
-    public Optional<Double> asDouble();
+    public default Optional<Double> asDouble(){ return Optional.empty(); }
 
     /**
      * If the form represents a list, returns an Optional.of(list), otherwise,
@@ -59,7 +59,7 @@ public interface LispObject {
      *
      * @return see description
      */
-    public Optional<ListObject> asList();
+    public default Optional<ListObject> asList(){ return Optional.empty(); }
 
     /**
      * If the form represents a list, returns an Optional.of(list), otherwise,
@@ -69,12 +69,12 @@ public interface LispObject {
      *
      * @return see description
      */
-    public Optional<FunctionObject> asFunction();
+    public default Optional<FunctionObject> asFunction(){ return Optional.empty(); }
 
     /**
      * @return see description
      */
-    public Optional<AtomObject> asAtom();
+    public default Optional<AtomObject> asAtom(){ return Optional.empty(); }
 
     /**
      * Returns an Optional.of(reference) if it is an ObjectForm belonging to the
@@ -84,7 +84,7 @@ public interface LispObject {
      * @param clazz The Class reference for the T type
      * @return see description
      */
-    public <T> Optional<T> asObject(Class<T> clazz);
+    public default <T> Optional<T> asObject(Class<T> clazz){ return Optional.empty(); }
 
     public default <T> Optional<T> as(Class<T> clazz) {
 
@@ -131,25 +131,5 @@ public interface LispObject {
     public <T> T accept(LispVisitor<T> visitor);
 
     public boolean error();
-
-    public boolean isBoolean();
-
-    public boolean isAtom();
-
-    public boolean isString();
-
-    public boolean isNumeric();
-
-    public boolean isDouble();
-
-    public boolean isInt();
-
-    public boolean isList();
-
-    public boolean isObject();
-
-    public boolean isVoid();
-
-    public boolean isFunction();
 
 }

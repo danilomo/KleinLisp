@@ -3,6 +3,7 @@ package net.sourceforge.kleinlisp.playground;
 import jline.console.ConsoleReader;
 import net.sourceforge.kleinlisp.Lisp;
 import net.sourceforge.kleinlisp.LispObject;
+import net.sourceforge.kleinlisp.objects.VoidObject;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -26,7 +27,7 @@ public class Main9 {
                     e.printStackTrace();
                     continue;
                 }
-                if (!result.isVoid()) {
+                if (! (result instanceof VoidObject)) {
                     System.out.println("==> " + result);
                 }
             }

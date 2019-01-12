@@ -67,56 +67,6 @@ public abstract class LispObjDecorator implements LispObject{
     public boolean error() {
         return evaluate().error();
     }
-
-    @Override
-    public boolean isBoolean() {
-        return evaluate().isBoolean();
-    }
-
-    @Override
-    public boolean isAtom() {
-        return evaluate().isAtom();
-    }
-
-    @Override
-    public boolean isString() {
-        return evaluate().isString();
-    }
-
-    @Override
-    public boolean isNumeric() {
-        return evaluate().isNumeric();
-    }
-
-    @Override
-    public boolean isDouble() {
-        return evaluate().isDouble();
-    }
-
-    @Override
-    public boolean isInt() {
-        return evaluate().isInt();
-    }
-
-    @Override
-    public boolean isList() {
-        return evaluate().isList();
-    }
-
-    @Override
-    public boolean isObject() {
-        return evaluate().isObject();
-    }
-
-    @Override
-    public boolean isVoid() {
-        return evaluate().isVoid();
-    }
-
-    @Override
-    public boolean isFunction() {
-        return evaluate().isFunction();
-    }
     
     
 }

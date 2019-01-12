@@ -20,19 +20,12 @@ public class DefineForm implements Function {
 
     @Override
     public LispObject evaluate(ListObject parameters) {
-//        String symbol = parameters.car().asAtom().get().toString();
-//        LispObject obj = parameters.cdr().car().evaluate();
-//
-//        this.environment.define(symbol, obj);
-//
-//        return ListObject.NIL;
-
         Optional<Tuple2<AtomObject, LispObject>> tuple1 = parameters.unpack(AtomObject.class, LispObject.class);
 
         if (tuple1.isPresent()) {
             defineSymbol(tuple1.get().first(), tuple1.get().second());
         } else {
-            if (parameters.car().isList()) {
+            if (parameters.car() instanceof ListObject) {
                 return defineFunction(parameters.car().asList().get(), parameters.cdr());
             }
         }
