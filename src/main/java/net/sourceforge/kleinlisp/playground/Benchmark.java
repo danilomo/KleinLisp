@@ -27,7 +27,7 @@ import net.sourceforge.kleinlisp.specialforms.LambdaFunction;
  *
  * @author daolivei
  */
-public class Main10 {
+public class Benchmark {
 
     public static void main(String[] args) {
         

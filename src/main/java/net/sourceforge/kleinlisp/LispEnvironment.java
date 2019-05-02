@@ -1,6 +1,5 @@
 package net.sourceforge.kleinlisp;
 
-import net.sourceforge.kleinlisp.playground.Main;
 import net.sourceforge.kleinlisp.objects.JavaObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 import java.beans.BeanInfo;
@@ -52,7 +51,7 @@ public class LispEnvironment implements Environment {
                 return new JavaObject(o);
 
             } catch (Exception ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(LispEnvironment.class.getName()).log(Level.SEVERE, null, ex);
             }
 
             return ListObject.NIL;

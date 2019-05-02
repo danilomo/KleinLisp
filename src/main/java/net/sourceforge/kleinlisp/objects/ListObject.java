@@ -169,7 +169,7 @@ public class ListObject implements LispObject, Iterable<LispObject> {
 
     @Override
     public LispObject evaluate() {
-        Optional<AtomObject> atom = car().asAtom();
+        /*Optional<AtomObject> atom = car().asAtom();
 
         if (atom.isPresent()) {
             Optional<Function> specialForm = SpecialForm
@@ -182,7 +182,8 @@ public class ListObject implements LispObject, Iterable<LispObject> {
 
         ListObject parameters = cdr().evaluateContents();
         FunctionObject obj = car().evaluate().asFunction().get();
-        return obj.function().evaluate(parameters);
+        return obj.function().evaluate(parameters);*/
+        return this;
     }
 
     @Override
