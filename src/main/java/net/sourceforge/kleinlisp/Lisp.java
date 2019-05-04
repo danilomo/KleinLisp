@@ -19,10 +19,6 @@ public class Lisp {
         this.parser = parser;
     }
 
-    public LispObject evaluate(String expression) {
-        return parse(expression).evaluate();
-    }
-
     public LispObject parse(String expression) {
         return parser.parse(expression, environment);
     }

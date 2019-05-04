@@ -116,18 +116,6 @@ public interface LispObject {
         return Optional.empty();
     }
 
-    /**
-     * Evaluates the form.
-     *
-     * Literals and atoms are evaluated to themselves, ListForms are evaluated
-     * according the Lisp semantics: the first element should be a symbol in the
-     * function environment. All parameters are evaluated before invoking the
-     * function, in according to the expected Lisp behavior.
-     *
-     * @return An evaluated form.
-     */
-    public LispObject evaluate();
-
     public <T> T accept(LispVisitor<T> visitor);
 
     public boolean error();

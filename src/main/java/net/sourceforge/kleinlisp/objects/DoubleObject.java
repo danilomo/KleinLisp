@@ -46,11 +46,6 @@ public final class DoubleObject implements NumericObject {
     }
 
     @Override
-    public LispObject evaluate() {
-        return this;
-    }
-
-    @Override
     public Optional<Integer> asInt() {
         return Optional.of((int) value);
     }

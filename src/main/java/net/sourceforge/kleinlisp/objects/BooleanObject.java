@@ -5,7 +5,6 @@
  */
 package net.sourceforge.kleinlisp.objects;
 
-import java.util.Optional;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.LispVisitor;
 
@@ -27,11 +26,6 @@ public final class BooleanObject implements LispObject {
     @Override
     public Object asObject() {
         return value;
-    }
-
-    @Override
-    public LispObject evaluate() {
-        return this;
     }
 
     @Override

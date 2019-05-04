@@ -10,12 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.sourceforge.kleinlisp.functions.ArithmeticOperator;
-import net.sourceforge.kleinlisp.functions.ArithmeticOperator.Operator;
-import net.sourceforge.kleinlisp.functions.ComparisonOperator;
-import net.sourceforge.kleinlisp.functions.IOFunctions;
-import net.sourceforge.kleinlisp.functions.ListFunctions;
-import net.sourceforge.kleinlisp.functions.MiscFunctions;
 import net.sourceforge.kleinlisp.objects.FunctionObject;
 
 /**
@@ -65,39 +59,10 @@ public class LispEnvironment implements Environment {
     }
 
     private void initFunctionTable() {
-//        registerFunction("+", new ArithmeticOperator(Operator.PLUS));
-//        registerFunction("-", new ArithmeticOperator(Operator.MINUS));
-
-        registerFunction("+", MiscFunctions::sum);
-        registerFunction("-", MiscFunctions::minus);
-
-        registerFunction("*", new ArithmeticOperator(Operator.TIMES));
-        registerFunction("/", new ArithmeticOperator(Operator.DIV));
-        registerFunction("%", new ArithmeticOperator(Operator.MOD));
-
-        registerFunction("list", parameters -> parameters);
-
-        registerFunction("<", new ComparisonOperator(ComparisonOperator.Operator.LT));
-        registerFunction(">", new ComparisonOperator(ComparisonOperator.Operator.GT));
-        registerFunction("<=", new ComparisonOperator(ComparisonOperator.Operator.LEQ));
-        registerFunction(">=", new ComparisonOperator(ComparisonOperator.Operator.GEQ));
-        registerFunction("=", new ComparisonOperator(ComparisonOperator.Operator.EQ));
-        registerFunction("!=", new ComparisonOperator(ComparisonOperator.Operator.NEQ));
-
-        registerFunction("list", ListFunctions::list);
-        registerFunction("length", ListFunctions::length);
-        registerFunction("car", ListFunctions::car);
-        registerFunction("cdr", ListFunctions::cdr);
-        registerFunction("map", ListFunctions::map);
-        registerFunction("filter", ListFunctions::filter);
-        registerFunction("takewhile", ListFunctions::takewhile);
-
         registerFunction("log", (parameters) -> {
             System.out.println("LOG::" + parameters);
             return parameters;
         });
-
-        registerFunction("print", IOFunctions::print);
     }
 
     private void registerFunction(String name, Function func) {

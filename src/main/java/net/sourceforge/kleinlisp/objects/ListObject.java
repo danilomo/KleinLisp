@@ -5,14 +5,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import net.sourceforge.kleinlisp.Function;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.LispVisitor;
 import net.sourceforge.kleinlisp.functional.Tuple2;
 import net.sourceforge.kleinlisp.functional.Tuple3;
 import net.sourceforge.kleinlisp.functional.Tuple4;
 import net.sourceforge.kleinlisp.functional.Tuple5;
-import net.sourceforge.kleinlisp.specialforms.SpecialForm;
 
 /**
  *
@@ -91,11 +89,6 @@ public class ListObject implements LispObject, Iterable<LispObject> {
         }
 
         @Override
-        public LispObject evaluate() {
-            return this;
-        }
-
-        @Override
         public Optional<Integer> asInt() {
             return Optional.empty();
         }
@@ -133,19 +126,6 @@ public class ListObject implements LispObject, Iterable<LispObject> {
         return new ListFormIterator();
     }
 
-    private ListObject evaluateContents() {
-
-        if (this == NIL) {
-            return this;
-        }
-
-        if (cdr() != NIL) {
-            return new ListObject(car().evaluate(), cdr().evaluateContents());
-        } else {
-            return new ListObject(car().evaluate(), NIL);
-        }
-    }
-
     private class ListFormIterator implements Iterator<LispObject> {
 
         private ListObject cursor;
@@ -165,25 +145,6 @@ public class ListObject implements LispObject, Iterable<LispObject> {
             cursor = cursor.cdr();
             return f;
         }
-    }
-
-    @Override
-    public LispObject evaluate() {
-        /*Optional<AtomObject> atom = car().asAtom();
-
-        if (atom.isPresent()) {
-            Optional<Function> specialForm = SpecialForm
-                    .of(atom.get().toString(), atom.get().environment());
-
-            if (specialForm.isPresent()) {
-                return specialForm.get().evaluate(cdr());
-            }
-        }
-
-        ListObject parameters = cdr().evaluateContents();
-        FunctionObject obj = car().evaluate().asFunction().get();
-        return obj.function().evaluate(parameters);*/
-        return this;
     }
 
     @Override

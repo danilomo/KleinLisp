@@ -9,7 +9,6 @@ import java.util.Optional;
 import net.sourceforge.kleinlisp.Function;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.LispVisitor;
-import net.sourceforge.kleinlisp.functions.ListFunctions;
 
 /**
  *
@@ -42,11 +41,6 @@ public final class FunctionObject implements LispObject {
     }
 
     @Override
-    public LispObject evaluate() {
-        return this;
-    }
-
-    @Override
     public boolean truthness() {
         return true;
     }
@@ -61,32 +55,7 @@ public final class FunctionObject implements LispObject {
         return visitor.visit(this);
     }
 
-    public LispObject call(Object... args) {
-
-        ListObject list = ListObject.NIL;
-
-        for (Object obj : args) {
-
-            LispObject parameter;
-
-            if (obj instanceof Integer) {
-                parameter = new IntObject((int) obj);
-            } else if (obj instanceof Double) {
-                parameter = new DoubleObject((double) obj);
-            } else {
-                parameter = new JavaObject(obj);
-            }
-
-            list = new ListObject(parameter, list);
-        }
-
-        list = ListFunctions.reverse(list).asList().get();
-
-        return function.evaluate(list);
-    }
-
     public LispObject call(LispObject... args) {
-
         ListObject list = ListObject.NIL;
 
         for (int i = args.length - 1; i >= 0; i--) {

@@ -5,7 +5,6 @@
  */
 package net.sourceforge.kleinlisp.objects;
 
-import java.util.Optional;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.LispVisitor;
 
@@ -33,11 +32,6 @@ public final class ErrorObject implements LispObject {
     @Override
     public boolean truthness() {
         throw new RuntimeException("Cannot evaluate error as boolean");
-    }
-
-    @Override
-    public LispObject evaluate() {
-        return this;
     }
 
     @Override

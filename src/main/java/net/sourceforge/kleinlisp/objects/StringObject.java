@@ -31,11 +31,6 @@ public final class StringObject implements LispObject {
     }
 
     @Override
-    public LispObject evaluate() {
-        return this;
-    }
-
-    @Override
     public boolean truthness() {
         return !value.isEmpty();
     }

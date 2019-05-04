@@ -31,11 +31,6 @@ public final class JavaObject implements LispObject {
     }
 
     @Override
-    public LispObject evaluate() {
-        return this;
-    }
-
-    @Override
     public <T> Optional<T> asObject(Class<T> clazz) {
         if (clazz.isAssignableFrom(object.getClass())) {
             return Optional.of((T) object);

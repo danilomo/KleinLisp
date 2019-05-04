@@ -59,17 +59,6 @@ public final class AtomObject implements LispObject {
     }
 
     @Override
-    public LispObject evaluate() {
-        try {
-            return env.lookupValue(value);
-        } catch (Exception e) {
-            System.out.println(">>> " + value);
-            e.printStackTrace();
-            throw e;
-        }
-    }
-
-    @Override
     public <T> T accept(LispVisitor<T> visitor) {
         return visitor.visit(this);
     }  
