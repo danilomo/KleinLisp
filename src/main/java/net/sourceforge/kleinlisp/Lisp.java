@@ -14,17 +14,8 @@ public class Lisp {
         this.parser = Parser.defaultParser();
     }
 
-    public Lisp(LispEnv environment, Parser parser) {
-        this.environment = environment;
-        this.parser = parser;
-    }
-
     public LispObject parse(String expression) {
         return parser.parse(expression, environment);
-    }
-
-    public void addClass(Class clazz) {
-        ((LispEnvironment) environment).addClass(clazz);
     }
 
     public Environment environment() {

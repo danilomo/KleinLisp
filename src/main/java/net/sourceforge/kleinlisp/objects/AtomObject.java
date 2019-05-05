@@ -16,15 +16,9 @@ import net.sourceforge.kleinlisp.LispVisitor;
  */
 public final class AtomObject implements LispObject {
 
-    private final String value;
     private Environment env;
 
-    public AtomObject(String value) {
-        this.value = value;
-    }
-
-    public AtomObject(String value, Environment env) {
-        this.value = value;
+    AtomObject(Environment env) {
         this.env = env;
     }
 
@@ -33,25 +27,23 @@ public final class AtomObject implements LispObject {
     }
 
     public String value() {
-        return value;
+        return env.valueOf(this);
     }
 
     @Override
     public String toString() {
-        return value;
+        return value();
     }
 
     @Override
     public Object asObject() {
-        return value;
+        return value();
     }
 
     @Override
     public Optional<AtomObject> asAtom() {
         return Optional.of(this);
     }
-    
-    
 
     @Override
     public boolean truthness() {
@@ -68,7 +60,4 @@ public final class AtomObject implements LispObject {
         return false;
     }
 
-
-    
-    
 }

@@ -5,6 +5,8 @@
  */
 package net.sourceforge.kleinlisp;
 
+import net.sourceforge.kleinlisp.objects.AtomObject;
+
 /**
  *
  * @author daolivei
@@ -20,7 +22,7 @@ public class CompositeEnvironment implements Environment {
     }
 
     @Override
-    public LispObject lookupValue(String name) {
+    public LispObject lookupValue(AtomObject name) {
         if (first.exists(name)) {
             return first.lookupValue(name);
         } else {
@@ -29,7 +31,7 @@ public class CompositeEnvironment implements Environment {
     }
 
     @Override
-    public void set(String name, LispObject obj) {
+    public void set(AtomObject name, LispObject obj) {
         if (first.exists(name)) {
             first.set(name, obj);
         } else {
@@ -38,12 +40,12 @@ public class CompositeEnvironment implements Environment {
     }
 
     @Override
-    public void define(String name, LispObject obj) {
+    public void define(AtomObject name, LispObject obj) {
         first.define(name, obj);
     }
 
     @Override
-    public void undefine(String name) {
+    public void undefine(AtomObject name) {
         if (first.exists(name)) {
             first.undefine(name);
         } else {
@@ -52,17 +54,27 @@ public class CompositeEnvironment implements Environment {
     }
 
     @Override
-    public boolean exists(String name) {
+    public boolean exists(AtomObject name) {
         return first.exists(name) || second.exists(name);
     }
     
-        @Override
-    public Binding lookup(String name) {
+    @Override
+    public Binding lookup(AtomObject name) {
         if (first.exists(name)) {
             return first.lookup(name);
         } else {
             return second.lookup(name);
         }
+    }
+
+    @Override
+    public AtomObject atomOf(String atom) {
+        return first.atomOf(atom);
+    }
+
+    @Override
+    public String valueOf(AtomObject atom) {
+        return first.valueOf(atom);
     }
 
 }

@@ -42,11 +42,11 @@ self_evaluating_form ::=
     INT_LITERAL:i    {: RESULT = new IntObject(i);    :} |
     DOUBLE_LITERAL:d {: RESULT = new DoubleObject(d); :} |
     STRING_LITERAL:s {: RESULT = new StringObject(s); :} |
-    ATOM:a           {: RESULT = new AtomObject(a, parser.environment() );   :};
+    ATOM:a           {: RESULT = parser.environment().atomOf(a);   :};
 
 list_form ::=
     OPEN_PAR     form_list:l   CLOSE_PAR     {: RESULT = l; :} |
-    OPEN_BRACKET form_list:l   CLOSE_BRACKET {: RESULT = new ListObject( new AtomObject("list", parser.environment()), l); :} |
+    //OPEN_BRACKET form_list:l   CLOSE_BRACKET {: RESULT = new ListObject( new AtomObject("list", parser.environment()), l); :} |
     OPEN_PAR                   CLOSE_PAR     {: RESULT = ListObject.NIL;  :};
 
 form_list ::= 
@@ -54,4 +54,4 @@ form_list ::=
     form:head                {: RESULT = new ListObject( head, ListObject.NIL ); :};
 
 quoted_form ::= 
-    QUOTE form:f {: RESULT = new ListObject( new AtomObject("quote"), f ); :};
+    QUOTE form:f {: RESULT = new ListObject( parser.environment().atomOf("quote"), new ListObject(f, ListObject.NIL) ); :};

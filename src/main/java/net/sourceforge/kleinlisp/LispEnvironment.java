@@ -3,13 +3,18 @@ package net.sourceforge.kleinlisp;
 import net.sourceforge.kleinlisp.objects.JavaObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.sourceforge.kleinlisp.objects.AtomFactory;
+import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.FunctionObject;
 
 /**
@@ -18,91 +23,59 @@ import net.sourceforge.kleinlisp.objects.FunctionObject;
  */
 public class LispEnvironment implements Environment {
 
-    private final Map<String, BindingList> objects = new  LinkedHashMap<>();
+    private final Map<AtomObject, BindingList> objects;
+    private final Map<AtomObject, String> names;
+    private final AtomFactory atomFactory;
 
     public LispEnvironment() {
-        initFunctionTable();
+        this.objects = new HashMap<>();
+        this.names = new HashMap<>();
+        this.atomFactory = new AtomFactory(this);
     }
 
     @Override
-    public String toString() {
-        return objects.toString();
-    }
-
-    public void addClass(Class clazz) {
-        Function f = (p) -> {
-            try {
-                BeanInfo info = Introspector.getBeanInfo(clazz);
-                PropertyDescriptor[] pds = info.getPropertyDescriptors();
-                Object o = clazz.getConstructors()[0].newInstance();
-
-                List<LispObject> list = p.toList();
-
-                for (int i = 1; i < pds.length; i++) {
-                    pds[i].getWriteMethod().invoke(o, list.get(i - 1).asObject());
-                }
-
-                return new JavaObject(o);
-
-            } catch (Exception ex) {
-                Logger.getLogger(LispEnvironment.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-            return ListObject.NIL;
-        };
-
-        this.addFunction(clazz.getSimpleName(), f);
-    }
-
-    public void addFunction(String name, Function function) {
-        registerFunction(name, function);
-    }
-
-    private void initFunctionTable() {
-        registerFunction("log", (parameters) -> {
-            System.out.println("LOG::" + parameters);
-            return parameters;
-        });
-    }
-
-    private void registerFunction(String name, Function func) {
-        this.define(name, new FunctionObject(func));
+    public LispObject lookupValue(AtomObject name) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public LispObject lookupValue(String name) {
-        try {
-            return this.objects.get(name).head().value();
-        } catch (Exception e) {
-            System.out.println("Failed to look up: " + name);
-            throw e;
-        }
+    public void set(AtomObject name, LispObject obj) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void set(String name, LispObject obj) {
-        this.objects.get(name).head().set(obj);
+    public void define(AtomObject name, LispObject obj) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void define(String name, LispObject obj) {
-        BindingList bl = this.objects.get(name);
-        this.objects.put(name, new BindingList(new Binding(obj), bl));
+    public void undefine(AtomObject name) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void undefine(String name) {
-        BindingList bl = this.objects.get(name);
-        this.objects.put(name, bl.tail());
+    public boolean exists(AtomObject name) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public boolean exists(String name) {
-        return objects.containsKey(name);
+    public Binding lookup(AtomObject name) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public AtomObject atomOf(String atom) {
+        AtomObject obj = atomFactory.newAtom(atom);
+        names.put(obj, atom);
+        return obj;
+    }
+
+    @Override
+    public String valueOf(AtomObject atom) {
+        return names.get(atom);
     }
 
     private static class BindingList {
-
         private final Binding head;
         private final BindingList tail;
 
@@ -129,17 +102,6 @@ public class LispEnvironment implements Environment {
             }
             builder.append("]");
             return builder.toString();
-        }
-
-    }
-
-    @Override
-    public Binding lookup(String name) {
-        try {
-            return this.objects.get(name).head();
-        } catch (Exception e) {
-            System.out.println("Failed to look up: " + name);
-            throw e;
         }
     }
 
