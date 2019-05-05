@@ -5,12 +5,12 @@
  */
 package net.sourceforge.kleinlisp;
 
-import net.sourceforge.kleinlisp.objects.ListObject;
+import java.util.List;
 
 /**
  *
  * @author daolivei
  */
 public interface Function {
-    public LispObject evaluate(ListObject parameters);    
+    public LispObject evaluate(List<LispObject> parameters);    
 }

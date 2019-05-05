@@ -152,12 +152,10 @@ public class ListObject implements LispObject, Iterable<LispObject> {
         return Optional.of(this);
     }
 
-
     @Override
     public boolean truthness() {
         return true;
     }
-
 
     @Override
     public <T> T accept(LispVisitor<T> visitor) {
@@ -247,4 +245,5 @@ public class ListObject implements LispObject, Iterable<LispObject> {
             return Optional.empty();
         }
     }
+        
 }

@@ -1,21 +1,9 @@
 package net.sourceforge.kleinlisp;
 
-import net.sourceforge.kleinlisp.objects.JavaObject;
-import net.sourceforge.kleinlisp.objects.ListObject;
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.sourceforge.kleinlisp.objects.AtomFactory;
 import net.sourceforge.kleinlisp.objects.AtomObject;
-import net.sourceforge.kleinlisp.objects.FunctionObject;
 
 /**
  *
@@ -34,33 +22,35 @@ public class LispEnvironment implements Environment {
     }
 
     @Override
-    public LispObject lookupValue(AtomObject name) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public LispObject lookupValue(AtomObject atom) {
+        return objects.get(atom).head.value();
     }
 
     @Override
-    public void set(AtomObject name, LispObject obj) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void set(AtomObject atom, LispObject obj) {
+        objects.get(atom).head.set(obj);
     }
 
     @Override
-    public void define(AtomObject name, LispObject obj) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void define(AtomObject atom, LispObject obj) {
+        BindingList tail = objects.get(atom);
+        objects.put(atom, new BindingList(new Binding(obj), tail));
     }
 
     @Override
     public void undefine(AtomObject name) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        BindingList bl = this.objects.get(name);
+        this.objects.put(name, bl.tail);        
     }
 
     @Override
-    public boolean exists(AtomObject name) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public boolean exists(AtomObject atom) {
+        return objects.containsKey(atom);
     }
 
     @Override
     public Binding lookup(AtomObject name) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return objects.get(name).head;
     }
 
     @Override
@@ -82,14 +72,6 @@ public class LispEnvironment implements Environment {
         public BindingList(Binding head, BindingList tail) {
             this.head = head;
             this.tail = tail;
-        }
-
-        public Binding head() {
-            return head;
-        }
-
-        public BindingList tail() {
-            return tail;
         }
 
         @Override

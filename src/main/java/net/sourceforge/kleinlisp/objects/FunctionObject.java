@@ -55,16 +55,6 @@ public final class FunctionObject implements LispObject {
         return visitor.visit(this);
     }
 
-    public LispObject call(LispObject... args) {
-        ListObject list = ListObject.NIL;
-
-        for (int i = args.length - 1; i >= 0; i--) {
-            list = new ListObject(args[i], list);
-        }
-
-        return function.evaluate(list);
-    }
-
     @Override
     public boolean error() {
         return false;
