@@ -10,6 +10,7 @@ import net.sourceforge.kleinlisp.Lisp;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.evaluator.Evaluator;
 import net.sourceforge.kleinlisp.objects.AtomObject;
+import net.sourceforge.kleinlisp.objects.BooleanObject;
 import net.sourceforge.kleinlisp.objects.FunctionObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
 
@@ -20,11 +21,14 @@ import net.sourceforge.kleinlisp.objects.IntObject;
 public class TestParser {
     public static void main(String[] args) {
         Lisp l = new Lisp();
+
+        AtomObject a1 = l.environment().atomOf("+");
+        AtomObject a2 = l.environment().atomOf("<");
+
+        l.environment().define(a1, new FunctionObject(TestParser::add));
+        l.environment().define(a2, new FunctionObject(TestParser::lt));
         
-        AtomObject a = l.environment().atomOf("+");
-        l.environment().define(a, new FunctionObject(TestParser::add));
-        
-        LispObject obj = l.parse("(+ 1 2 3)");
+        LispObject obj = l.parse("(if (< 3 2) 1 2)");
         
         Evaluator eval = new Evaluator(l.environment());
         
@@ -36,12 +40,17 @@ public class TestParser {
     public static LispObject add(List<LispObject> params){
         int sum = 0;
         
-        System.out.println(">>> "+ params);
-        
         for(LispObject i: params){
             sum += i.asInt().get();
         }
         
         return new IntObject(sum);
+    }
+
+    public static LispObject lt(List<LispObject> params){
+        Integer i1 = params.get(0).asInt().get();
+        Integer i2 = params.get(1).asInt().get();
+
+        return new BooleanObject( i1 < i2 );
     }
 }

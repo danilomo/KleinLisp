@@ -5,8 +5,13 @@
  */
 package net.sourceforge.kleinlisp.special_forms;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+
 import net.sourceforge.kleinlisp.Environment;
+import net.sourceforge.kleinlisp.LispObject;
+import net.sourceforge.kleinlisp.evaluator.Evaluator;
 import net.sourceforge.kleinlisp.objects.AtomObject;
 
 /**
@@ -14,17 +19,39 @@ import net.sourceforge.kleinlisp.objects.AtomObject;
  * @author danilo
  */
 public class SpecialForms {
-    private final Environment enviromnent;
+    private final Evaluator evaluator;
+    private final Environment environment;
     private Map<AtomObject, SpecialForm> forms;
 
-    public SpecialForms(Environment enviromnent) {
-        this.enviromnent = enviromnent;
+    public SpecialForms(Environment environment, Evaluator evaluator) {
+        this.environment = environment;
+        this.evaluator = evaluator;
+        this.forms = new HashMap<>();
+        initForms();
     }
-    
+
+    private void initForms() {
+        this.insertForm("if", new IfForm(evaluator));
+    }
+
     SpecialForms insertForm(String name,  SpecialForm form){
-        forms.put(enviromnent.atomOf(name), form);
+        forms.put(environment.atomOf(name), form);
         return this;
     }
-    
-    
+
+    public Optional<SpecialForm> get(AtomObject atom){
+        if(forms.containsKey(atom)){
+            return Optional.of(forms.get(atom));
+        }
+
+        return Optional.empty();
+    }
+
+    public Optional<SpecialForm> get(LispObject obj){
+        if(obj instanceof AtomObject){
+            return get( (AtomObject) obj );
+        }
+
+        return Optional.empty();
+    }
 }

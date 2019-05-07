@@ -2,7 +2,7 @@
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
- */
+ */(+ 1 2 1) (+ 1 2 3)
 package net.sourceforge.kleinlisp.evaluator;
 
 import java.util.List;
@@ -28,9 +28,12 @@ public class FunctionCall implements Supplier<LispObject>{
 
     @Override
     public LispObject get() {
-        Optional<Function> function = head.get().asFunction().flatMap(
-            f -> Optional.of(f.function())
-        );
+        Optional<Function> function = head
+            .get()
+            .asFunction()
+            .flatMap(
+                f -> Optional.of(f.function())
+            );
         
         final List<LispObject> params = this.parameters
                 .stream()

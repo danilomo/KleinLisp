@@ -7,6 +7,7 @@ package net.sourceforge.kleinlisp.evaluator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 import net.sourceforge.kleinlisp.Environment;
 import net.sourceforge.kleinlisp.LispObject;
@@ -21,6 +22,8 @@ import net.sourceforge.kleinlisp.objects.JavaObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 import net.sourceforge.kleinlisp.objects.StringObject;
 import net.sourceforge.kleinlisp.objects.VoidObject;
+import net.sourceforge.kleinlisp.special_forms.SpecialForm;
+import net.sourceforge.kleinlisp.special_forms.SpecialForms;
 
 /**
  *
@@ -29,9 +32,11 @@ import net.sourceforge.kleinlisp.objects.VoidObject;
 public class Evaluator implements LispVisitor<Supplier<LispObject>>{
     
     private Environment environment;
+    private final SpecialForms forms;
 
     public Evaluator(Environment environment) {
         this.environment = environment;
+        this.forms = new SpecialForms(environment, this);
     }  
     
     public LispObject evaluate(LispObject obj){
@@ -40,9 +45,7 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>>{
 
     @Override
     public Supplier<LispObject> visit(AtomObject obj) {
-        return () -> {
-            return environment.lookupValue(obj);
-        };
+        return () -> environment.lookupValue(obj);
     }
 
     @Override
@@ -67,15 +70,23 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>>{
 
     @Override
     public Supplier<LispObject> visit(ListObject list) {
-        Supplier<LispObject> head = list.head().accept(this);
 
+        LispObject head = list.head();
+
+        Optional<SpecialForm> form = forms.get(head);
+
+        if(form.isPresent()){
+            return form.get().apply(list.cdr());
+        }
+
+        Supplier<LispObject> headEval = head.accept(this);
         List<Supplier<LispObject>> parameters = new ArrayList<>();
 
         for(LispObject obj: list.cdr()){
             parameters.add(obj.accept(this));
         }
 
-        return new FunctionCall(head, parameters);        
+        return new FunctionCall(headEval, parameters);
     }
 
     @Override
