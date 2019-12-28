@@ -2,8 +2,12 @@ package net.sourceforge.kleinlisp;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import net.sourceforge.kleinlisp.api.ListFunctions;
+import net.sourceforge.kleinlisp.api.MathFunctions;
 import net.sourceforge.kleinlisp.objects.AtomFactory;
 import net.sourceforge.kleinlisp.objects.AtomObject;
+import net.sourceforge.kleinlisp.objects.FunctionObject;
 
 /**
  *
@@ -19,6 +23,24 @@ public class LispEnvironment implements Environment {
         this.objects = new HashMap<>();
         this.names = new HashMap<>();
         this.atomFactory = new AtomFactory(this);
+
+        initFunctionTable();
+    }
+
+    private void initFunctionTable() {
+        registerFunction("+", MathFunctions::add);
+        registerFunction("-", MathFunctions::sub);
+        registerFunction("*", MathFunctions::mul);
+        registerFunction("/", MathFunctions::div);
+        registerFunction("%", MathFunctions::mod);
+        registerFunction("list", ListFunctions::list);
+        registerFunction("length", ListFunctions::length);
+        registerFunction("car", ListFunctions::car);
+        registerFunction("cdr", ListFunctions::cdr);
+    }
+
+    private void registerFunction(String symbol, net.sourceforge.kleinlisp.Function func) {
+        define(atomOf(symbol), new FunctionObject(func));
     }
 
     @Override

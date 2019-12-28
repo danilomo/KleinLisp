@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import net.sourceforge.kleinlisp.Lisp;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.LispVisitor;
 import net.sourceforge.kleinlisp.functional.Tuple2;
@@ -44,6 +46,17 @@ public class ListObject implements LispObject, Iterable<LispObject> {
         this.head = head;
         this.tail = ListObject.NIL;
         this.length = 1;
+    }
+
+    public static LispObject fromList(List<LispObject> params) {
+        ListObject obj = ListObject.NIL;
+
+        for(int i = params.size() - 1; i >= 0; i--){
+            LispObject elem = params.get(i);
+            obj = new ListObject(elem, obj);
+        }
+
+        return obj;
     }
 
     public LispObject head() {
