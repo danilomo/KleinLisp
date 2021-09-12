@@ -6,7 +6,6 @@
 package net.sourceforge.kleinlisp.functional;
 
 /**
- *
  * @author Danilo Oliveira
  */
 public class Tuple5<K, V, T, X, Z> {
@@ -27,7 +26,7 @@ public class Tuple5<K, V, T, X, Z> {
     public K first() {
         return k;
     }
-    
+
     public V second() {
         return v;
     }
@@ -43,8 +42,7 @@ public class Tuple5<K, V, T, X, Z> {
     public Z fifth() {
         return z;
     }
-    
-    
+
 
 }
 

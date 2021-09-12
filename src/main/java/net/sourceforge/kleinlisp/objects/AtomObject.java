@@ -5,13 +5,13 @@
  */
 package net.sourceforge.kleinlisp.objects;
 
-import java.util.Optional;
 import net.sourceforge.kleinlisp.Environment;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.LispVisitor;
 
+import java.util.Optional;
+
 /**
- *
  * @author daolivei
  */
 public final class AtomObject implements LispObject {
@@ -50,8 +50,7 @@ public final class AtomObject implements LispObject {
     public Optional<AtomObject> asAtom() {
         return Optional.of(this);
     }
-    
-    
+
 
     @Override
     public boolean truthness() {
@@ -72,7 +71,7 @@ public final class AtomObject implements LispObject {
     @Override
     public <T> T accept(LispVisitor<T> visitor) {
         return visitor.visit(this);
-    }  
+    }
 
     @Override
     public boolean error() {
@@ -80,6 +79,4 @@ public final class AtomObject implements LispObject {
     }
 
 
-    
-    
 }

@@ -27,7 +27,7 @@ public class Main9 {
                     e.printStackTrace();
                     continue;
                 }
-                if (! (result instanceof VoidObject)) {
+                if (!(result instanceof VoidObject)) {
                     System.out.println("==> " + result);
                 }
             }

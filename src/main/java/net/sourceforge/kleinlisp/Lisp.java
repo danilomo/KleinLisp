@@ -1,7 +1,6 @@
 package net.sourceforge.kleinlisp;
 
 /**
- *
  * @author daolivei
  */
 public class Lisp {

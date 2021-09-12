@@ -10,20 +10,19 @@ import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 
 /**
- *
  * @author daolivei
  */
-class QuoteForm implements Function{
+class QuoteForm implements Function {
 
     private static final QuoteForm INSTANCE = new QuoteForm();
-    
-    static QuoteForm instance(){
+
+    static QuoteForm instance() {
         return INSTANCE;
     }
-    
+
     @Override
     public LispObject evaluate(ListObject parameters) {
         return parameters.head();
-    }        
-    
+    }
+
 }

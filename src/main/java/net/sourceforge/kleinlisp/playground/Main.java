@@ -1,10 +1,10 @@
 package net.sourceforge.kleinlisp.playground;
 
-import java.util.List;
 import net.sourceforge.kleinlisp.Lisp;
 
+import java.util.List;
+
 /**
- *
  * @author daolivei
  */
 public class Main {
@@ -13,9 +13,9 @@ public class Main {
         Lisp runtime = new Lisp();
 
         String code = "(if 0 (log [1 2 3 4 5 6]) (log \"banana\"))";
-        
+
         code = "((lambda (x y) (+ x y)) 10 20)";
-        
+
 //        System.out.println(runtime.parse(code));
 //        System.out.println("");
 //        System.out.println(runtime.evaluate(code));
@@ -65,12 +65,12 @@ class Poligon {
     public Poligon() {
     }
 
-    public void setPoints(List<Point> points) {
-        this.points = points;
-    }
-
     public List<Point> getPoints() {
         return points;
+    }
+
+    public void setPoints(List<Point> points) {
+        this.points = points;
     }
 
     @Override

@@ -12,7 +12,6 @@ import net.sourceforge.kleinlisp.objects.IntObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 
 /**
- *
  * @author daolivei
  */
 public final class FunctionApplication extends LispObjDecorator {
@@ -33,24 +32,24 @@ public final class FunctionApplication extends LispObjDecorator {
         this.obj = obj;
     }
 
-    @Override
-    public LispObject evaluate() {
-        if (function != null) {
-            return function.evaluate(evaluateList(parameterList));
-        }else {
-            return obj.evaluate().asFunction().get().function().evaluate(evaluateList(parameterList));
-        }
-    }
-
     public static void main(String[] args) {
         LispObject obj = new FunctionApplication(MiscFunctions::sum, new ListObject(new IntObject(1), new ListObject(new IntObject(2))));
         System.out.println(obj.evaluate());
     }
 
+    @Override
+    public LispObject evaluate() {
+        if (function != null) {
+            return function.evaluate(evaluateList(parameterList));
+        } else {
+            return obj.evaluate().asFunction().get().function().evaluate(evaluateList(parameterList));
+        }
+    }
+
     private ListObject evaluateList(ListObject obj) {
-        if(obj == ListObject.NIL){
+        if (obj == ListObject.NIL) {
             return obj;
-        }else{
+        } else {
             return new ListObject(obj.car().evaluate(), evaluateList(obj.cdr()));
         }
     }

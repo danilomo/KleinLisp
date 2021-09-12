@@ -1,6 +1,5 @@
 package net.sourceforge.kleinlisp.specialforms;
 
-import java.util.Optional;
 import net.sourceforge.kleinlisp.Environment;
 import net.sourceforge.kleinlisp.Function;
 import net.sourceforge.kleinlisp.LispObject;
@@ -9,6 +8,8 @@ import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.ErrorObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 import net.sourceforge.kleinlisp.objects.VoidObject;
+
+import java.util.Optional;
 
 public class DefineForm implements Function {
 

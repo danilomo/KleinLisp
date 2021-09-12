@@ -5,34 +5,28 @@
  */
 package net.sourceforge.kleinlisp.playground;
 
-import java.util.ArrayList;
 import net.sourceforge.kleinlisp.Environment;
 import net.sourceforge.kleinlisp.Function;
 import net.sourceforge.kleinlisp.Lisp;
 import net.sourceforge.kleinlisp.LispObject;
-import net.sourceforge.kleinlisp.compiler.CompareTwo;
-import net.sourceforge.kleinlisp.compiler.FunctionApplication;
-import net.sourceforge.kleinlisp.compiler.IfForm;
-import net.sourceforge.kleinlisp.compiler.OrForm;
-import net.sourceforge.kleinlisp.compiler.SubtractTwo;
-import net.sourceforge.kleinlisp.compiler.SumTwo;
-import net.sourceforge.kleinlisp.compiler.VariableLookup;
+import net.sourceforge.kleinlisp.compiler.*;
 import net.sourceforge.kleinlisp.functional.Tuple2;
 import net.sourceforge.kleinlisp.objects.FunctionObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 import net.sourceforge.kleinlisp.specialforms.LambdaFunction;
 
+import java.util.ArrayList;
+
 /**
- *
  * @author daolivei
  */
 public class Main8 {
 
     public static void main(String[] args) {
-        
+
         double x = System.currentTimeMillis();
-        
+
         Lisp lisp = new Lisp();
 
         Environment env = lisp.environment();
@@ -61,25 +55,24 @@ public class Main8 {
         pl.add("n");
 
         LambdaFunction l = new LambdaFunction(pl, new ListObject(ifForm), env);
-        
-        
+
 
         env.define("fib", new FunctionObject(l));
-        
+
         double y = System.currentTimeMillis();
-        
-        y = (y - x)/1000.0;
-        
+
+        y = (y - x) / 1000.0;
+
         System.out.println(">> " + y);
-         
+
         for (int i = 0; i < 30; i++) {
-            
+
             long l1 = System.currentTimeMillis();
             lisp.evaluate("(fib 34)");
             long l2 = System.currentTimeMillis();
-            
+
             double l3 = (l2 - l1) / 1000.0;
-            
+
             System.out.println(l3 + ", ");
         }
 

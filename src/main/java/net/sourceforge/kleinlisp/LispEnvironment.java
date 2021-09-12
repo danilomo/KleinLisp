@@ -1,8 +1,12 @@
 package net.sourceforge.kleinlisp;
 
-import net.sourceforge.kleinlisp.playground.Main;
+import net.sourceforge.kleinlisp.functions.*;
+import net.sourceforge.kleinlisp.functions.ArithmeticOperator.Operator;
+import net.sourceforge.kleinlisp.objects.FunctionObject;
 import net.sourceforge.kleinlisp.objects.JavaObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
+import net.sourceforge.kleinlisp.playground.Main;
+
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -11,21 +15,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.sourceforge.kleinlisp.functions.ArithmeticOperator;
-import net.sourceforge.kleinlisp.functions.ArithmeticOperator.Operator;
-import net.sourceforge.kleinlisp.functions.ComparisonOperator;
-import net.sourceforge.kleinlisp.functions.IOFunctions;
-import net.sourceforge.kleinlisp.functions.ListFunctions;
-import net.sourceforge.kleinlisp.functions.MiscFunctions;
-import net.sourceforge.kleinlisp.objects.FunctionObject;
 
 /**
- *
  * @author daolivei
  */
 public class LispEnvironment implements Environment {
 
-    private final Map<String, BindingList> objects = new  LinkedHashMap<>();
+    private final Map<String, BindingList> objects = new LinkedHashMap<>();
 
     public LispEnvironment() {
         initFunctionTable();
@@ -137,6 +133,16 @@ public class LispEnvironment implements Environment {
         return objects.containsKey(name);
     }
 
+    @Override
+    public Binding lookup(String name) {
+        try {
+            return this.objects.get(name).head();
+        } catch (Exception e) {
+            System.out.println("Failed to look up: " + name);
+            throw e;
+        }
+    }
+
     private static class BindingList {
 
         private final Binding head;
@@ -167,16 +173,6 @@ public class LispEnvironment implements Environment {
             return builder.toString();
         }
 
-    }
-
-    @Override
-    public Binding lookup(String name) {
-        try {
-            return this.objects.get(name).head();
-        } catch (Exception e) {
-            System.out.println("Failed to look up: " + name);
-            throw e;
-        }
     }
 
 }

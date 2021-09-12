@@ -8,10 +8,9 @@ package net.sourceforge.kleinlisp.compiler;
 import net.sourceforge.kleinlisp.LispObject;
 
 /**
- *
  * @author daolivei
  */
-public class IfForm extends LispObjDecorator{
+public class IfForm extends LispObjDecorator {
     private final LispObject test;
     private final LispObject ifTrue;
     private final LispObject ifFalse;
@@ -24,9 +23,9 @@ public class IfForm extends LispObjDecorator{
 
     @Override
     public LispObject evaluate() {
-        if(test.evaluate().truthness()){
+        if (test.evaluate().truthness()) {
             return ifTrue.evaluate();
-        }else{
+        } else {
             return ifFalse.evaluate();
         }
     }

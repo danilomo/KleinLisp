@@ -9,10 +9,9 @@ import net.sourceforge.kleinlisp.Environment;
 import net.sourceforge.kleinlisp.LispObject;
 
 /**
- *
  * @author daolivei
  */
-public class VariableLookup extends LispObjDecorator{
+public class VariableLookup extends LispObjDecorator {
     public String name;
     public Environment environment;
 
@@ -26,5 +25,5 @@ public class VariableLookup extends LispObjDecorator{
         return environment.lookupValue(name);
     }
 
-    
+
 }

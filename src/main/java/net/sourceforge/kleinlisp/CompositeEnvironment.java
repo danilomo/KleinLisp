@@ -6,7 +6,6 @@
 package net.sourceforge.kleinlisp;
 
 /**
- *
  * @author daolivei
  */
 public class CompositeEnvironment implements Environment {
@@ -55,8 +54,8 @@ public class CompositeEnvironment implements Environment {
     public boolean exists(String name) {
         return first.exists(name) || second.exists(name);
     }
-    
-        @Override
+
+    @Override
     public Binding lookup(String name) {
         if (first.exists(name)) {
             return first.lookup(name);

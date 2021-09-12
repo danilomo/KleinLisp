@@ -9,20 +9,19 @@ import net.sourceforge.kleinlisp.Lisp;
 import net.sourceforge.kleinlisp.objects.IntObject;
 
 /**
- *
  * @author daolivei
  */
 public class Main5 {
     public static void main(String[] args) {
         String code = " ";
         Lisp lisp = new Lisp();
-        
+
         System.out.println(lisp.evaluate(code));
-        
+
         lisp.environment().define("x", new IntObject(1));
-        
+
         lisp.evaluate("(set! x 1000)");
-        
+
         System.out.println(lisp.evaluate("x"));
     }
 }

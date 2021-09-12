@@ -1,10 +1,5 @@
 package net.sourceforge.kleinlisp.objects;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import net.sourceforge.kleinlisp.Function;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.LispVisitor;
@@ -14,12 +9,53 @@ import net.sourceforge.kleinlisp.functional.Tuple4;
 import net.sourceforge.kleinlisp.functional.Tuple5;
 import net.sourceforge.kleinlisp.specialforms.SpecialForm;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 /**
- *
  * @author daolivei
  */
 public class ListObject implements LispObject, Iterable<LispObject> {
 
+    public static final ListObject NIL = new ListObject() {
+        @Override
+        public String toString() {
+            return "()";
+        }
+
+        @Override
+        public LispObject evaluate() {
+            return this;
+        }
+
+        @Override
+        public Optional<Integer> asInt() {
+            return Optional.empty();
+        }
+
+        @Override
+        public Optional<Double> asDouble() {
+            return Optional.empty();
+        }
+
+        @Override
+        public Optional<ListObject> asList() {
+            return Optional.of(this);
+        }
+
+        @Override
+        public boolean truthness() {
+            return false;
+        }
+
+        @Override
+        public int length() {
+            return 0;
+        }
+    };
     private final LispObject head;
     private final LispObject tail;
     private final int length;
@@ -84,43 +120,6 @@ public class ListObject implements LispObject, Iterable<LispObject> {
         return "(" + String.join(" ", toList().stream().map(t -> t.toString()).collect(Collectors.toList())) + ")";
     }
 
-    public static final ListObject NIL = new ListObject() {
-        @Override
-        public String toString() {
-            return "()";
-        }
-
-        @Override
-        public LispObject evaluate() {
-            return this;
-        }
-
-        @Override
-        public Optional<Integer> asInt() {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<Double> asDouble() {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<ListObject> asList() {
-            return Optional.of(this);
-        }
-
-        @Override
-        public boolean truthness() {
-            return false;
-        }
-
-        @Override
-        public int length() {
-            return 0;
-        }
-    };
-
     public List<LispObject> toList() {
         List<LispObject> list = new ArrayList<>();
         Iterator<LispObject> it = iterator();
@@ -143,27 +142,6 @@ public class ListObject implements LispObject, Iterable<LispObject> {
             return new ListObject(car().evaluate(), cdr().evaluateContents());
         } else {
             return new ListObject(car().evaluate(), NIL);
-        }
-    }
-
-    private class ListFormIterator implements Iterator<LispObject> {
-
-        private ListObject cursor;
-
-        public ListFormIterator() {
-            cursor = ListObject.this;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return cursor != NIL;
-        }
-
-        @Override
-        public LispObject next() {
-            LispObject f = cursor.head;
-            cursor = cursor.cdr();
-            return f;
         }
     }
 
@@ -190,12 +168,10 @@ public class ListObject implements LispObject, Iterable<LispObject> {
         return Optional.of(this);
     }
 
-
     @Override
     public boolean truthness() {
         return true;
     }
-
 
     @Override
     public <T> T accept(LispVisitor<T> visitor) {
@@ -244,7 +220,7 @@ public class ListObject implements LispObject, Iterable<LispObject> {
     }
 
     public <K, V, T, X> Optional<Tuple4<K, V, T, X>> unpack(Class<K> c1, Class<V> c2,
-            Class<T> c3, Class<X> c4) {
+                                                            Class<T> c3, Class<X> c4) {
 
         if (this.length() < 4) {
             return Optional.empty();
@@ -264,7 +240,7 @@ public class ListObject implements LispObject, Iterable<LispObject> {
     }
 
     public <K, V, T, X, Z> Optional<Tuple5<K, V, T, X, Z>> unpack(Class<K> c1, Class<V> c2,
-            Class<T> c3, Class<X> c4, Class<Z> c5) {
+                                                                  Class<T> c3, Class<X> c4, Class<Z> c5) {
 
         if (this.length() < 5) {
             return Optional.empty();
@@ -283,6 +259,27 @@ public class ListObject implements LispObject, Iterable<LispObject> {
                     second.get(), third.get(), fourth.get(), fifth.get()));
         } else {
             return Optional.empty();
+        }
+    }
+
+    private class ListFormIterator implements Iterator<LispObject> {
+
+        private ListObject cursor;
+
+        public ListFormIterator() {
+            cursor = ListObject.this;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return cursor != NIL;
+        }
+
+        @Override
+        public LispObject next() {
+            LispObject f = cursor.head;
+            cursor = cursor.cdr();
+            return f;
         }
     }
 }

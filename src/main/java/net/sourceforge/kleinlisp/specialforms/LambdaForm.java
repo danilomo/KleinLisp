@@ -5,22 +5,17 @@
  */
 package net.sourceforge.kleinlisp.specialforms;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import net.sourceforge.kleinlisp.CompositeEnvironment;
-import net.sourceforge.kleinlisp.DefaultVisitor;
-import net.sourceforge.kleinlisp.Environment;
-import net.sourceforge.kleinlisp.Function;
-import net.sourceforge.kleinlisp.LispEnvironment;
-import net.sourceforge.kleinlisp.LispObject;
+import net.sourceforge.kleinlisp.*;
 import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.FunctionObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
- *
  * @author daolivei
  */
 public class LambdaForm implements Function {
@@ -36,7 +31,7 @@ public class LambdaForm implements Function {
     public LambdaForm(Environment environment, String name) {
         this.environment = environment;
         this.name = name;
-    }        
+    }
 
     @Override
     public LispObject evaluate(ListObject parameters) {
@@ -50,9 +45,9 @@ public class LambdaForm implements Function {
         }
 
         Environment closuredEnv = createClosure(parameterList, body, environment);
-        
+
         WithNewEnvironment visitor = new WithNewEnvironment(closuredEnv);
-        
+
         body = body.accept(visitor).asList().get();
 
         return new FunctionObject(new LambdaFunction(parameterList, body, environment));
@@ -63,27 +58,27 @@ public class LambdaForm implements Function {
 
         Set<String> defined = new DefinedSymbolCollector().symbols(body);
         Set<String> used = new UsedSymbolCollector().symbols(body);
-        
-        if(! name.isEmpty() ){
+
+        if (!name.isEmpty()) {
             defined.add(name);
             used.remove(name);
         }
 
         paramList.forEach((ao) -> {
-            defined.add(ao.toString());
+            defined.add(ao);
         });
 
         Set<String> diff = new HashSet<>();
-        
-        for(String s: used){
-            if(!defined.contains(s)){
+
+        for (String s : used) {
+            if (!defined.contains(s)) {
                 diff.add(s);
             }
         }
 
         Environment newEnv = new LispEnvironment();
-        
-        for(String symbol: diff){
+
+        for (String symbol : diff) {
             LispObject obj = env.lookupValue(symbol);
             newEnv.define(symbol, obj);
         }
@@ -107,7 +102,7 @@ public class LambdaForm implements Function {
             symbols.remove("set!");
             symbols.remove("begin");
             symbols.remove("cond");
-            symbols.remove("if");            
+            symbols.remove("if");
             return symbols;
         }
 
@@ -143,7 +138,7 @@ public class LambdaForm implements Function {
             return symbols;
         }
     }
-    
+
     static class WithNewEnvironment extends DefaultVisitor {
         private final Environment environment;
 
@@ -155,7 +150,7 @@ public class LambdaForm implements Function {
         public LispObject visit(AtomObject obj) {
             return new AtomObject(obj.toString(), environment);
         }
-        
+
     }
 
 }

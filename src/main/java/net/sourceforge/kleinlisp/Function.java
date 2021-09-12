@@ -8,9 +8,8 @@ package net.sourceforge.kleinlisp;
 import net.sourceforge.kleinlisp.objects.ListObject;
 
 /**
- *
  * @author daolivei
  */
 public interface Function {
-    public LispObject evaluate(ListObject parameters);    
+    LispObject evaluate(ListObject parameters);
 }

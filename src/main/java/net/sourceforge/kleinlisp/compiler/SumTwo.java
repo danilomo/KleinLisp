@@ -9,13 +9,12 @@ import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
 
 /**
- *
  * @author danilo
  */
 public class SumTwo extends LispObjDecorator {
 
-    private LispObject int1;
-    private LispObject int2;
+    private final LispObject int1;
+    private final LispObject int2;
 
     public SumTwo(LispObject int1, LispObject int2) {
         this.int1 = int1;
