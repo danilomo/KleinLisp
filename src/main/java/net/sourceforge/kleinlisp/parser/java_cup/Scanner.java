@@ -5,8 +5,8 @@ package net.sourceforge.kleinlisp.parser.java_cup;
  * implementation of <code>lr_parser.scan()</code>.  Integration
  * of scanners implementing <code>Scanner</code> is facilitated.
  *
- * @version last updated 23-Jul-1999
  * @author David MacMahon <davidm@smartsc.com>
+ * @version last updated 23-Jul-1999
  */
 
 /* *************************************************
@@ -20,6 +20,8 @@ package net.sourceforge.kleinlisp.parser.java_cup;
   <code>null</code>.
  ***************************************************/
 public interface Scanner {
-    /** Return the next token, or <code>null</code> on end-of-file. */
-    public Symbol next_token() throws java.lang.Exception;
+    /**
+     * Return the next token, or <code>null</code> on end-of-file.
+     */
+    Symbol next_token() throws java.lang.Exception;
 }

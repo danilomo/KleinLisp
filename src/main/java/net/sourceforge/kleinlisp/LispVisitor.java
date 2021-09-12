@@ -5,33 +5,35 @@
  */
 package net.sourceforge.kleinlisp;
 
-import net.sourceforge.kleinlisp.objects.AtomObject;
-import net.sourceforge.kleinlisp.objects.BooleanObject;
-import net.sourceforge.kleinlisp.objects.DoubleObject;
-import net.sourceforge.kleinlisp.objects.ErrorObject;
-import net.sourceforge.kleinlisp.objects.FunctionObject;
-import net.sourceforge.kleinlisp.objects.IntObject;
-import net.sourceforge.kleinlisp.objects.JavaObject;
-import net.sourceforge.kleinlisp.objects.ListObject;
-import net.sourceforge.kleinlisp.objects.StringObject;
-import net.sourceforge.kleinlisp.objects.VoidObject;
+import net.sourceforge.kleinlisp.objects.*;
 
 /**
- *
- * @author daolivei
  * @param <T>
+ * @author daolivei
  */
 public interface LispVisitor<T> {
-    public T visit(AtomObject obj);
-    public T visit(BooleanObject obj);
-    public T visit(DoubleObject obj);
-    public T visit(IntObject obj);
-    public T visit(JavaObject obj);
-    public T visit(ListObject obj);
-    public T visit(StringObject obj);
-    public T visit(FunctionObject obj);
-    public T visit(ErrorObject obj);
-    public T visit(VoidObject obj);    
-    public static class Void{}
-    public static Void NONE = new Void();
+    Void NONE = new Void();
+
+    T visit(AtomObject obj);
+
+    T visit(BooleanObject obj);
+
+    T visit(DoubleObject obj);
+
+    T visit(IntObject obj);
+
+    T visit(JavaObject obj);
+
+    T visit(ListObject obj);
+
+    T visit(StringObject obj);
+
+    T visit(FunctionObject obj);
+
+    T visit(ErrorObject obj);
+
+    T visit(VoidObject obj);
+
+    class Void {
+    }
 }

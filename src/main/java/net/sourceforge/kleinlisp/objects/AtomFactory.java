@@ -5,12 +5,12 @@
  */
 package net.sourceforge.kleinlisp.objects;
 
-import java.util.HashMap;
-import java.util.Map;
 import net.sourceforge.kleinlisp.Environment;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- *
  * @author danilo
  */
 public class AtomFactory {
@@ -22,12 +22,12 @@ public class AtomFactory {
         this.environment = env;
     }
 
-    public AtomObject newAtom(String atom){
-        if(!cache.containsKey(atom)){
+    public AtomObject newAtom(String atom) {
+        if (!cache.containsKey(atom)) {
             cache.put(atom, new AtomObject(environment));
         }
-        
+
         return cache.get(atom);
     }
-        
+
 }

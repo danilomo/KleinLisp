@@ -5,15 +5,15 @@
  */
 package net.sourceforge.kleinlisp.special_forms;
 
-import java.util.function.Function;
-import java.util.function.Supplier;
 import net.sourceforge.kleinlisp.LispObject;
 
+import java.util.function.Function;
+import java.util.function.Supplier;
+
 /**
- *
  * @author danilo
  */
 @FunctionalInterface
-public interface SpecialForm extends Function<LispObject, Supplier<LispObject>>{
-    
+public interface SpecialForm extends Function<LispObject, Supplier<LispObject>> {
+
 }

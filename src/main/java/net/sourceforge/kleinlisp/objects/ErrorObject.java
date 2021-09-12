@@ -9,7 +9,6 @@ import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.LispVisitor;
 
 /**
- *
  * @author daolivei
  */
 public final class ErrorObject implements LispObject {

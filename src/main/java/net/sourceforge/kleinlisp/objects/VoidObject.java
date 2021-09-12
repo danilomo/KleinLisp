@@ -9,13 +9,12 @@ import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.LispVisitor;
 
 /**
- *
  * @author daolivei
  */
 public class VoidObject implements LispObject {
 
     public static final VoidObject VOID = new VoidObject();
-    
+
     @Override
     public Object asObject() {
         return this;
@@ -28,12 +27,12 @@ public class VoidObject implements LispObject {
 
     @Override
     public <T> T accept(LispVisitor<T> visitor) {
-       return visitor.visit(this);
+        return visitor.visit(this);
     }
 
     @Override
     public boolean error() {
         return false;
     }
-    
+
 }

@@ -28,9 +28,9 @@ public class IfForm implements SpecialForm {
         final Supplier<LispObject> elseS = elseForm.accept(evaluator);
 
         return () -> {
-            if(condS.get().truthness()){
+            if (condS.get().truthness()) {
                 return trueS.get();
-            }else{
+            } else {
                 return elseS.get();
             }
         };

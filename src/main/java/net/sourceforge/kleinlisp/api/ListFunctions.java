@@ -1,15 +1,12 @@
 package net.sourceforge.kleinlisp.api;
 
+import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
-import net.sourceforge.kleinlisp.LispObject;
-import net.sourceforge.kleinlisp.functional.Tuple2;
-import net.sourceforge.kleinlisp.objects.FunctionObject;
 
 import java.util.List;
 
 /**
- *
  * @author Danilo Oliveira
  */
 public class ListFunctions {
@@ -39,7 +36,7 @@ public class ListFunctions {
     public static LispObject reverse(ListObject parameters) {
         ListObject newl = ListObject.NIL;
 
-        for(LispObject par: parameters){
+        for (LispObject par : parameters) {
             newl = new ListObject(par, newl);
         }
 

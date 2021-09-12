@@ -3,7 +3,6 @@ package net.sourceforge.kleinlisp;
 import net.sourceforge.kleinlisp.evaluator.Evaluator;
 
 /**
- *
  * @author daolivei
  */
 public class Lisp {

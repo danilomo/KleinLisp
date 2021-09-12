@@ -1,16 +1,15 @@
 package net.sourceforge.kleinlisp;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import net.sourceforge.kleinlisp.api.ListFunctions;
 import net.sourceforge.kleinlisp.api.MathFunctions;
 import net.sourceforge.kleinlisp.objects.AtomFactory;
 import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.FunctionObject;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- *
  * @author daolivei
  */
 public class LispEnvironment implements Environment {
@@ -62,7 +61,7 @@ public class LispEnvironment implements Environment {
     @Override
     public void undefine(AtomObject name) {
         BindingList bl = this.objects.get(name);
-        this.objects.put(name, bl.tail);        
+        this.objects.put(name, bl.tail);
     }
 
     @Override

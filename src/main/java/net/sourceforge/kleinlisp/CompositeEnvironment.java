@@ -8,7 +8,6 @@ package net.sourceforge.kleinlisp;
 import net.sourceforge.kleinlisp.objects.AtomObject;
 
 /**
- *
  * @author daolivei
  */
 public class CompositeEnvironment implements Environment {
@@ -57,7 +56,7 @@ public class CompositeEnvironment implements Environment {
     public boolean exists(AtomObject name) {
         return first.exists(name) || second.exists(name);
     }
-    
+
     @Override
     public Binding lookup(AtomObject name) {
         if (first.exists(name)) {

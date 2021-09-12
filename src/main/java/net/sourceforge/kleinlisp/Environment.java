@@ -8,16 +8,22 @@ package net.sourceforge.kleinlisp;
 import net.sourceforge.kleinlisp.objects.AtomObject;
 
 /**
- *
  * @author daolivei
  */
 public interface Environment {
-    public LispObject lookupValue(AtomObject name);
-    public void set(AtomObject name, LispObject obj);
-    public void define(AtomObject name, LispObject obj);
-    public void undefine(AtomObject name);
-    public boolean exists(AtomObject name);    
-    public Binding lookup(AtomObject name);
-    public AtomObject atomOf(String atom);
-    public String valueOf(AtomObject atom);
+    LispObject lookupValue(AtomObject name);
+
+    void set(AtomObject name, LispObject obj);
+
+    void define(AtomObject name, LispObject obj);
+
+    void undefine(AtomObject name);
+
+    boolean exists(AtomObject name);
+
+    Binding lookup(AtomObject name);
+
+    AtomObject atomOf(String atom);
+
+    String valueOf(AtomObject atom);
 }
