@@ -41,7 +41,7 @@ public final class FunctionObject implements LispObject {
     }
 
     @Override
-    public boolean truthness() {
+    public boolean truthiness() {
         return true;
     }
 

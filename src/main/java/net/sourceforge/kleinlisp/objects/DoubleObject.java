@@ -56,7 +56,7 @@ public final class DoubleObject implements NumericObject {
 
 
     @Override
-    public boolean truthness() {
+    public boolean truthiness() {
         return true;
     }
 

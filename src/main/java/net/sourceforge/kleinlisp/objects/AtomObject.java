@@ -46,7 +46,7 @@ public final class AtomObject implements LispObject {
     }
 
     @Override
-    public boolean truthness() {
+    public boolean truthiness() {
         return true;
     }
 

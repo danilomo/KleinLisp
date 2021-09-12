@@ -29,7 +29,7 @@ public final class StringObject implements LispObject {
     }
 
     @Override
-    public boolean truthness() {
+    public boolean truthiness() {
         return !value.isEmpty();
     }
 

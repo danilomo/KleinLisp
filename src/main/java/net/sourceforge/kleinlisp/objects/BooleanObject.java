@@ -28,7 +28,7 @@ public final class BooleanObject implements LispObject {
     }
 
     @Override
-    public boolean truthness() {
+    public boolean truthiness() {
         return value;
     }
 

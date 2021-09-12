@@ -30,7 +30,7 @@ public interface LispObject {
      *
      * @return
      */
-    boolean truthness();
+    boolean truthiness();
 
     /**
      * If the form represents a numeric value, returns Optional.of(number),

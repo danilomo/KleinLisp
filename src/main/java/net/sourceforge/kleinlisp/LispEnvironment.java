@@ -1,5 +1,6 @@
 package net.sourceforge.kleinlisp;
 
+import net.sourceforge.kleinlisp.api.BooleanFunctions;
 import net.sourceforge.kleinlisp.api.ListFunctions;
 import net.sourceforge.kleinlisp.api.MathFunctions;
 import net.sourceforge.kleinlisp.objects.AtomFactory;
@@ -36,6 +37,13 @@ public class LispEnvironment implements Environment {
         registerFunction("length", ListFunctions::length);
         registerFunction("car", ListFunctions::car);
         registerFunction("cdr", ListFunctions::cdr);
+
+        registerFunction("<",  BooleanFunctions::lt);
+        registerFunction(">",  BooleanFunctions::gt);
+        registerFunction("<=", BooleanFunctions::le);
+        registerFunction(">=", BooleanFunctions::ge);
+        registerFunction("=",  BooleanFunctions::eq);
+        registerFunction("!=", BooleanFunctions::neq);
     }
 
     private void registerFunction(String symbol, net.sourceforge.kleinlisp.Function func) {

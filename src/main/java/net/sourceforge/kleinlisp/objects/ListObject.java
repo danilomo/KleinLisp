@@ -40,7 +40,7 @@ public class ListObject implements LispObject, Iterable<LispObject> {
         }
 
         @Override
-        public boolean truthness() {
+        public boolean truthiness() {
             return false;
         }
 
@@ -142,7 +142,7 @@ public class ListObject implements LispObject, Iterable<LispObject> {
     }
 
     @Override
-    public boolean truthness() {
+    public boolean truthiness() {
         return true;
     }
 

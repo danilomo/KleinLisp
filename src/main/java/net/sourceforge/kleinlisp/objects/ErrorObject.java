@@ -29,7 +29,7 @@ public final class ErrorObject implements LispObject {
     }
 
     @Override
-    public boolean truthness() {
+    public boolean truthiness() {
         throw new RuntimeException("Cannot evaluate error as boolean");
     }
 

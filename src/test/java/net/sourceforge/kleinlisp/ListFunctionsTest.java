@@ -31,11 +31,6 @@ public class ListFunctionsTest {
                 lisp.evaluate("(length (list 1 2 3 4 5 6))").asInt().get().intValue(),
                 6
         );
-
-        /*assertEquals(
-                lisp.evaluate("(length ())").asInt().get().intValue(),
-                0
-        );*/
     }
 
     @Test

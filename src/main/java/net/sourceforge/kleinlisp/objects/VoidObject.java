@@ -21,7 +21,7 @@ public class VoidObject implements LispObject {
     }
 
     @Override
-    public boolean truthness() {
+    public boolean truthiness() {
         return false;
     }
 

@@ -56,7 +56,7 @@ public final class IntObject implements NumericObject {
 
 
     @Override
-    public boolean truthness() {
+    public boolean truthiness() {
         return !(value == 0);
     }
 

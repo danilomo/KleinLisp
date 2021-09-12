@@ -40,7 +40,7 @@ public final class JavaObject implements LispObject {
     }
 
     @Override
-    public boolean truthness() {
+    public boolean truthiness() {
         return true;
     }
 
