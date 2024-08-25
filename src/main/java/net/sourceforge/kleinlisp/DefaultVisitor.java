@@ -71,5 +71,9 @@ public class DefaultVisitor implements LispVisitor<LispObject> {
         return obj;
     }
 
+    @Override
+    public LispObject visit(ComputedLispObject obj) {
+        return obj;
+    }
 
 }

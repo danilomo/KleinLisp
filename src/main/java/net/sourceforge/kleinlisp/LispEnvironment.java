@@ -1,5 +1,6 @@
 package net.sourceforge.kleinlisp;
 
+import java.util.ArrayList;
 import net.sourceforge.kleinlisp.api.BooleanFunctions;
 import net.sourceforge.kleinlisp.api.ListFunctions;
 import net.sourceforge.kleinlisp.api.MathFunctions;
@@ -8,6 +9,7 @@ import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.FunctionObject;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,12 +20,13 @@ public class LispEnvironment implements Environment {
     private final Map<AtomObject, BindingList> objects;
     private final Map<AtomObject, String> names;
     private final AtomFactory atomFactory;
+    private final List<List<LispObject>> stack;
 
     public LispEnvironment() {
         this.objects = new HashMap<>();
         this.names = new HashMap<>();
         this.atomFactory = new AtomFactory(this);
-
+        this.stack = new ArrayList<>();
         initFunctionTable();
     }
 
@@ -92,6 +95,21 @@ public class LispEnvironment implements Environment {
     @Override
     public String valueOf(AtomObject atom) {
         return names.get(atom);
+    }
+
+    @Override
+    public void stackPush(List<LispObject> parameters) {
+        stack.add(parameters);
+    }
+    
+    @Override
+    public List<LispObject> stackTop() {
+        return stack.get(stack.size() -1);
+    }
+
+    @Override
+    public void stackPop() {
+        stack.remove(stack.size()-1);
     }
 
     private static class BindingList {

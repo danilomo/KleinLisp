@@ -33,6 +33,8 @@ public interface LispVisitor<T> {
     T visit(ErrorObject obj);
 
     T visit(VoidObject obj);
+    
+    T visit(ComputedLispObject obj);
 
     class Void {
     }

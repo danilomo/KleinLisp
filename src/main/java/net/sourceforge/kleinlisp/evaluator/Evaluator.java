@@ -100,4 +100,9 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
         return () -> obj;
     }
 
+    @Override
+    public Supplier<LispObject> visit(ComputedLispObject obj) {
+        return obj.getComputed();
+    }
+
 }

@@ -31,6 +31,9 @@ public class SpecialForms {
 
     private void initForms() {
         this.insertForm("if", new IfForm(evaluator));
+        this.insertForm("let", new LetForm(evaluator, environment));
+        this.insertForm("lambda", new LambdaForm(evaluator, environment));
+        this.insertForm("define", new DefineForm(evaluator, environment));
     }
 
     SpecialForms insertForm(String name, SpecialForm form) {
