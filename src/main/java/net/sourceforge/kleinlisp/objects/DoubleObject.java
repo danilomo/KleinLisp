@@ -5,12 +5,12 @@
  */
 package net.sourceforge.kleinlisp.objects;
 
+import java.util.Optional;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.LispVisitor;
 
-import java.util.Optional;
-
 /**
+ *
  * @author daolivei
  */
 public final class DoubleObject implements NumericObject {

@@ -9,19 +9,20 @@ import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 
 /**
+ *
  * @author daolivei
  */
 public class IOFunctions {
-
-
-    public static LispObject print(ListObject parameters) {
-
-        for (LispObject obj : parameters) {
+    
+    
+    public static LispObject print(ListObject parameters){
+        
+        for(LispObject obj: parameters){
             System.out.print("---> " + obj);
         }
-
-        System.out.println();
-
+        
+        System.out.println("");
+        
         return ListObject.NIL;
     }
 }

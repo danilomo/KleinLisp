@@ -5,11 +5,16 @@
  */
 package net.sourceforge.kleinlisp.functions;
 
+import net.sourceforge.kleinlisp.objects.DoubleObject;
 import net.sourceforge.kleinlisp.Function;
+import net.sourceforge.kleinlisp.objects.IntObject;
+import net.sourceforge.kleinlisp.objects.ListObject;
 import net.sourceforge.kleinlisp.LispObject;
-import net.sourceforge.kleinlisp.objects.*;
+import net.sourceforge.kleinlisp.objects.ErrorObject;
+import net.sourceforge.kleinlisp.objects.NumericObject;
 
 /**
+ *
  * @author Danilo Oliveira
  */
 public class ArithmeticOperator implements Function {
@@ -21,7 +26,7 @@ public class ArithmeticOperator implements Function {
     }
 
     @Override
-    public LispObject evaluate(ListObject parameters) {
+    public LispObject evaluate(ListObject parameters) {       
         return evaluate(parameters.car(), parameters.cdr());
     }
 
@@ -104,7 +109,7 @@ public class ArithmeticOperator implements Function {
         return new IntObject(Integer.MIN_VALUE);
     }
 
-    public enum Operator {
+    public static enum Operator {
         PLUS,
         MINUS,
         DIV,

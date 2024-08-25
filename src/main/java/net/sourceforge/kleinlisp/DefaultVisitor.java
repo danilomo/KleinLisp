@@ -5,12 +5,22 @@
  */
 package net.sourceforge.kleinlisp;
 
-import net.sourceforge.kleinlisp.objects.*;
+import net.sourceforge.kleinlisp.objects.AtomObject;
+import net.sourceforge.kleinlisp.objects.BooleanObject;
+import net.sourceforge.kleinlisp.objects.DoubleObject;
+import net.sourceforge.kleinlisp.objects.ErrorObject;
+import net.sourceforge.kleinlisp.objects.FunctionObject;
+import net.sourceforge.kleinlisp.objects.IntObject;
+import net.sourceforge.kleinlisp.objects.JavaObject;
+import net.sourceforge.kleinlisp.objects.ListObject;
+import net.sourceforge.kleinlisp.objects.StringObject;
+import net.sourceforge.kleinlisp.objects.VoidObject;
 
 /**
+ *
  * @author daolivei
  */
-public class DefaultVisitor implements LispVisitor<LispObject> {
+public class DefaultVisitor implements LispVisitor<LispObject>{
 
     @Override
     public LispObject visit(AtomObject obj) {
@@ -44,15 +54,15 @@ public class DefaultVisitor implements LispVisitor<LispObject> {
 
     @Override
     public LispObject visit(ListObject obj) {
-
-        if (obj == ListObject.NIL) {
+        
+        if(obj == ListObject.NIL){
             return obj;
         }
-
+        
         if (obj.tail() != ListObject.NIL) {
             return new ListObject(obj.head().accept(this), obj.tail().accept(this));
         } else {
-            return new ListObject(obj.head().accept(this), ListObject.NIL);
+            return new ListObject(obj.head().accept(this), ListObject.NIL );
         }
     }
 
@@ -70,6 +80,6 @@ public class DefaultVisitor implements LispVisitor<LispObject> {
     public LispObject visit(ErrorObject obj) {
         return obj;
     }
-
-
+        
+    
 }

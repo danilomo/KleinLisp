@@ -11,6 +11,7 @@ import net.sourceforge.kleinlisp.objects.ListObject;
 import net.sourceforge.kleinlisp.objects.NumericObject;
 
 /**
+ *
  * @author daolivei
  */
 public class MiscFunctions {
@@ -30,10 +31,10 @@ public class MiscFunctions {
     public static LispObject minus(ListObject parameters) {
 
         ListObject it = parameters;
-
+        
         int sum = ((NumericObject) it.car()).toInt();
         it = it.cdr();
-
+        
         while (it != ListObject.NIL) {
             sum -= ((NumericObject) it.car()).toInt();
             it = it.cdr();

@@ -5,18 +5,20 @@
  */
 package net.sourceforge.kleinlisp.objects;
 
+import java.util.Optional;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.LispVisitor;
 
 /**
+ *
  * @author danilo
  */
 public final class BooleanObject implements LispObject {
-
-    public static final BooleanObject TRUE = new BooleanObject(true);
+    
+    public static final BooleanObject TRUE  = new BooleanObject(true);
     public static final BooleanObject FALSE = new BooleanObject(true);
 
-    private final boolean value;
+    private boolean value;
 
     public BooleanObject(boolean value) {
         this.value = value;

@@ -5,12 +5,13 @@
  */
 package net.sourceforge.kleinlisp.functions;
 
-import net.sourceforge.kleinlisp.Function;
-import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.BooleanObject;
+import net.sourceforge.kleinlisp.Function;
 import net.sourceforge.kleinlisp.objects.ListObject;
+import net.sourceforge.kleinlisp.LispObject;
 
 /**
+ *
  * @author Danilo Oliveira
  */
 public class ComparisonOperator implements Function {
@@ -45,28 +46,28 @@ public class ComparisonOperator implements Function {
         }
 
     }
-
+    
 
     private boolean comparisonIsTrue(Object c1, Object c2) {
-        switch (operator) {
+        switch (operator) {            
             case EQ:
                 return c1.equals(c2);
             case NEQ:
-                return !c2.equals(c2);
+                return ! c2.equals(c2);
             case LT:
-                return ((Comparable) c1).compareTo(c2) < 0;
+                return ((Comparable)c1).compareTo(c2) < 0;
             case GT:
-                return ((Comparable) c1).compareTo(c2) > 0;
+                return ((Comparable)c1).compareTo(c2) > 0;
             case LEQ:
-                return ((Comparable) c1).compareTo(c2) <= 0;
+                return ((Comparable)c1).compareTo(c2) <= 0;
             case GEQ:
-                return ((Comparable) c1).compareTo(c2) >= 0;
+                return ((Comparable)c1).compareTo(c2) >= 0;
             default:
                 return false;
         }
     }
 
-    public enum Operator {
+    public static enum Operator {
         EQ,
         NEQ,
         LT,

@@ -5,13 +5,13 @@
  */
 package net.sourceforge.kleinlisp.compiler;
 
+import java.util.List;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.functional.Tuple2;
 import net.sourceforge.kleinlisp.objects.ListObject;
 
-import java.util.List;
-
 /**
+ *
  * @author daolivei
  */
 public class CondForm extends LispObjDecorator {
@@ -19,11 +19,11 @@ public class CondForm extends LispObjDecorator {
     private final LispObject elseClause;
     private final List<Tuple2<LispObject, LispObject>> clauses;
 
-    public CondForm(List<Tuple2<LispObject, LispObject>> clauses) {
+    public CondForm( List<Tuple2<LispObject, LispObject>> clauses) {
         this(clauses, ListObject.NIL);
     }
 
-    public CondForm(List<Tuple2<LispObject, LispObject>> clauses, LispObject elseClause) {
+    public CondForm( List<Tuple2<LispObject, LispObject>> clauses, LispObject elseClause) {
         this.clauses = clauses;
         this.elseClause = elseClause;
     }

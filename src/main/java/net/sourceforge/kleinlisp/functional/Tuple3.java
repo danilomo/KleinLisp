@@ -8,6 +8,7 @@
 package net.sourceforge.kleinlisp.functional;
 
 /**
+ *
  * @author Danilo Oliveira
  */
 public class Tuple3<K, V, T> {
@@ -24,7 +25,7 @@ public class Tuple3<K, V, T> {
     public K first() {
         return k;
     }
-
+    
     public V second() {
         return v;
     }
@@ -37,6 +38,6 @@ public class Tuple3<K, V, T> {
     public String toString() {
         return "[ " + k + ", " + v + ", " + t + " ]";
     }
-
-
+    
+    
 }

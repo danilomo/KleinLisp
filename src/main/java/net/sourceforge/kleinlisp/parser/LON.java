@@ -5,11 +5,15 @@
  */
 package net.sourceforge.kleinlisp.parser;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import net.sourceforge.kleinlisp.parser.java_cup.Symbol;
 
-import java.io.*;
-
 /**
+ *
  * @author daolivei
  */
 public class LON {
@@ -17,27 +21,27 @@ public class LON {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws IOException, Exception {
 //        SourceLexicalAnalyzer sla = new SourceLexicalAnalyzer(new FileInputStream(new File("/uni-mainz.de/homes/daolivei/.emacs.d/init.el")));
-
+        
         String code = "(a de e ( dfsdf ) ) ;;;;;dfsfds\n  \t\t\n(a)";
 
-        InputStream in = new ByteArrayInputStream(code.getBytes());
+        InputStream in = new ByteArrayInputStream(code.getBytes());                
 
         SourceLexicalAnalyzer sla = new SourceLexicalAnalyzer(in);
-
-        sla = new SourceLexicalAnalyzer(new FileInputStream(new
-                File("/home/danilo/.emacs.d/init.el")));
+        
+        sla = new SourceLexicalAnalyzer(new FileInputStream(new 
+        File("/home/danilo/.emacs.d/init.el")));
 
         System.out.println("___");
-        while (true) {
+        while(true){
             Symbol s = sla.next_token();
             System.out.println(s.value);
             System.out.println("___");
-            if (s.sym == sym.EOF) {
+            if(s.sym == sym.EOF){
                 return;
             }
         }
-    }
+    }    
 
 }

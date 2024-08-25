@@ -5,18 +5,18 @@
  */
 package net.sourceforge.kleinlisp.compiler;
 
+import java.util.Optional;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.LispVisitor;
 import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.FunctionObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 
-import java.util.Optional;
-
 /**
+ *
  * @author daolivei
  */
-public abstract class LispObjDecorator implements LispObject {
+public abstract class LispObjDecorator implements LispObject{
 
     @Override
     public Object asObject() {
@@ -67,6 +67,6 @@ public abstract class LispObjDecorator implements LispObject {
     public boolean error() {
         return evaluate().error();
     }
-
-
+    
+    
 }

@@ -1,14 +1,8 @@
 package net.sourceforge.kleinlisp;
 
-import net.sourceforge.kleinlisp.functions.ArithmeticOperator;
-import net.sourceforge.kleinlisp.functions.ArithmeticOperator.Operator;
-import net.sourceforge.kleinlisp.functions.ComparisonOperator;
-import net.sourceforge.kleinlisp.functions.ListFunctions;
-import net.sourceforge.kleinlisp.objects.FunctionObject;
+import net.sourceforge.kleinlisp.playground.Main;
 import net.sourceforge.kleinlisp.objects.JavaObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
-import net.sourceforge.kleinlisp.playground.Main;
-
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -17,11 +11,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.sourceforge.kleinlisp.functions.ArithmeticOperator;
+import net.sourceforge.kleinlisp.functions.ArithmeticOperator.Operator;
+import net.sourceforge.kleinlisp.functions.ComparisonOperator;
+import net.sourceforge.kleinlisp.functions.ListFunctions;
+import net.sourceforge.kleinlisp.objects.FunctionObject;
 
 /**
+ *
  * @author daolivei
  */
-public class LispEnv implements Environment {
+public class LispEnv implements Environment {    
 
     private final Map<String, LispObject> objects = new HashMap<>();
 
@@ -82,7 +82,7 @@ public class LispEnv implements Environment {
         registerFunction("length", ListFunctions::length);
         registerFunction("car", ListFunctions::car);
         registerFunction("cdr", ListFunctions::cdr);
-
+        
         registerFunction("log", (parameters) -> {
             System.out.println("LOG::" + parameters);
             return parameters;
@@ -116,14 +116,9 @@ public class LispEnv implements Environment {
     @Override
     public boolean exists(String name) {
         return objects.containsKey(name);
-    }
-
-    @Override
-    public Binding lookup(String name) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    private static class BindingList {
+    }            
+    
+    private static class BindingList{
         private final LispObject head;
         private final BindingList tail;
 
@@ -144,16 +139,21 @@ public class LispEnv implements Environment {
         public String toString() {
             BindingList bl = this;
             StringBuilder builder = new StringBuilder().append("[");
-            while (bl != null) {
+            while(bl != null){
                 builder.append(bl.head).append(", ");
                 bl = bl.tail;
             }
             builder.append("]");
             return builder.toString();
         }
-
-
+        
+        
     }
 
-
+    @Override
+    public Binding lookup(String name) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    
 }

@@ -1,10 +1,9 @@
 package net.sourceforge.kleinlisp;
 
+import java.util.Optional;
 import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.FunctionObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
-
-import java.util.Optional;
 
 /**
  * A Lisp object, i.e., something that can be evaluated in Lisp programs: atoms,
@@ -16,13 +15,13 @@ public interface LispObject {
 
     /**
      * Return the form as a Java object, applying some conversion if necessary.
-     * <p>
+     *
      * AtomForm, StringForm -> String, IntForm -> Integer, DoubleForm -> Double,
      * ListObject -> java.util.List, etc.
      *
      * @return A java.lang.Object according to the LispObject concrete type
      */
-    Object asObject();
+    public Object asObject();
 
     /**
      * Return the boolean value corresponding to the object.Nil (empty list) ->
@@ -30,76 +29,64 @@ public interface LispObject {
      *
      * @return
      */
-    boolean truthness();
+    public boolean truthness();
 
     /**
      * If the form represents a numeric value, returns Optional.of(number),
      * otherwise, return an Optional.empty().
-     * <p>
+     *
      * For DoubleForm, the value is coerced to int.
      *
      * @return see description
      */
-    default Optional<Integer> asInt() {
-        return Optional.empty();
-    }
+    public default Optional<Integer> asInt(){ return Optional.empty(); }
 
     /**
      * If the form represents a numeric value, returns Optional.of(number),
      * otherwise, return an Optional.empty().
-     * <p>
+     *
      * For IntForm, the value is promoted to int.
      *
      * @return see description
      */
-    default Optional<Double> asDouble() {
-        return Optional.empty();
-    }
+    public default Optional<Double> asDouble(){ return Optional.empty(); }
 
     /**
      * If the form represents a list, returns an Optional.of(list), otherwise,
      * return an Optional.empty().
-     * <p>
+     *
      * For IntForm, the value is promoted to int.
      *
      * @return see description
      */
-    default Optional<ListObject> asList() {
-        return Optional.empty();
-    }
+    public default Optional<ListObject> asList(){ return Optional.empty(); }
 
     /**
      * If the form represents a list, returns an Optional.of(list), otherwise,
      * return an Optional.empty().
-     * <p>
+     *
      * For IntForm, the value is promoted to int.
      *
      * @return see description
      */
-    default Optional<FunctionObject> asFunction() {
-        return Optional.empty();
-    }
+    public default Optional<FunctionObject> asFunction(){ return Optional.empty(); }
 
     /**
      * @return see description
      */
-    default Optional<AtomObject> asAtom() {
-        return Optional.empty();
-    }
+    public default Optional<AtomObject> asAtom(){ return Optional.empty(); }
 
     /**
      * Returns an Optional.of(reference) if it is an ObjectForm belonging to the
      * specified type, otherwise, returns an Optional.empty().
      *
-     * @param <T>   The expected type
+     * @param <T> The expected type
      * @param clazz The Class reference for the T type
      * @return see description
      */
-    default <T> Optional<T> asObject(Class<T> clazz) {
-        return Optional.empty();
-    }
+    public default <T> Optional<T> asObject(Class<T> clazz){ return Optional.empty(); }
 
-    default <T> Optional<T> as(Class<T> clazz) {
+    public default <T> Optional<T> as(Class<T> clazz) {
 
         if (clazz.equals(LispObject.class)) {
             return Optional.of((T) this);
@@ -131,7 +118,7 @@ public interface LispObject {
 
     /**
      * Evaluates the form.
-     * <p>
+     *
      * Literals and atoms are evaluated to themselves, ListForms are evaluated
      * according the Lisp semantics: the first element should be a symbol in the
      * function environment. All parameters are evaluated before invoking the
@@ -139,10 +126,10 @@ public interface LispObject {
      *
      * @return An evaluated form.
      */
-    LispObject evaluate();
+    public LispObject evaluate();
 
-    <T> T accept(LispVisitor<T> visitor);
+    public <T> T accept(LispVisitor<T> visitor);
 
-    boolean error();
+    public boolean error();
 
 }

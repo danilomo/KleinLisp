@@ -13,6 +13,7 @@ import net.sourceforge.kleinlisp.objects.IntObject;
 import net.sourceforge.kleinlisp.objects.StringObject;
 
 /**
+ *
  * @author daolivei
  */
 public class Main2 {
@@ -21,7 +22,7 @@ public class Main2 {
         Lisp runtime = new Lisp();
 
         String code = "((lambda (x y) (+ x y)) 10 10)";
-
+        
         System.out.println(runtime.evaluate(code));
 
 //        LispObject tree = runtime.parse(code);
@@ -47,6 +48,7 @@ class UppercaseVisitor extends DefaultVisitor {
     public LispObject visit(IntObject obj) {
         return new StringObject("" + obj.value());
     }
-
+    
+    
 
 }

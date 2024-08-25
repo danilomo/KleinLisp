@@ -6,6 +6,7 @@
 package net.sourceforge.kleinlisp.functional;
 
 /**
+ *
  * @author Danilo Oliveira
  */
 public class Tuple2<K, V> {
@@ -20,8 +21,8 @@ public class Tuple2<K, V> {
     public K first() {
         return k;
     }
-
+    
     public V second() {
         return v;
-    }
+    }    
 }

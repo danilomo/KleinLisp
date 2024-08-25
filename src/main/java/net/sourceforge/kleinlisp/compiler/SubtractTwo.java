@@ -9,12 +9,13 @@ import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
 
 /**
+ *
  * @author danilo
  */
 public class SubtractTwo extends LispObjDecorator {
 
-    private final LispObject int1;
-    private final LispObject int2;
+    private LispObject int1;
+    private LispObject int2;
 
     public SubtractTwo(LispObject int1, LispObject int2) {
         this.int1 = int1;

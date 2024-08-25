@@ -6,18 +6,15 @@
 package net.sourceforge.kleinlisp;
 
 /**
+ *
  * @author daolivei
  */
 public interface Environment {
-    LispObject lookupValue(String name);
-
-    void set(String name, LispObject obj);
-
-    void define(String name, LispObject obj);
-
-    void undefine(String name);
-
-    boolean exists(String name);
-
-    Binding lookup(String name);
+    public LispObject lookupValue(String name);
+    public void set(String name, LispObject obj);
+    public void define(String name, LispObject obj);
+    public void undefine(String name);
+    public boolean exists(String name);
+    
+    public Binding lookup(String name);
 }
