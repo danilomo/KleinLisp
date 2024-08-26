@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.sourceforge.kleinlisp.evaluator;
 
 import net.sourceforge.kleinlisp.Environment;
@@ -103,6 +98,11 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
     @Override
     public Supplier<LispObject> visit(ComputedLispObject obj) {
         return obj.getComputed();
+    }
+    
+    @Override
+    public Supplier<LispObject> visit(CellObject obj) {
+        return () -> obj.get();
     }
 
 }

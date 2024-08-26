@@ -23,6 +23,10 @@ public class SpecialFormsTest {
         lisp = new Lisp();
     }
 
+    private int evalAsInt(String str) {
+        return lisp.evaluate(str).asInt().get();
+    }
+    
     @Test
     public void testIfForm() {
         assertEquals(
@@ -30,7 +34,7 @@ public class SpecialFormsTest {
                 6
         );
     }
-    
+
     @Test
     public void testLetForm() {
         assertEquals(
@@ -42,38 +46,46 @@ public class SpecialFormsTest {
     @Test
     public void testLambdaForm() {
         FunctionObject obj = lisp.evaluate("(lambda (x y z) (+ x y z))").asFunction().get();
-        
+
         LispObject result = obj.function().evaluate(Arrays.asList(
                 new IntObject(1),
                 new IntObject(1),
                 new IntObject(1)
         ));
-        
+
         assertEquals(
                 result.asInt().get().intValue(),
                 3
         );
 
     }
-    
+
     @Test
     public void testDefineLambdaForm() {
         lisp.evaluate("(define foo (lambda (x y z) (+ x y z)))");
-        
+
         assertEquals(
                 lisp.evaluate("(foo 1 2 3)").asInt().get().intValue(),
                 6
         );
-    } 
-    
+    }
+
     @Test
     public void testDefineForm() {
         lisp.evaluate("(define (foo x y z) (+ x y z))");
-        
+
         assertEquals(
                 lisp.evaluate("(foo 1 2 3)").asInt().get().intValue(),
                 6
-        );                
-    }      
+        );
+    }
+    
+    @Test
+    public void testBeginForm() {
+        assertEquals(
+                evalAsInt("(begin (println 1) (println 2) 3)"),
+                3
+        );
+    }
 
 }

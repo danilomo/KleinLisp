@@ -5,6 +5,7 @@ import net.sourceforge.kleinlisp.objects.FunctionObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 
 import java.util.Optional;
+import net.sourceforge.kleinlisp.objects.CellObject;
 
 /**
  * A Lisp object, i.e., something that can be evaluated in Lisp programs: atoms,
@@ -96,6 +97,10 @@ public interface LispObject {
      * @return see description
      */
     default <T> Optional<T> asObject(Class<T> clazz) {
+        return Optional.empty();
+    }
+    
+    default Optional<CellObject> asCell() {
         return Optional.empty();
     }
 

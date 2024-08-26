@@ -11,6 +11,7 @@ import net.sourceforge.kleinlisp.objects.FunctionObject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.sourceforge.kleinlisp.api.IOFunctions;
 
 /**
  * @author daolivei
@@ -47,6 +48,9 @@ public class LispEnvironment implements Environment {
         registerFunction(">=", BooleanFunctions::ge);
         registerFunction("=",  BooleanFunctions::eq);
         registerFunction("!=", BooleanFunctions::neq);
+        
+        registerFunction("print", IOFunctions::print);
+        registerFunction("println", IOFunctions::println);
     }
 
     private void registerFunction(String symbol, net.sourceforge.kleinlisp.Function func) {

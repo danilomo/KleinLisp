@@ -35,6 +35,8 @@ public interface LispVisitor<T> {
     T visit(VoidObject obj);
     
     T visit(ComputedLispObject obj);
+    
+    T visit(CellObject obj);
 
     class Void {
     }
