@@ -10,6 +10,7 @@ import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.LispVisitor;
 
 import java.util.Optional;
+import net.sourceforge.kleinlisp.special_forms.SpecialFormEnum;
 
 /**
  * @author daolivei
@@ -17,10 +18,12 @@ import java.util.Optional;
 public final class AtomObject implements LispObject {
 
     private final Environment env;
-
-    AtomObject(Environment env) {
+    private SpecialFormEnum specialForm;
+    
+    AtomObject(Environment env, SpecialFormEnum specialForm) {
         this.env = env;
-    }
+        this.specialForm = specialForm;
+    }    
 
     public Environment environment() {
         return env;
@@ -58,6 +61,11 @@ public final class AtomObject implements LispObject {
     @Override
     public boolean error() {
         return false;
+    }      
+
+    public SpecialFormEnum specialForm() {
+        return specialForm;
     }
 
+    
 }

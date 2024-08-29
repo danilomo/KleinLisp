@@ -52,11 +52,20 @@ public class ListObject implements LispObject, Iterable<LispObject> {
     private final LispObject head;
     private final LispObject tail;
     private final int length;
+    private Object meta;
 
     private ListObject() {
         this.head = null;
         this.tail = null;
         this.length = 0;
+    }
+
+    public <T> T getMeta(Class<T> clazz) {
+        return (T) meta;
+    }
+    
+    public void setMeta(Object meta) {
+        this.meta = meta;
     }
 
     public ListObject(LispObject head, LispObject tail) {
@@ -121,7 +130,11 @@ public class ListObject implements LispObject, Iterable<LispObject> {
 
     @Override
     public String toString() {
-        return "(" + String.join(" ", toList().stream().map(t -> t.toString()).collect(Collectors.toList())) + ")";
+        String metastr = "";
+        if (meta != null) {
+            metastr = meta + "@";
+        }
+        return metastr + "(" + String.join(" ", toList().stream().map(t -> t.toString()).collect(Collectors.toList())) + ")";
     }
 
     public List<LispObject> toList() {
