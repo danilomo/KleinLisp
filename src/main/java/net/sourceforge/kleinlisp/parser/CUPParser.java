@@ -6,6 +6,7 @@ import net.sourceforge.kleinlisp.Parser;
 import net.sourceforge.kleinlisp.objects.ErrorObject;
 
 import java.io.ByteArrayInputStream;
+import net.sourceforge.kleinlisp.LispEnvironment;
 
 /**
  * @author daolivei
@@ -13,7 +14,7 @@ import java.io.ByteArrayInputStream;
 public class CUPParser implements Parser {
 
     @Override
-    public LispObject parse(String expression, Environment env) {
+    public LispObject parse(String expression, LispEnvironment env) {
         try {
             ByteArrayInputStream in =
                     new ByteArrayInputStream(expression.getBytes());

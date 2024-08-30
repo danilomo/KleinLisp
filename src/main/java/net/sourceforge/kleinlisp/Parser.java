@@ -10,5 +10,5 @@ public interface Parser {
         return new CUPParser();
     }
 
-    LispObject parse(String expression, Environment env);
+    LispObject parse(String expression, LispEnvironment env);
 }

@@ -6,6 +6,7 @@
 package net.sourceforge.kleinlisp.parser;
 
 import net.sourceforge.kleinlisp.Environment;
+import net.sourceforge.kleinlisp.LispEnvironment;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.DoubleObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
@@ -79,7 +80,7 @@ public class parser extends lr_parser {
      * Instance of action encapsulation class.
      */
     protected CUP$parser$actions action_obj;
-    private Environment environment;
+    private LispEnvironment environment;
 
     /**
      * Default constructor.
@@ -171,12 +172,12 @@ public class parser extends lr_parser {
         return 1;
     }
 
-    public parser withEnvironment(Environment environment) {
+    public parser withEnvironment(LispEnvironment environment) {
         this.environment = environment;
         return this;
     }
 
-    public Environment environment() {
+    public LispEnvironment environment() {
         return environment;
     }
 

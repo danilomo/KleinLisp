@@ -18,7 +18,7 @@ import net.sourceforge.kleinlisp.api.IOFunctions;
  */
 public class LispEnvironment implements Environment {
 
-    private final Map<AtomObject, BindingList> objects;
+    private final Map<AtomObject, LispObject> objects;
     private final Map<AtomObject, String> names;
     private final AtomFactory atomFactory;
     private final List<List<LispObject>> stack;
@@ -54,29 +54,17 @@ public class LispEnvironment implements Environment {
     }
 
     private void registerFunction(String symbol, net.sourceforge.kleinlisp.Function func) {
-        define(atomOf(symbol), new FunctionObject(func));
+        set(atomOf(symbol), new FunctionObject(func));
     }
 
     @Override
     public LispObject lookupValue(AtomObject atom) {
-        return objects.get(atom).head.value();
+        return objects.get(atom);
     }
 
     @Override
     public void set(AtomObject atom, LispObject obj) {
-        objects.get(atom).head.set(obj);
-    }
-
-    @Override
-    public void define(AtomObject atom, LispObject obj) {
-        BindingList tail = objects.get(atom);
-        objects.put(atom, new BindingList(new Binding(obj), tail));
-    }
-
-    @Override
-    public void undefine(AtomObject name) {
-        BindingList bl = this.objects.get(name);
-        this.objects.put(name, bl.tail);
+        objects.put(atom, obj);
     }
 
     @Override
@@ -84,58 +72,26 @@ public class LispEnvironment implements Environment {
         return objects.containsKey(atom);
     }
 
-    @Override
-    public Binding lookup(AtomObject name) {
-        return objects.get(name).head;
-    }
-
-    @Override
     public AtomObject atomOf(String atom) {
         AtomObject obj = atomFactory.newAtom(atom);
         names.put(obj, atom);
         return obj;
     }
 
-    @Override
     public String valueOf(AtomObject atom) {
         return names.get(atom);
     }
 
-    @Override
     public void stackPush(List<LispObject> parameters) {
         stack.add(parameters);
     }
-    
-    @Override
+
     public List<LispObject> stackTop() {
         return stack.get(stack.size() -1);
     }
 
-    @Override
     public void stackPop() {
         stack.remove(stack.size()-1);
-    }
-
-    private static class BindingList {
-        private final Binding head;
-        private final BindingList tail;
-
-        public BindingList(Binding head, BindingList tail) {
-            this.head = head;
-            this.tail = tail;
-        }
-
-        @Override
-        public String toString() {
-            BindingList bl = this;
-            StringBuilder builder = new StringBuilder().append("[");
-            while (bl != null) {
-                builder.append(bl.head).append(", ");
-                bl = bl.tail;
-            }
-            builder.append("]");
-            return builder.toString();
-        }
     }
 
 }

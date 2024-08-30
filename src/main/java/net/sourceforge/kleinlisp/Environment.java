@@ -5,7 +5,6 @@
  */
 package net.sourceforge.kleinlisp;
 
-import java.util.List;
 import net.sourceforge.kleinlisp.objects.AtomObject;
 
 /**
@@ -16,21 +15,5 @@ public interface Environment {
 
     void set(AtomObject name, LispObject obj);
 
-    void define(AtomObject name, LispObject obj);
-
-    void undefine(AtomObject name);
-
     boolean exists(AtomObject name);
-
-    Binding lookup(AtomObject name);
-
-    AtomObject atomOf(String atom);
-
-    String valueOf(AtomObject atom);
-
-    void stackPush(List<LispObject> parameters);
-
-    void stackPop();
-    
-    List<LispObject> stackTop();
 }

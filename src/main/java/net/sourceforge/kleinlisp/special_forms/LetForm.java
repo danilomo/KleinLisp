@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 import net.sourceforge.kleinlisp.Environment;
+import net.sourceforge.kleinlisp.LispEnvironment;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.evaluator.Evaluator;
 import net.sourceforge.kleinlisp.objects.ListObject;
@@ -15,9 +16,9 @@ import net.sourceforge.kleinlisp.objects.ListObject;
 public class LetForm implements SpecialForm {
 
     private final Evaluator evaluator;
-    private final Environment environment;
+    private final LispEnvironment environment;
 
-    public LetForm(Evaluator evaluator, Environment environment) {
+    public LetForm(Evaluator evaluator, LispEnvironment environment) {
         this.evaluator = evaluator;
         this.environment = environment;
     }

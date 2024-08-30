@@ -30,7 +30,8 @@ public final class AtomObject implements LispObject {
     }
 
     public String value() {
-        return env.valueOf(this);
+        //return env.valueOf(this);
+        return "xxx";
     }
 
     @Override

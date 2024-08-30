@@ -1,6 +1,5 @@
 package net.sourceforge.kleinlisp.evaluator;
 
-import net.sourceforge.kleinlisp.Environment;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.LispVisitor;
 import net.sourceforge.kleinlisp.objects.*;
@@ -11,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
+import net.sourceforge.kleinlisp.LispEnvironment;
 
 /**
  * @author danilo
@@ -18,15 +18,16 @@ import java.util.function.Supplier;
 public class Evaluator implements LispVisitor<Supplier<LispObject>> {
 
     private final SpecialForms forms;
-    private final Environment environment;
+    private final LispEnvironment environment;
 
-    public Evaluator(Environment environment) {
+    public Evaluator(LispEnvironment environment) {
         this.environment = environment;
         this.forms = new SpecialForms(environment, this);
     }
 
     public LispObject evaluate(LispObject obj) {
-        return obj.accept(this).get();
+        LispObject transformed = ClosureVisitor.addClosureMeta(obj);
+        return transformed.accept(this).get();
     }
 
     @Override
@@ -56,7 +57,6 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
 
     @Override
     public Supplier<LispObject> visit(ListObject list) {
-
         LispObject head = list.head();
 
         Optional<SpecialForm> form = forms.get(head);

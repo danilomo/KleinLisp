@@ -5,7 +5,6 @@
  */
 package net.sourceforge.kleinlisp.special_forms;
 
-import net.sourceforge.kleinlisp.Environment;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.evaluator.Evaluator;
 import net.sourceforge.kleinlisp.objects.AtomObject;
@@ -13,16 +12,17 @@ import net.sourceforge.kleinlisp.objects.AtomObject;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import net.sourceforge.kleinlisp.LispEnvironment;
 
 /**
  * @author danilo
  */
 public class SpecialForms {
     private final Evaluator evaluator;
-    private final Environment environment;
+    private final LispEnvironment environment;
     private final Map<AtomObject, SpecialForm> forms;
 
-    public SpecialForms(Environment environment, Evaluator evaluator) {
+    public SpecialForms(LispEnvironment environment, Evaluator evaluator) {
         this.environment = environment;
         this.evaluator = evaluator;
         this.forms = new HashMap<>();

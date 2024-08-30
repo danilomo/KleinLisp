@@ -7,7 +7,7 @@ import net.sourceforge.kleinlisp.evaluator.Evaluator;
  */
 public class Lisp {
 
-    private final Environment environment;
+    private final LispEnvironment environment;
     private final Parser parser;
     private final Evaluator evaluator;
 
@@ -25,8 +25,12 @@ public class Lisp {
         return evaluator.evaluate(parse(expression));
     }
 
-    public Environment environment() {
+    public LispEnvironment environment() {
         return environment;
+    }
+
+    public Evaluator evaluator() {
+        return evaluator;
     }
 
 }
