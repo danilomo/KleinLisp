@@ -8,7 +8,6 @@ import net.sourceforge.kleinlisp.objects.ListObject;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 /**
  * @author danilo
@@ -31,10 +30,6 @@ public class FunctionCall implements Supplier<LispObject> {
                         f -> Optional.of(f.function())
                 );
 
-        /*final List<LispObject> params = this.parameters
-                .stream()
-                .map(x -> x.get())
-                .collect(Collectors.toList());*/
         List<LispObject> params = new ArrayList<>();
         for (Supplier<LispObject> param: parameters) {
             LispObject obj = param.get();

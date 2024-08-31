@@ -4,29 +4,14 @@ import java.util.Arrays;
 import net.sourceforge.kleinlisp.objects.FunctionObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
 import static org.junit.Assert.assertEquals;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
  *
  * @author danilo
  */
-public class SpecialFormsTest {
+public class SpecialFormsTest extends BaseTestClass {
 
-    private Lisp lisp;
-
-    public SpecialFormsTest() {
-    }
-
-    @Before
-    public void setup() {
-        lisp = new Lisp();
-    }
-
-    private int evalAsInt(String str) {
-        return lisp.evaluate(str).asInt().get();
-    }
-    
     @Test
     public void testIfForm() {
         assertEquals(
@@ -80,7 +65,7 @@ public class SpecialFormsTest {
                 6
         );
     }
-    
+
     @Test
     public void testBeginForm() {
         assertEquals(

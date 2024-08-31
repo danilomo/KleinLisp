@@ -1,24 +1,13 @@
 package net.sourceforge.kleinlisp;
 
 import static org.junit.Assert.assertEquals;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
  *
  * @author danilo
  */
-public class FunctionsTest {
-
-    private Lisp lisp;
-
-    public FunctionsTest() {
-    }
-
-    @Before
-    public void setup() {
-        lisp = new Lisp();
-    }
+public class FunctionsTest extends BaseTestClass {
 
     @Test
     public void testRecursiveFunction() {
@@ -92,8 +81,4 @@ public class FunctionsTest {
                 10
         );
     }    
-
-    private int evalAsInt(String str) {
-        return lisp.evaluate(str).asInt().get();
-    }
 }

@@ -2,23 +2,14 @@ package net.sourceforge.kleinlisp;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.junit.Before;
 
 /**
  *
  * @author Danilo Oliveira
  */
-public class BasicFunctionsTest {
+public class BasicFunctionsTest  extends BaseTestClass {
 
-    private Lisp lisp;
 
-    public BasicFunctionsTest() {
-    }
-
-    @Before
-    public void setup() {
-        lisp = new Lisp();
-    }
 
     @Test
     public void testArithmetic() {

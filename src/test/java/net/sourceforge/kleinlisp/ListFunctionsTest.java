@@ -6,24 +6,13 @@
 package net.sourceforge.kleinlisp;
 
 import static org.junit.Assert.*;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
  *
  * @author daolivei
  */
-public class ListFunctionsTest {
-
-    private Lisp lisp;
-
-    public ListFunctionsTest() {
-    }
-
-    @Before
-    public void setup() {
-        lisp = new Lisp();
-    }
+public class ListFunctionsTest extends BaseTestClass {
 
     @Test
     public void testLen() {

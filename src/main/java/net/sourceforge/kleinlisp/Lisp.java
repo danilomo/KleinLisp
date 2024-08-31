@@ -40,20 +40,24 @@ public class Lisp {
         return evaluator;
     }
 
-    public void runFile(Path path) throws IOException {
+    public void runScript(Path path) throws IOException {
         try (InputStream in = Files.newInputStream(path)) {
-            SourceLexicalAnalyzer sla = new SourceLexicalAnalyzer(in);
+            runScript(in);
+        }
+    }
 
-            while (true) {
-                Symbol s = sla.next_token();
-                if (s.value == null) {
-                    return;
-                }                                
-                
-                evaluate(s.value.toString());
-                if (s.sym == sym.EOF) {
-                    return;
-                }
+    public void runScript(InputStream in) throws IOException {
+        SourceLexicalAnalyzer sla = new SourceLexicalAnalyzer(in);
+
+        while (true) {
+            Symbol s = sla.next_token();
+            if (s.value == null) {
+                return;
+            }
+
+            evaluate(s.value.toString());
+            if (s.sym == sym.EOF) {
+                return;
             }
         }
     }

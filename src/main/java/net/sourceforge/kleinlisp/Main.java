@@ -10,6 +10,6 @@ public class Main {
     public static void main(String[] args) throws Exception {
         String script = args[0];
         Lisp lisp = new Lisp();
-        lisp.runFile(Paths.get(script));
+        lisp.runScript(Paths.get(script));
     }
 }
