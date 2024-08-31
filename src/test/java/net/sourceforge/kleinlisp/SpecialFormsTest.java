@@ -37,9 +37,11 @@ public class SpecialFormsTest {
 
     @Test
     public void testLetForm() {
+        lisp.evaluate("(define foo 10)");
+        lisp.evaluate("(define bar 10)");
         assertEquals(
-                lisp.evaluate("(let ((x 1) (y 2)) (+ x y 1))").asInt().get().intValue(),
-                4
+                lisp.evaluate("(let ((x 1) (y (+ foo bar))) (+ x y 1))").asInt().get().intValue(),
+                22
         );
     }
 
@@ -57,7 +59,6 @@ public class SpecialFormsTest {
                 result.asInt().get().intValue(),
                 3
         );
-
     }
 
     @Test

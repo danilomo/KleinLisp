@@ -1,7 +1,7 @@
 package net.sourceforge.kleinlisp;
 
-import net.sourceforge.kleinlisp.evaluator.ClosureVisitor;
-import net.sourceforge.kleinlisp.special_forms.LambdaForm;
+import static org.junit.Assert.assertEquals;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -10,43 +10,25 @@ import org.junit.Test;
  */
 public class ClosureTest {
 
+    private Lisp lisp;
+
+    @Before
+    public void setup() {
+        lisp = new Lisp();
+    }
+
     @Test
     public void testClosure() {
-        Lisp lisp = new Lisp();
-        LispObject obj = lisp.parse("(lambda (incr)\n"
-                + "                        (lambda (counter) \n"
-                + "                                     (lambda ()\n"
-                + "                                       (set! counter (+ counter incr))\n"
-                + "                                       counter)))");
-        obj = ClosureVisitor.addClosureMeta(obj);
-        
-        System.out.println(obj);
+        lisp.evaluate("(define (foo val)\n"
+                + "   ((lambda () (set! val (+ val 10)) (println val)))\n"
+                + "    val)");
+        assertEquals(
+                evalAsInt("(foo 10)"),
+                20
+        );
     }
-    
-    @Test
-    public void testClosure2() {
-        Lisp lisp = new Lisp();
-        LispObject obj = lisp.parse("(lambda (counter) \n"
-                + "                                     (lambda ()\n"
-                + "                                       (set! counter (+ counter 1))\n"
-                + "                                       counter))");
-        obj = ClosureVisitor.addClosureMeta(obj);
-        
-        LambdaForm form = new LambdaForm(lisp.evaluator(), lisp.environment());
-        
-        form.apply(obj);
+
+    private int evalAsInt(String str) {
+        return lisp.evaluate(str).asInt().get();
     }
-    
-    @Test
-    public void testClosure3() {
-        Lisp lisp = new Lisp();
-        LispObject obj = lisp.parse("(lambda ()"
-                + "  (set! counter (+ counter 1))\n"
-                + "   counter))");
-        obj = ClosureVisitor.addClosureMeta(obj);
-        
-        LambdaForm form = new LambdaForm(lisp.evaluator(), lisp.environment());
-        
-        form.apply(obj);
-    }    
 }

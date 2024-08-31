@@ -9,7 +9,7 @@ import java.util.List;
 public class MathFunctions {
     public static LispObject add(List<LispObject> params) {
         int sum = 0;
-        for (LispObject i : params) {
+        for (LispObject i : params) {            
             sum += i.asInt().get();
         }
         return new IntObject(sum);

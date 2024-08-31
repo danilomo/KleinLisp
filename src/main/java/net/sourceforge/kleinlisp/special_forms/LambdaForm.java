@@ -2,6 +2,7 @@ package net.sourceforge.kleinlisp.special_forms;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -68,17 +69,19 @@ public class LambdaForm implements SpecialForm {
         }
 
         @Override
-        public LispObject evaluate(List<LispObject> parameters) {            
+        public LispObject evaluate(List<LispObject> parameters) {
             Environment closureEnv = upvaluesObj(parameters);
-            
+
             Environment cenv;
-            
+
             if (closureEnv == null) {
                 cenv = env;
+            } else if (env == null) {
+                cenv = closureEnv;
             } else {
                 cenv = new CompositeEnvironment(closureEnv, env);
             }
-            
+
             environment.stackPush(parameters, cenv);
 
             LispObject result = body.get();
@@ -91,9 +94,9 @@ public class LambdaForm implements SpecialForm {
             if (meta.getClosureInfo().isEmpty()) {
                 return null;
             }
-            
+
             Environment closureEnv = new MapEnvironment();
-            
+
             for (AtomObject id : meta.getClosureInfo().keySet()) {
                 int parIndex = meta.getClosureInfo().get(id);
                 if (parIndex >= 0) {
@@ -107,7 +110,7 @@ public class LambdaForm implements SpecialForm {
                     cell.set(cell);
                 }
             }
-            
+
             return closureEnv;
         }
 
@@ -115,8 +118,6 @@ public class LambdaForm implements SpecialForm {
         public String toString() {
             return "LambdaFunction{" + "body=" + meta.getRepr() + ", meta=" + meta + ", env=" + env + '}';
         }
-        
-        
 
     }
 
@@ -135,21 +136,23 @@ public class LambdaForm implements SpecialForm {
         LambdaMeta meta = orig.getMeta(LambdaMeta.class);
 
         ListObject body = list.cdr();
+        Set<AtomObject> fromClosure = new HashSet<>(meta.getParent().getClosureInfo().keySet());
+        fromClosure.addAll(meta.getClosureInfo().keySet());
 
         ListObject transformed = transformBodySymbols(
                 body,
                 meta.getParameters(),
-                meta.getParent().getClosureInfo().keySet());
+                fromClosure);
 
         Supplier<LispObject> functionSupplier = evaluateBody(transformed);
 
         return () -> {
-            Environment env = new MapEnvironment();
-            
+            Environment env = null;
+
             if (!environment.isStackEmpty()) {
                 env = environment.stackTop().getEnv();
             }
-            
+
             LambdaFunction function = new LambdaFunction(functionSupplier, meta, env);
 
             return new FunctionObject(function);
@@ -160,15 +163,17 @@ public class LambdaForm implements SpecialForm {
         DefaultVisitor visitor = new DefaultVisitor() {
             @Override
             public LispObject visit(AtomObject obj) {
+
+                if (fromClosure.contains(obj)) {
+                    return getValueFromClosure(obj);
+                }
+
                 for (int i = 0; i < fromParameters.size(); i++) {
                     if (obj == fromParameters.get(i)) {
                         return getParameterObj(i);
                     }
                 }
 
-                if (fromClosure.contains(obj)) {
-                    return getValueFromClosure(obj);
-                }
                 return obj;
             }
 
