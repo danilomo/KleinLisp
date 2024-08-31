@@ -72,6 +72,8 @@ public class LispEnvironment implements Environment {
         
         registerFunction("print", IOFunctions::print);
         registerFunction("println", IOFunctions::println);
+        registerFunction("display", IOFunctions::println);
+
     }
 
     private void registerFunction(String symbol, net.sourceforge.kleinlisp.Function func) {

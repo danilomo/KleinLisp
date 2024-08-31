@@ -12,7 +12,7 @@ import net.sourceforge.kleinlisp.parser.java_cup.Symbol;
  * on 10/12/18, 12:05 PM from the specification file
  * <tt>source_lexical.flex</tt>
  */
-class SourceLexicalAnalyzer implements Scanner {
+public class SourceLexicalAnalyzer implements Scanner {
 
     /**
      * This character denotes the end of file
@@ -166,7 +166,7 @@ class SourceLexicalAnalyzer implements Scanner {
      *
      * @param in the java.io.Inputstream to read input from.
      */
-    SourceLexicalAnalyzer(java.io.InputStream in) {
+    public SourceLexicalAnalyzer(java.io.InputStream in) {
         this(new java.io.InputStreamReader(in));
     }
 
