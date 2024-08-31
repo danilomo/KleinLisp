@@ -67,6 +67,7 @@ public class CellObject implements LispObject {
         return Optional.of(this);
     }
     
+    @Override
     public void set(LispObject obj) {
         object = obj;
     }

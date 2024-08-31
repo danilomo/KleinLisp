@@ -33,14 +33,13 @@ public class FunctionsTest {
         );
     }
 
-    //@Test
+    @Test
     public void testClosure() {
-        lisp.evaluate("(define (new-counter)\n"
-                + "  (let ((i 0))\n"
+        lisp.evaluate("(define (new-counter i)\n"
                 + "    (lambda ()\n"
                 + "      (set! i (+ i 1))\n"
-                + "      i)))");
-        lisp.evaluate("(define c1 (new-counter))");
+                + "      i))");
+        lisp.evaluate("(define c1 (new-counter 0))");
 
         assertEquals(
                 evalAsInt("(c1)"),
@@ -48,7 +47,7 @@ public class FunctionsTest {
         );
 
         assertEquals(
-                evalAsInt("(c2)"),
+                evalAsInt("(c1)"),
                 2
         );
     }
@@ -63,15 +62,25 @@ public class FunctionsTest {
         );
     }
     
-    //@Test
+    @Test
     public void testMultiExpressionFunction() {
-        lisp.evaluate("(define (foo) (print 1) (print 2) 3)");
+        lisp.evaluate("(define (foo a b) (print 1) (print 2) (+ a b))");
         
         assertEquals(
                 evalAsInt("(foo 1 1)"),
-                4
+                2
         );
     }
+    
+    @Test
+    public void testSetParameter() {
+        lisp.evaluate("(define (foo a) (set! a 10) a)");
+        
+        assertEquals(
+                evalAsInt("(foo 1)"),
+                10
+        );
+    }    
 
     private int evalAsInt(String str) {
         return lisp.evaluate(str).asInt().get();

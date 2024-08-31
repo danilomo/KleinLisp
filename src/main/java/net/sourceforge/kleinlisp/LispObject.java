@@ -103,6 +103,12 @@ public interface LispObject {
     default Optional<CellObject> asCell() {
         return Optional.empty();
     }
+    
+    default void set(LispObject value) {
+        throw new UnsupportedOperationException("This object is immutable: |"
+                + this
+                + "|");
+    }
 
     default <T> Optional<T> as(Class<T> clazz) {
 
@@ -129,6 +135,10 @@ public interface LispObject {
         if (clazz.equals(Function.class)) {
             Optional<Function> func = this.asFunction().flatMap(f -> Optional.of(f.function()));
             return (Optional<T>) func;
+        }
+        
+        if (clazz.equals(AtomObject.class)) {
+            return (Optional<T>) this.asAtom();
         }
 
         return Optional.empty();

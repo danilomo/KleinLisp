@@ -4,6 +4,9 @@ import java.util.function.Supplier;
 import net.sourceforge.kleinlisp.Environment;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.evaluator.Evaluator;
+import net.sourceforge.kleinlisp.functional.Tuple2;
+import net.sourceforge.kleinlisp.objects.AtomObject;
+import net.sourceforge.kleinlisp.objects.ListObject;
 import net.sourceforge.kleinlisp.objects.VoidObject;
 
 /**
@@ -22,8 +25,17 @@ public class SetForm implements SpecialForm {
 
     @Override
     public Supplier<LispObject> apply(LispObject obj) {
-
+        ListObject list = obj.asList().get().cdr();
+        
+        LispObject symbol = list.car();      
+        Supplier<LispObject> value = list.cdr().car().accept(evaluator);
+        
         return () -> {
+            LispObject o = symbol;
+            LispObject val = value.get();
+            
+            o.set(val);
+            
             return VoidObject.VOID;
         };
     }

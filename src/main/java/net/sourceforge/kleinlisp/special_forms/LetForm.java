@@ -3,9 +3,9 @@ package net.sourceforge.kleinlisp.special_forms;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
-import net.sourceforge.kleinlisp.Environment;
 import net.sourceforge.kleinlisp.LispEnvironment;
 import net.sourceforge.kleinlisp.LispObject;
+import net.sourceforge.kleinlisp.evaluator.ClosureVisitor;
 import net.sourceforge.kleinlisp.evaluator.Evaluator;
 import net.sourceforge.kleinlisp.objects.ListObject;
 
@@ -28,9 +28,10 @@ public class LetForm implements SpecialForm {
     public Supplier<LispObject> apply(LispObject obj) {
         List<LispObject> parameters = new ArrayList<>();
         List<LispObject> values = new ArrayList<>();
+        ListObject list = obj.asList().get().cdr();
         
-        LispObject head = obj.asList().get().car();
-        LispObject tail = obj.asList().get().cdr();
+        LispObject head = list.car();
+        LispObject tail = list.cdr();
         
         for(LispObject elem: head.asList().get()) {
             ListObject tuple = elem.asList().get();
@@ -50,6 +51,7 @@ public class LetForm implements SpecialForm {
                 lambda,
                 ListObject.fromList(values)
         );
+        transformedExp = ClosureVisitor.addClosureMeta(transformedExp);
         
         return transformedExp.accept(evaluator);
     }

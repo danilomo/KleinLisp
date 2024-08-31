@@ -28,6 +28,7 @@ public class ClosureVisitor extends DefaultVisitor {
         LispObject proc = obj.accept(visitor);
         
         collectIndirectUsedSymbols(visitor.currentFunction);
+        collectClosureInfo(visitor.currentFunction);
         
         return proc;
     }
@@ -45,22 +46,57 @@ public class ClosureVisitor extends DefaultVisitor {
 
                 currentFunction.symbols.add(symbol);
             }
+        }        
+    }
+    
+    private static void collectClosureInfo(LambdaMeta currentFunction) {
+        
+        if (currentFunction.children.isEmpty()) {
+            return;
         }
+        
+        Set<AtomObject> symbols = new HashSet<>();
+        
+        for (LambdaMeta func : currentFunction.children) {
+            symbols.addAll(func.getUsedSymbols());
+        }
+        
+        Map<AtomObject, Integer> closureInfo = new HashMap<>();
+        
+        for (int i = 0; i < currentFunction.parameters.size(); i++) {            
+            AtomObject param = currentFunction.parameters.get(i);
+            
+            if (!symbols.contains(param)) {
+                continue;
+            }
+            
+            closureInfo.put(param, i);
+        }
+        
+        for (AtomObject param: symbols) {
+            if (closureInfo.containsKey(param)) {
+                continue;
+            }
+            
+            closureInfo.put(param, -1);
+        }
+        
+        currentFunction.closureInfo = closureInfo;
+        
+        for (LambdaMeta func : currentFunction.children) {
+            collectClosureInfo(func);
+        }            
     }
 
     public static class LambdaMeta {
 
-        private final Map<AtomObject, Integer> positions = new HashMap<>();
         private List<AtomObject> parameters;
         private Set<AtomObject> symbols = new HashSet<>();
         private List<LambdaMeta> children = new ArrayList<>();
+        private Map<AtomObject, Integer> closureInfo = Collections.emptyMap();
         
         public LambdaMeta(List<AtomObject> parameters) {
-            this.parameters = parameters;
-            
-            for (int i = 0; i < parameters.size(); i++) {
-                positions.put(parameters.get(i), i);
-            }
+            this.parameters = parameters;           
         }
 
         public List<LambdaMeta> getChildren() {
@@ -74,15 +110,21 @@ public class ClosureVisitor extends DefaultVisitor {
         public Set<AtomObject> getUsedSymbols() {
             return symbols;
         }
-        
-        public int parameterPos(AtomObject obj) {
-            return positions.get(obj);
-        }
+
+        public Map<AtomObject, Integer> getClosureInfo() {
+            return closureInfo;
+        }                
 
         @Override
         public String toString() {
-            return "LambdaFunction{" + "parameters=" + parameters + ", symbols=" + symbols + '}';
-        }                
+            StringBuilder sb = new StringBuilder();
+            sb.append("LambdaMeta{");
+            sb.append("parameters=").append(parameters);
+            sb.append(", symbols=").append(symbols);
+            sb.append(", closureInfo=").append(closureInfo);
+            sb.append('}');
+            return sb.toString();
+        }
 
     }
 

@@ -12,16 +12,37 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.sourceforge.kleinlisp.api.IOFunctions;
-
 /**
  * @author daolivei
  */
 public class LispEnvironment implements Environment {
+    
+    public static class FunctionStack {
+        private final List<LispObject> parameters;
+        private final Environment env;
+        
+        public FunctionStack(List<LispObject> parameters, Environment env) {        
+            this.parameters = parameters;
+            this.env = env;            
+        }
+        
+        public final LispObject parameterAt(int i) {
+            return parameters.get(i);
+        }
+
+        public void setParameterAt(int i, LispObject obj) {
+            parameters.set(i, obj);
+        }
+
+        public Environment getEnv() {
+            return env;
+        }        
+    }    
 
     private final Map<AtomObject, LispObject> objects;
     private final Map<AtomObject, String> names;
     private final AtomFactory atomFactory;
-    private final List<List<LispObject>> stack;
+    private final List<FunctionStack> stack;
 
     public LispEnvironment() {
         this.objects = new HashMap<>();
@@ -82,16 +103,16 @@ public class LispEnvironment implements Environment {
         return names.get(atom);
     }
 
-    public void stackPush(List<LispObject> parameters) {
-        stack.add(parameters);
-    }
-
-    public List<LispObject> stackTop() {
-        return stack.get(stack.size() -1);
+    public void stackPush(List<LispObject> parameters, Environment env) {
+        stack.add(new FunctionStack(parameters, env));
     }
 
     public void stackPop() {
         stack.remove(stack.size()-1);
+    }
+    
+    public FunctionStack stackTop() {
+        return stack.get(stack.size()-1);
     }
 
 }

@@ -1,9 +1,6 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package net.sourceforge.kleinlisp.objects;
 
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.LispVisitor;
@@ -14,34 +11,59 @@ import net.sourceforge.kleinlisp.LispVisitor;
  */
 public class ComputedLispObject implements LispObject {
 
-    private Supplier<LispObject> computed;
+    private Supplier<LispObject> getter;
+    private Consumer<LispObject> setter;
+    private LispObject cache = null;
 
-    public ComputedLispObject(Supplier<LispObject> computed) {
-        this.computed = computed;
+    public ComputedLispObject(Supplier<LispObject> getter, Consumer<LispObject> setter) {
+        this.getter = getter;        
+        this.setter = setter;
+    }
+    
+    public ComputedLispObject(Supplier<LispObject> getter) {
+        this(getter, null);
     }
 
     public Supplier<LispObject> getComputed() {
-        return computed;
+        return getter;
     }     
     
     @Override
     public Object asObject() {
-        return computed.get().asObject();
+        return getObj().asObject();
     }
 
     @Override
     public boolean truthiness() {
-        return computed.get().truthiness();
+        return getObj().truthiness();
     }
 
     @Override
     public <T> T accept(LispVisitor<T> visitor) {
         return visitor.visit(this);
     }
+    
+    @Override
+    public void set(LispObject value) {
+        setter.accept(value);
+    }
 
     @Override
     public boolean error() {
-        return computed.get().error();
+        return getObj().error();
     }
+
+    private LispObject getObj() {
+        if (setter != null) {
+            return getter.get();
+        }
+        
+        if (cache == null) {
+            cache = getter.get();
+        }
+        
+        return cache;
+    }
+    
     
 }

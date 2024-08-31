@@ -13,18 +13,19 @@ import net.sourceforge.kleinlisp.objects.VoidObject;
 public class DefineForm implements SpecialForm {
 
     private final Evaluator evaluator;  
-    private final LispEnvironment environment;  
-    private final LambdaForm lambdaForm;
+    private final LispEnvironment environment; 
+    private final AtomObject lambdaAtom;
 
     public DefineForm(Evaluator evaluator, LispEnvironment environment) {
         this.evaluator = evaluator;
         this.environment = environment;
-        this.lambdaForm = new LambdaForm(evaluator, environment);
+        this.lambdaAtom = environment.atomOf("lambda");
     }
     
     @Override
     public Supplier<LispObject> apply(LispObject t) {
         ListObject list = t.asList().get();
+        list = list.cdr();
         LispObject first = list.car();
         
         Optional<AtomObject> idOpt = first.asAtom();
@@ -46,8 +47,11 @@ public class DefineForm implements SpecialForm {
         AtomObject id = signature.car().asAtom().get();
         LispObject parameters = signature.cdr();
         
-        ListObject lambda = new ListObject(parameters, value);
-        LispObject function = lambdaForm.apply(lambda).get();
+        ListObject lambda = new ListObject(
+                lambdaAtom,
+                new ListObject(parameters, value)
+        );
+        LispObject function = evaluator.evaluate(lambda);
         
         environment.set(id, function);
     }

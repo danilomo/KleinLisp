@@ -18,10 +18,12 @@ import net.sourceforge.kleinlisp.special_forms.SpecialFormEnum;
 public final class AtomObject implements LispObject {
 
     private final Environment env;
+    private final String value;
     private SpecialFormEnum specialForm;
     
-    AtomObject(Environment env, SpecialFormEnum specialForm) {
+    AtomObject(Environment env, String value, SpecialFormEnum specialForm) {
         this.env = env;
+        this.value = value;
         this.specialForm = specialForm;
     }    
 
@@ -30,8 +32,7 @@ public final class AtomObject implements LispObject {
     }
 
     public String value() {
-        //return env.valueOf(this);
-        return "xxx";
+        return value;
     }
 
     @Override

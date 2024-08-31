@@ -55,7 +55,7 @@ public class AtomFactory {
                     break;
             }
             
-            cache.put(atom, new AtomObject(environment, specialForm));
+            cache.put(atom, new AtomObject(environment, atom, specialForm));
         }
 
         return cache.get(atom);

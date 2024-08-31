@@ -62,7 +62,7 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
         Optional<SpecialForm> form = forms.get(head);
 
         if (form.isPresent()) {
-            return form.get().apply(list.cdr());
+            return form.get().apply(list);
         }
 
         Supplier<LispObject> headEval = head.accept(this);

@@ -2,7 +2,6 @@ package net.sourceforge.kleinlisp.api;
 
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.BooleanObject;
-import net.sourceforge.kleinlisp.objects.IntObject;
 
 import java.util.List;
 
