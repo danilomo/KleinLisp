@@ -11,7 +11,7 @@ import net.sourceforge.kleinlisp.LispVisitor;
 public class CellObject implements LispObject {
 
     private LispObject object;
-    
+
     @Override
     public Object asObject() {
         return object.asObject();
@@ -80,5 +80,11 @@ public class CellObject implements LispObject {
     public boolean error() {
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "CellObject{" + "object=" + object + '}';
+    }
+
     
 }

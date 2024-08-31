@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package net.sourceforge.kleinlisp.evaluator;
 
 import java.util.ArrayList;
@@ -93,7 +89,9 @@ public class ClosureVisitor extends DefaultVisitor {
         private List<AtomObject> parameters;
         private Set<AtomObject> symbols = new HashSet<>();
         private List<LambdaMeta> children = new ArrayList<>();
+        private LambdaMeta parent;
         private Map<AtomObject, Integer> closureInfo = Collections.emptyMap();
+        private String repr;
         
         public LambdaMeta(List<AtomObject> parameters) {
             this.parameters = parameters;           
@@ -113,6 +111,10 @@ public class ClosureVisitor extends DefaultVisitor {
 
         public Map<AtomObject, Integer> getClosureInfo() {
             return closureInfo;
+        }   
+
+        public LambdaMeta getParent() {
+            return parent;
         }                
 
         @Override
@@ -125,6 +127,10 @@ public class ClosureVisitor extends DefaultVisitor {
             sb.append('}');
             return sb.toString();
         }
+
+        public String getRepr() {
+            return repr;
+        }                
 
     }
 
@@ -156,7 +162,9 @@ public class ClosureVisitor extends DefaultVisitor {
         }
 
         LambdaMeta newFunction = new LambdaMeta(parameters);
+        newFunction.repr = obj.toString();
         currentFunction.children.add(newFunction);
+        newFunction.parent = currentFunction;
         LambdaMeta temp = currentFunction;
         currentFunction = newFunction;
 

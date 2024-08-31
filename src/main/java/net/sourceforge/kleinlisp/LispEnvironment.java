@@ -114,5 +114,9 @@ public class LispEnvironment implements Environment {
     public FunctionStack stackTop() {
         return stack.get(stack.size()-1);
     }
+    
+    public boolean isStackEmpty() {
+        return stack.isEmpty();
+    }
 
 }

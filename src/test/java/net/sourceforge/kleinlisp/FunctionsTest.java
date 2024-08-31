@@ -35,11 +35,12 @@ public class FunctionsTest {
 
     @Test
     public void testClosure() {
-        lisp.evaluate("(define (new-counter i)\n"
+        lisp.evaluate("(define new-counter (lambda (i)\n"
                 + "    (lambda ()\n"
                 + "      (set! i (+ i 1))\n"
-                + "      i))");
+                + "      i)))");
         lisp.evaluate("(define c1 (new-counter 0))");
+        lisp.evaluate("(define c2 (new-counter 10))");
 
         assertEquals(
                 evalAsInt("(c1)"),
@@ -50,6 +51,16 @@ public class FunctionsTest {
                 evalAsInt("(c1)"),
                 2
         );
+        
+        assertEquals(
+                evalAsInt("(c2)"),
+                11
+        );
+
+        assertEquals(
+                evalAsInt("(c2)"),
+                12
+        );       
     }
     
     @Test

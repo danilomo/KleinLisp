@@ -12,6 +12,7 @@ import net.sourceforge.kleinlisp.DefaultVisitor;
 import net.sourceforge.kleinlisp.Environment;
 import net.sourceforge.kleinlisp.Function;
 import net.sourceforge.kleinlisp.LispEnvironment;
+import net.sourceforge.kleinlisp.CompositeEnvironment;
 import net.sourceforge.kleinlisp.LispObject;
 import static net.sourceforge.kleinlisp.evaluator.ClosureVisitor.LambdaMeta;
 import net.sourceforge.kleinlisp.evaluator.Evaluator;
@@ -26,6 +27,8 @@ import net.sourceforge.kleinlisp.objects.ListObject;
  * @author danilo
  */
 public class LambdaForm implements SpecialForm {
+
+    public static final MapEnvironment EMPTY_ENV = new MapEnvironment();
 
     public static class MapEnvironment implements Environment {
 
@@ -45,26 +48,76 @@ public class LambdaForm implements SpecialForm {
         public boolean exists(AtomObject name) {
             return map.containsKey(name);
         }
+
+        @Override
+        public String toString() {
+            return "MapEnvironment{" + "map=" + map + '}';
+        }
     }
 
     private class LambdaFunction implements Function {
 
         private final Supplier<LispObject> body;
+        private final LambdaMeta meta;
         private final Environment env;
 
-        public LambdaFunction(Supplier<LispObject> body, Environment env) {
+        public LambdaFunction(Supplier<LispObject> body, LambdaMeta meta, Environment env) {
             this.body = body;
+            this.meta = meta;
             this.env = env;
         }
 
         @Override
-        public LispObject evaluate(List<LispObject> parameters) {
-            environment.stackPush(parameters, env);
+        public LispObject evaluate(List<LispObject> parameters) {            
+            Environment closureEnv = upvaluesObj(parameters);
+            
+            Environment cenv;
+            
+            if (closureEnv == null) {
+                cenv = env;
+            } else {
+                cenv = new CompositeEnvironment(closureEnv, env);
+            }
+            
+            environment.stackPush(parameters, cenv);
+
             LispObject result = body.get();
             environment.stackPop();
 
             return result;
         }
+
+        private Environment upvaluesObj(List<LispObject> parameters) {
+            if (meta.getClosureInfo().isEmpty()) {
+                return null;
+            }
+            
+            Environment closureEnv = new MapEnvironment();
+            
+            for (AtomObject id : meta.getClosureInfo().keySet()) {
+                int parIndex = meta.getClosureInfo().get(id);
+                if (parIndex >= 0) {
+                    CellObject cell = new CellObject();
+                    cell.set(parameters.get(parIndex));
+
+                    closureEnv.set(id, cell);
+                } else {
+                    LispObject cell = env.lookupValue(id);
+
+                    cell.set(cell);
+                }
+            }
+            
+            return closureEnv;
+        }
+
+        @Override
+        public String toString() {
+            return "LambdaFunction{" + "body=" + meta.getRepr() + ", meta=" + meta + ", env=" + env + '}';
+        }
+        
+        
+
     }
 
     private final Evaluator evaluator;
@@ -83,12 +136,21 @@ public class LambdaForm implements SpecialForm {
 
         ListObject body = list.cdr();
 
-        ListObject transformed = transformBodySymbols(body, meta.getParameters(), meta.getClosureInfo().keySet());
+        ListObject transformed = transformBodySymbols(
+                body,
+                meta.getParameters(),
+                meta.getParent().getClosureInfo().keySet());
+
         Supplier<LispObject> functionSupplier = evaluateBody(transformed);
-        
+
         return () -> {
-            Environment closureEnv = upvaluesObj(meta);    
-            LambdaFunction function = new LambdaFunction(functionSupplier, closureEnv);
+            Environment env = new MapEnvironment();
+            
+            if (!environment.isStackEmpty()) {
+                env = environment.stackTop().getEnv();
+            }
+            
+            LambdaFunction function = new LambdaFunction(functionSupplier, meta, env);
 
             return new FunctionObject(function);
         };
@@ -103,7 +165,7 @@ public class LambdaForm implements SpecialForm {
                         return getParameterObj(i);
                     }
                 }
-                
+
                 if (fromClosure.contains(obj)) {
                     return getValueFromClosure(obj);
                 }
@@ -138,36 +200,20 @@ public class LambdaForm implements SpecialForm {
                 return new ComputedLispObject(getter, setter);
             }
 
-            private LispObject getValueFromClosure(AtomObject obj) {
-                Environment closureEnv = environment.stackTop().getEnv();
-                
-                return closureEnv
-                        .lookupValue(obj);
+            private LispObject getValueFromClosure(AtomObject id) {
+                Supplier<LispObject> getter = () -> {
+                    return environment.stackTop().getEnv().lookupValue(id);
+                };
+                Consumer<LispObject> setter = (obj) -> {
+                    //environment.stackTop().getEnv().set(id, obj);
+                    environment.stackTop().getEnv().lookupValue(id).set(obj);
+                };
+                return new ComputedLispObject(getter, setter);
             }
 
         };
 
         return body.accept(visitor).asList().get();
-    }
-
-    private Environment upvaluesObj(LambdaMeta meta) {
-        Environment env = new MapEnvironment();
-        
-        for (AtomObject id: meta.getClosureInfo().keySet()) {
-            int parIndex = meta.getClosureInfo().get(id);
-            if (parIndex >= 0) {
-                CellObject cell = new CellObject();
-                cell.set(environment.stackTop().parameterAt(parIndex));
-                
-                env.set(id, cell);
-            } else {
-                LispObject cell = environment.stackTop().getEnv().lookupValue(id);
-                
-                env.set(id, cell);
-            }
-        }
-        
-        return env;
     }
 
     private Supplier<LispObject> evaluateBody(ListObject body) {

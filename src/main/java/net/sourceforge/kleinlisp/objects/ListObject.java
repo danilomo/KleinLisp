@@ -132,7 +132,7 @@ public class ListObject implements LispObject, Iterable<LispObject> {
     public String toString() {
         String metastr = "";
         if (meta != null) {
-            metastr = meta + "@";
+            //metastr = meta + "@";
         }
         return metastr + "(" + String.join(" ", toList().stream().map(t -> t.toString()).collect(Collectors.toList())) + ")";
     }
