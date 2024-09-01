@@ -1,3 +1,26 @@
+/*
+ * MIT License
+ * 
+ * Copyright (c) 2018 Danilo Oliveira
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package net.sourceforge.kleinlisp.api;
 
 import net.sourceforge.kleinlisp.LispObject;
@@ -7,7 +30,7 @@ import net.sourceforge.kleinlisp.objects.IntObject;
 import java.util.List;
 
 public class MathFunctions {
-    public static LispObject add(List<LispObject> params) {
+    public static LispObject add(LispObject[] params) {
         int sum = 0;
         for (LispObject i : params) {            
             sum += i.asInt().get();
@@ -15,7 +38,7 @@ public class MathFunctions {
         return new IntObject(sum);
     }
 
-    public static LispObject sub(List<LispObject> params) {
+    public static LispObject sub(LispObject[] params) {
         boolean first = true;
         int sum = 0;
 
@@ -30,7 +53,7 @@ public class MathFunctions {
         return new IntObject(sum);
     }
 
-    public static LispObject mul(List<LispObject> params) {
+    public static LispObject mul(LispObject[] params) {
         int prod = 1;
 
         for (LispObject i : params) {
@@ -39,7 +62,7 @@ public class MathFunctions {
         return new IntObject(prod);
     }
 
-    public static LispObject div(List<LispObject> params) {
+    public static LispObject div(LispObject[] params) {
         int prod = 1;
         boolean first = true;
 
@@ -54,7 +77,7 @@ public class MathFunctions {
         return new IntObject(prod);
     }
 
-    public static LispObject mod(List<LispObject> params) {
+    public static LispObject mod(LispObject[] params) {
         int prod = 1;
 
         for (LispObject i : params) {
@@ -63,9 +86,9 @@ public class MathFunctions {
         return new IntObject(prod);
     }
 
-    public static LispObject lt(List<LispObject> params) {
-        Integer i1 = params.get(0).asInt().get();
-        Integer i2 = params.get(1).asInt().get();
+    public static LispObject lt(LispObject[] params) {
+        Integer i1 = params[0].asInt().get();
+        Integer i2 = params[1].asInt().get();
 
         return new BooleanObject(i1 < i2);
     }
