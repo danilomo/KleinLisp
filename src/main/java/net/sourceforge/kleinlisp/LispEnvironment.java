@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.sourceforge.kleinlisp.api.IOFunctions;
+import net.sourceforge.kleinlisp.macros.MacroDefinition;
 /**
  * @author daolivei
  */
@@ -64,6 +65,7 @@ public class LispEnvironment implements Environment {
 
     private final Map<AtomObject, LispObject> objects;
     private final Map<AtomObject, String> names;
+    private final Map<AtomObject, MacroDefinition> macros;
     private final AtomFactory atomFactory;
     private final List<FunctionStack> stack;
 
@@ -72,7 +74,9 @@ public class LispEnvironment implements Environment {
         this.names = new HashMap<>();
         this.atomFactory = new AtomFactory(this);
         this.stack = new ArrayList<>();
+        this.macros = new HashMap<>();
         initFunctionTable();
+        initMacroTable();
     }
 
     private void initFunctionTable() {
@@ -96,12 +100,19 @@ public class LispEnvironment implements Environment {
         registerFunction("print", IOFunctions::print);
         registerFunction("println", IOFunctions::println);
         registerFunction("display", IOFunctions::println);
-
     }
+    
+    private void initMacroTable() {
+        
+    }    
 
     private void registerFunction(String symbol, net.sourceforge.kleinlisp.Function func) {
         set(atomOf(symbol), new FunctionObject(func));
     }
+    
+    private void registerMacro(String symbol, MacroDefinition macro) {
+        macros.put(atomOf(symbol), macro);
+    }    
 
     @Override
     public LispObject lookupValue(AtomObject atom) {
