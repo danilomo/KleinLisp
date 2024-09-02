@@ -23,18 +23,35 @@
  */
 package net.sourceforge.kleinlisp;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import org.junit.After;
 import org.junit.Before;
 
 abstract public class BaseTestClass {
 
     protected Lisp lisp;
+    private ByteArrayOutputStream redirectedOut;
+    private PrintStream originalOut;
 
     @Before
     public void setup() {
         lisp = new Lisp();
+        originalOut = System.out;
+        redirectedOut = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(redirectedOut));
+    }
+    
+    @After
+    public void tearDown() {
+        System.setOut(originalOut);
     }
 
     protected int evalAsInt(String str) {
         return lisp.evaluate(str).asInt().get();
+    }
+    
+    protected String getStdOut() {
+        return new String(redirectedOut.toByteArray());
     }
 }

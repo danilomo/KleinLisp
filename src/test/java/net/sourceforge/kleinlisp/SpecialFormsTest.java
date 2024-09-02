@@ -54,13 +54,33 @@ public class SpecialFormsTest extends BaseTestClass {
     }
 
     @Test
+    public void testNestedLetWithShadowing() {
+        lisp.evaluate("(define foo 10)");
+        lisp.evaluate("(define bar 10)");
+        assertEquals( //
+                evalAsInt("(let ((x 1) (y (+ foo bar))) (+ x y 1 (let ((x 2) (y 3)) (+ x y))))\""),
+                27
+        );
+    }
+
+    @Test
+    public void testNestedLetWithoutShadowing() {
+        lisp.evaluate("(define foo 10)");
+        lisp.evaluate("(define bar 10)");
+        assertEquals( //
+                evalAsInt("(let ((x 1) (y (+ foo bar))) (+ x y 1 (let ((a 2) (b 3)) (+ a b))))\""),
+                27
+        );
+    }
+
+    @Test
     public void testLambdaForm() {
         FunctionObject obj = lisp.evaluate("(lambda (x y z) (+ x y z))").asFunction().get();
 
         LispObject result = obj.function().evaluate(new LispObject[]{
-                new IntObject(1),
-                new IntObject(1),
-                new IntObject(1)
+            new IntObject(1),
+            new IntObject(1),
+            new IntObject(1)
         });
 
         assertEquals(

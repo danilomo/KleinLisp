@@ -106,8 +106,8 @@ public class LispEnvironment implements Environment {
     
     private void initMacroTable() {
         StandardMacros macros = new StandardMacros(this);
-        registerMacro("display", macros::display);
         registerMacro("when", macros::when);
+        registerMacro("let", macros::let);
     }    
 
     public void registerFunction(String symbol, net.sourceforge.kleinlisp.Function func) {

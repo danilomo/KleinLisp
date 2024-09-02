@@ -23,6 +23,9 @@
  */
 package net.sourceforge.kleinlisp;
 
+import net.sourceforge.kleinlisp.macros.StandardMacros;
+import net.sourceforge.kleinlisp.objects.ListObject;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -30,16 +33,26 @@ import org.junit.Test;
  * @author danilo
  */
 public class MacrosTest extends BaseTestClass {
-    
+
     @Test
     public void testMacro() {
+        class MacroEnv extends StandardMacros {
+
+            public MacroEnv() {
+                super((lisp.environment()));
+            }
+
+            ListObject display(ListObject object) {
+                return new ListObject(atom("print"), object);
+            }
+        }
+        MacroEnv env = new MacroEnv();
+
         String script = "(when (= 1 1) (display 2) (display (+ 1 2)))";
-        LispObject parsed = lisp.parse(script);
-        System.out.println(parsed);
-        LispObject expanded = lisp.environment().expandMacros(parsed);
-        
-        System.out.println(expanded);
+        lisp.environment().registerMacro("display", env::display);        
         lisp.evaluate(script);
+        
+        Assert.assertEquals("23", getStdOut());
     }
-    
+
 }

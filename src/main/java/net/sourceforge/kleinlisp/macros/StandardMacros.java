@@ -23,6 +23,8 @@
  */
 package net.sourceforge.kleinlisp.macros;
 
+import java.util.ArrayList;
+import java.util.List;
 import net.sourceforge.kleinlisp.LispEnvironment;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.AtomObject;
@@ -51,13 +53,40 @@ public class StandardMacros {
                 atom("if"),
                 new ListObject(condition, ifBody)
         );
-    }
+    } 
     
-    public ListObject display(ListObject object) {
-        return new ListObject(atom("println"), object);
+    public ListObject let(ListObject list) {
+        List<LispObject> parameters = new ArrayList<>();
+        List<LispObject> values = new ArrayList<>();
+        
+        LispObject head = list.car();
+        LispObject tail = list.cdr();
+        
+        for(LispObject elem: head.asList().get()) {
+            ListObject tuple = elem.asList().get();
+            parameters.add(tuple.car());
+            values.add(tuple.cdr().car());            
+        }
+        
+        ListObject lambda = new ListObject(
+                atom("lambda"),
+                new ListObject(
+                        ListObject.fromList(parameters),
+                        tail
+                )
+        );
+        
+        return new ListObject(
+                lambda,
+                ListObject.fromList(values)
+        );
     }
 
-    private AtomObject atom(String atom) {
+    protected AtomObject atom(String atom) {
         return lisp.atomOf(atom);
+    }
+    
+    protected LispEnvironment lisp() {
+        return lisp;
     }
 }
