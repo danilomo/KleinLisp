@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.Map;
 import net.sourceforge.kleinlisp.api.IOFunctions;
 import net.sourceforge.kleinlisp.macros.MacroDefinition;
+import net.sourceforge.kleinlisp.macros.MacroExpander;
+import net.sourceforge.kleinlisp.macros.StandardMacros;
 /**
  * @author daolivei
  */
@@ -65,7 +67,7 @@ public class LispEnvironment implements Environment {
 
     private final Map<AtomObject, LispObject> objects;
     private final Map<AtomObject, String> names;
-    private final Map<AtomObject, MacroDefinition> macros;
+    private final Map<AtomObject, MacroDefinition> macroTable;
     private final AtomFactory atomFactory;
     private final List<FunctionStack> stack;
 
@@ -74,7 +76,7 @@ public class LispEnvironment implements Environment {
         this.names = new HashMap<>();
         this.atomFactory = new AtomFactory(this);
         this.stack = new ArrayList<>();
-        this.macros = new HashMap<>();
+        this.macroTable = new HashMap<>();
         initFunctionTable();
         initMacroTable();
     }
@@ -103,15 +105,17 @@ public class LispEnvironment implements Environment {
     }
     
     private void initMacroTable() {
-        
+        StandardMacros macros = new StandardMacros(this);
+        registerMacro("display", macros::display);
+        registerMacro("when", macros::when);
     }    
 
-    private void registerFunction(String symbol, net.sourceforge.kleinlisp.Function func) {
+    public void registerFunction(String symbol, net.sourceforge.kleinlisp.Function func) {
         set(atomOf(symbol), new FunctionObject(func));
     }
     
-    private void registerMacro(String symbol, MacroDefinition macro) {
-        macros.put(atomOf(symbol), macro);
+    public void registerMacro(String symbol, MacroDefinition macro) {
+        macroTable.put(atomOf(symbol), macro);
     }    
 
     @Override
@@ -155,4 +159,7 @@ public class LispEnvironment implements Environment {
         return stack.isEmpty();
     }
 
+    public LispObject expandMacros(LispObject obj) {
+        return MacroExpander.expandMacro(macroTable, obj);
+    }
 }

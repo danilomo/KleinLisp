@@ -35,7 +35,26 @@ import net.sourceforge.kleinlisp.objects.ListObject;
  * @author danilo
  */
 public class MacroExpander extends DefaultVisitor {
-    private Map<AtomObject, MacroDefinition> macros;
+    
+    public static LispObject expandMacro(Map<AtomObject, MacroDefinition> macros, LispObject obj) {
+        // TODO: detect infinite recursion
+        while (true) {
+            MacroExpander expander = new MacroExpander(macros);
+            obj = obj.accept(expander);
+            if (!expander.expanded) {
+                break;
+            }
+        }
+        
+        return obj;
+    }
+    
+    private final Map<AtomObject, MacroDefinition> macros;
+    private boolean expanded = false;
+
+    public MacroExpander(Map<AtomObject, MacroDefinition> macros) {
+        this.macros = macros;
+    }        
 
     @Override
     public LispObject visit(ListObject obj) {        
@@ -53,14 +72,18 @@ public class MacroExpander extends DefaultVisitor {
         
         if (macros.containsKey(atom)) {
             MacroDefinition macro = macros.get(atom);
-            return macroExpand(macro, obj);
+            return macroExpand(macro, obj.cdr());
         }
         
         return super.visit(obj);
     }
 
     private LispObject macroExpand(MacroDefinition macro, ListObject obj) {
-        return null;
+        ListObject transformed = macro.expand(obj);
+        
+        expanded = true;
+        
+        return transformed;
     }
     
     

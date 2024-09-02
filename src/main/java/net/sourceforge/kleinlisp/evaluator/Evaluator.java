@@ -49,7 +49,10 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
     }
 
     public LispObject evaluate(LispObject obj) {
-        LispObject transformed = ClosureVisitor.addClosureMeta(obj);
+
+        LispObject transformed = environment.expandMacros(
+                ClosureVisitor.addClosureMeta(obj)
+        );
         return transformed.accept(this).get();
     }
 
@@ -79,8 +82,12 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
     }
 
     @Override
-    public Supplier<LispObject> visit(ListObject list) {
-        LispObject head = list.head();
+    public Supplier<LispObject> visit(ListObject list) {        
+        if (list == ListObject.NIL) {
+            return () -> ListObject.NIL;
+        }
+        
+        LispObject head = list.head();               
 
         Optional<SpecialForm> form = forms.get(head);
 
@@ -122,7 +129,7 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
     public Supplier<LispObject> visit(ComputedLispObject obj) {
         return obj.getComputed();
     }
-    
+
     @Override
     public Supplier<LispObject> visit(CellObject obj) {
         return () -> obj.get();

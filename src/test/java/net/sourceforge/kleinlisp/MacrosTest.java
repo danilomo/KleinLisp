@@ -21,43 +21,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.sourceforge.kleinlisp.macros;
+package net.sourceforge.kleinlisp;
 
-import net.sourceforge.kleinlisp.LispEnvironment;
-import net.sourceforge.kleinlisp.LispObject;
-import net.sourceforge.kleinlisp.objects.AtomObject;
-import net.sourceforge.kleinlisp.objects.ListObject;
+import org.junit.Test;
 
 /**
  *
  * @author danilo
  */
-public class StandardMacros {
-
-    private final LispEnvironment lisp;
-
-    public StandardMacros(LispEnvironment lisp) {
-        this.lisp = lisp;
-    }
-
-    public ListObject when(ListObject body) {
-        LispObject condition = body.car();
-        ListObject statements = body.cdr();
-
-        ListObject trueBranch = new ListObject(atom("begin"), statements);
-        ListObject ifBody = new ListObject(trueBranch, new ListObject(ListObject.NIL));
-
-        return new ListObject(
-                atom("if"),
-                new ListObject(condition, ifBody)
-        );
+public class MacrosTest extends BaseTestClass {
+    
+    @Test
+    public void testMacro() {
+        String script = "(when (= 1 1) (display 2) (display (+ 1 2)))";
+        LispObject parsed = lisp.parse(script);
+        System.out.println(parsed);
+        LispObject expanded = lisp.environment().expandMacros(parsed);
+        
+        System.out.println(expanded);
+        lisp.evaluate(script);
     }
     
-    public ListObject display(ListObject object) {
-        return new ListObject(atom("println"), object);
-    }
-
-    private AtomObject atom(String atom) {
-        return lisp.atomOf(atom);
-    }
 }
