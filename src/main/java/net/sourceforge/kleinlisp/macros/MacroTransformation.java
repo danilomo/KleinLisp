@@ -23,13 +23,42 @@
  */
 package net.sourceforge.kleinlisp.macros;
 
+import net.sourceforge.kleinlisp.DefaultVisitor;
+import net.sourceforge.kleinlisp.LispObject;
+import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
+import net.sourceforge.kleinlisp.objects.VoidObject;
 
 /**
  *
  * @author danilo
  */
 public class MacroTransformation {
+    
+    private static class ListBuffer {
+        private final ListObject first;   
+        private ListObject last;
+
+        public ListBuffer() {
+            first = new ListObject(VoidObject.VOID);
+            last = first;
+        }
+        
+        public void add(LispObject obj) {
+            last.setCdr(new ListObject(obj));
+            last = last.cdr();
+        }
+        
+        public void concat(ListObject list) {
+            last.setCdr(list);                        
+        }
+        
+        public ListObject getList() {
+            return first.cdr();
+        }
+        
+    }
+    
     private final ListObject transformationBody;
     private final MatchResult match;
 
@@ -38,7 +67,68 @@ public class MacroTransformation {
         this.match = match;
     }
     
-    public ListObject transform(ListObject input) {
+    private class TransformationVisitor extends DefaultVisitor {
+
+        @Override
+        public LispObject visit(ListObject obj) {
+            ListBuffer buffer = new ListBuffer();
+            ListObject pointer = obj;
+            AtomObject last;
+            AtomObject atom = null;
+            
+            while(pointer != ListObject.NIL) {
+                LispObject elem = pointer.car();
+                
+                if (elem.asAtom().isPresent()) {
+                    last = atom;
+                    atom = elem.asAtom().get();
+                    
+                    if (atom.toString().equals("_REST_")) {
+                        ListObject ellipsis = match.getEllipsis(last).asList().get();
+                        buffer.concat(ellipsis);
+                        break;
+                    }
+                    
+                    if (match.getTransformation(atom) != null) {
+                        buffer.add(match.getTransformation(atom));                       
+                    } else {                        
+                        buffer.add(atom);
+                    }
+                    
+                } else {                
+                    buffer.add(elem.accept(this));                    
+                }
+                
+                pointer = pointer.cdr();
+            }
+            
+            return buffer.getList();
+        }
         
+        /*
+                    if (obj.toString().equals("_REST_")) {
+                LispObject rest = match.getEllipsis(last);
+                if (rest != null) {
+                    return rest;    
+                } else {
+                    return new ErrorObject("error expanding ellipsis, to define what to write");
+                }
+            }
+        
+        @Override
+        public LispObject visit(AtomObject obj) {           
+            if (match.getTransformation(obj) != null) {
+                return match.getTransformation(obj);
+            } 
+            
+            return obj;
+        }
+        */
+    }
+    
+    public ListObject transform() {
+        TransformationVisitor visitor = new TransformationVisitor();
+        
+        return transformationBody.accept(visitor).asList().get();
     }
 }

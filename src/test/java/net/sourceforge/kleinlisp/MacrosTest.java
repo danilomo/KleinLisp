@@ -25,6 +25,8 @@ package net.sourceforge.kleinlisp;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import net.sourceforge.kleinlisp.macros.MacroTransformation;
+import net.sourceforge.kleinlisp.macros.MatchResult;
 import net.sourceforge.kleinlisp.macros.PatternMatcher;
 import net.sourceforge.kleinlisp.macros.StandardMacros;
 import net.sourceforge.kleinlisp.objects.ListObject;
@@ -100,4 +102,21 @@ public class MacrosTest extends BaseTestClass {
         )));
         pm.match(input);
     } 
+    
+    @Test
+    public void testPatternMatching4() {        
+        ListObject pattern = lisp.parse("(_ condition body _REST_)").asList().get();
+        ListObject input = lisp.parse("(when (> 1 2) (print like) (print this) (print like) (print that))").asList().get();
+        ListObject transformation = lisp.parse("(if (not condition) (begin body _REST_))").asList().get();
+        
+        System.out.println(pattern);
+        System.out.println(input);
+        
+        PatternMatcher pm = new PatternMatcher(pattern, new HashSet<>(Arrays.asList()));
+        MatchResult match = pm.match(input);
+        
+        MacroTransformation trans = new MacroTransformation(transformation, match);
+        
+        System.out.println(trans.transform());
+    }    
 }

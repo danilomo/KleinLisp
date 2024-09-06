@@ -72,8 +72,8 @@ public class ListObject implements LispObject, Iterable<LispObject> {
             return 0;
         }
     };
-    private final LispObject head;
-    private final LispObject tail;
+    private LispObject head;
+    private LispObject tail;
     private final int length;
     private Object meta;
 
@@ -280,6 +280,10 @@ public class ListObject implements LispObject, Iterable<LispObject> {
         } else {
             return Optional.empty();
         }
+    }
+
+    public void setCdr(LispObject list) {
+        this.tail = list;
     }
 
     private class ListFormIterator implements Iterator<LispObject> {

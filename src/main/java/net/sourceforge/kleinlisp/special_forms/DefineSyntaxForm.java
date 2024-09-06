@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.function.Supplier;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.evaluator.Evaluator;
-import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 import net.sourceforge.kleinlisp.objects.VoidObject;
 

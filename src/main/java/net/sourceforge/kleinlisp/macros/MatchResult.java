@@ -26,7 +26,6 @@ package net.sourceforge.kleinlisp.macros;
 import java.util.Map;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.AtomObject;
-import net.sourceforge.kleinlisp.objects.ListObject;
 
 /**
  *
@@ -35,10 +34,10 @@ import net.sourceforge.kleinlisp.objects.ListObject;
 public class MatchResult {
 
     private final Map<AtomObject, LispObject> patterns;
-    private final Map<AtomObject, ListObject> ellipisis;
+    private final Map<AtomObject, LispObject> ellipisis;
     boolean match;
 
-    public MatchResult(Map<AtomObject, LispObject> patterns, Map<AtomObject, ListObject> ellipisis, boolean match) {
+    public MatchResult(Map<AtomObject, LispObject> patterns, Map<AtomObject, LispObject> ellipisis, boolean match) {
         this.patterns = patterns;
         this.ellipisis = ellipisis;
         this.match = match;
@@ -52,7 +51,7 @@ public class MatchResult {
         return patterns.get(atom);
     }
     
-    public ListObject getEllipsis(AtomObject atom) {
+    public LispObject getEllipsis(AtomObject atom) {
         return ellipisis.get(atom);
     }
 }

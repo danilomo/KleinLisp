@@ -57,7 +57,7 @@ public class PatternMatcher {
     private class PatternTreeWalker {
 
         Map<AtomObject, LispObject> patterns = new HashMap<>();
-        Map<AtomObject, ListObject> ellipisis = new HashMap<>();
+        Map<AtomObject, LispObject> ellipisis = new HashMap<>();
         boolean matches = true;
         
         AtomObject last = null;
