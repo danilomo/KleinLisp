@@ -21,37 +21,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.sourceforge.kleinlisp;
+package net.sourceforge.kleinlisp.macros;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import org.junit.After;
-import org.junit.Before;
+import java.util.Map;
+import net.sourceforge.kleinlisp.LispObject;
+import net.sourceforge.kleinlisp.objects.AtomObject;
+import net.sourceforge.kleinlisp.objects.ListObject;
 
-abstract public class BaseTestClass {
+/**
+ *
+ * @author danilo
+ */
+public class MatchResult {
 
-    protected Lisp lisp;
-    private ByteArrayOutputStream redirectedOut;
-    private PrintStream originalOut;
+    private final Map<AtomObject, LispObject> patterns;
+    private final Map<AtomObject, ListObject> ellipisis;
+    boolean match;
 
-    @Before
-    public void setup() {
-        lisp = new Lisp();
-        originalOut = System.out;
-        redirectedOut = new ByteArrayOutputStream();
-        //System.setOut(new PrintStream(redirectedOut));
+    public MatchResult(Map<AtomObject, LispObject> patterns, Map<AtomObject, ListObject> ellipisis, boolean match) {
+        this.patterns = patterns;
+        this.ellipisis = ellipisis;
+        this.match = match;
     }
     
-    @After
-    public void tearDown() {
-        //System.setOut(originalOut);
-    }
-
-    protected int evalAsInt(String str) {
-        return lisp.evaluate(str).asInt().get();
+    public boolean isMatch() {
+        return match;
     }
     
-    protected String getStdOut() {
-        return new String(redirectedOut.toByteArray());
+    public LispObject getTransformation(AtomObject atom) {
+        return patterns.get(atom);
+    }
+    
+    public ListObject getEllipsis(AtomObject atom) {
+        return ellipisis.get(atom);
     }
 }

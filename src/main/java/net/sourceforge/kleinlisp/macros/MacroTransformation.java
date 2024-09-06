@@ -21,37 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.sourceforge.kleinlisp;
+package net.sourceforge.kleinlisp.macros;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import org.junit.After;
-import org.junit.Before;
+import net.sourceforge.kleinlisp.objects.ListObject;
 
-abstract public class BaseTestClass {
+/**
+ *
+ * @author danilo
+ */
+public class MacroTransformation {
+    private final ListObject transformationBody;
+    private final MatchResult match;
 
-    protected Lisp lisp;
-    private ByteArrayOutputStream redirectedOut;
-    private PrintStream originalOut;
-
-    @Before
-    public void setup() {
-        lisp = new Lisp();
-        originalOut = System.out;
-        redirectedOut = new ByteArrayOutputStream();
-        //System.setOut(new PrintStream(redirectedOut));
+    public MacroTransformation(ListObject transformationBody, MatchResult match) {
+        this.transformationBody = transformationBody;
+        this.match = match;
     }
     
-    @After
-    public void tearDown() {
-        //System.setOut(originalOut);
-    }
-
-    protected int evalAsInt(String str) {
-        return lisp.evaluate(str).asInt().get();
-    }
-    
-    protected String getStdOut() {
-        return new String(redirectedOut.toByteArray());
+    public ListObject transform(ListObject input) {
+        
     }
 }

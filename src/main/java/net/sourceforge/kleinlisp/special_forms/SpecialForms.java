@@ -54,6 +54,7 @@ public class SpecialForms {
         this.insertForm("define", new DefineForm(evaluator, environment));
         this.insertForm("set!", new SetForm(evaluator, environment));
         this.insertForm("begin", new BeginForm(evaluator));
+        this.insertForm("define-syntax", new DefineSyntaxForm(evaluator));
     }
 
     SpecialForms insertForm(String name, SpecialForm form) {

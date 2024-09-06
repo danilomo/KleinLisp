@@ -21,37 +21,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.sourceforge.kleinlisp;
+package net.sourceforge.kleinlisp.special_forms;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import org.junit.After;
-import org.junit.Before;
+import java.util.List;
+import java.util.function.Supplier;
+import net.sourceforge.kleinlisp.LispObject;
+import net.sourceforge.kleinlisp.evaluator.Evaluator;
+import net.sourceforge.kleinlisp.objects.AtomObject;
+import net.sourceforge.kleinlisp.objects.ListObject;
+import net.sourceforge.kleinlisp.objects.VoidObject;
 
-abstract public class BaseTestClass {
+/**
+ *
+ * @author danilo
+ */
+public class DefineSyntaxForm implements SpecialForm {
 
-    protected Lisp lisp;
-    private ByteArrayOutputStream redirectedOut;
-    private PrintStream originalOut;
+    private final Evaluator evaluator;
 
-    @Before
-    public void setup() {
-        lisp = new Lisp();
-        originalOut = System.out;
-        redirectedOut = new ByteArrayOutputStream();
-        //System.setOut(new PrintStream(redirectedOut));
-    }
-    
-    @After
-    public void tearDown() {
-        //System.setOut(originalOut);
+    public DefineSyntaxForm(Evaluator evaluator) {
+        this.evaluator = evaluator;
     }
 
-    protected int evalAsInt(String str) {
-        return lisp.evaluate(str).asInt().get();
+    @Override
+    public Supplier<LispObject> apply(LispObject t) {
+        ListObject body = t.asList().get().cdr().cdr().car().asList().get();
+        
+        List<LispObject> list = body.toList();
+        
+        System.out.println(list);
+
+        return () -> {
+            return VoidObject.VOID;
+        };
     }
-    
-    protected String getStdOut() {
-        return new String(redirectedOut.toByteArray());
-    }
+
 }

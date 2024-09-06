@@ -23,6 +23,9 @@
  */
 package net.sourceforge.kleinlisp;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import net.sourceforge.kleinlisp.macros.PatternMatcher;
 import net.sourceforge.kleinlisp.macros.StandardMacros;
 import net.sourceforge.kleinlisp.objects.ListObject;
 import org.junit.Assert;
@@ -49,10 +52,52 @@ public class MacrosTest extends BaseTestClass {
         MacroEnv env = new MacroEnv();
 
         String script = "(when (= 1 1) (display 2) (display (+ 1 2)))";
-        lisp.environment().registerMacro("display", env::display);        
+        lisp.environment().registerMacro("display", env::display);
         lisp.evaluate(script);
-        
+
         Assert.assertEquals("23", getStdOut());
     }
 
+    @Test
+    public void testPatternMatching() {        
+        ListObject pattern = lisp.parse("(_ ana _ else bananinha)").asList().get();
+        ListObject input = lisp.parse("(ronaldo 1 2 else 3)").asList().get();
+        
+        System.out.println(pattern);
+        System.out.println(input);
+        
+        PatternMatcher pm = new PatternMatcher(pattern, new HashSet<>(Arrays.asList(
+                lisp.environment().atomOf("else")
+        )));
+        pm.match(input);
+    }
+    
+    @Test
+    public void testPatternMatching2() {        
+        ListObject pattern = lisp.parse("(_ ana else bananinha)").asList().get();
+        ListObject input = lisp.parse("(ronaldo 1 2 else 3)").asList().get();
+        
+        System.out.println(pattern);
+        System.out.println(input);
+        
+        PatternMatcher pm = new PatternMatcher(pattern, new HashSet<>(Arrays.asList(
+                lisp.environment().atomOf("else")
+        )));
+        pm.match(input);
+    }
+    
+        
+    @Test
+    public void testPatternMatching3() {        
+        ListObject pattern = lisp.parse("(_ (e1 e2 e3 _REST_) (e4 e5 e6 _REST_))").asList().get();
+        ListObject input = lisp.parse("(cond (a b c 4 5 6) (d e f 7))").asList().get();
+        
+        System.out.println(pattern);
+        System.out.println(input);
+        
+        PatternMatcher pm = new PatternMatcher(pattern, new HashSet<>(Arrays.asList(
+                lisp.environment().atomOf("else")
+        )));
+        pm.match(input);
+    } 
 }
