@@ -70,5 +70,9 @@ public class BooleanFunctions {
 
         return new BooleanObject(left != right);
     }
+    
+    public static LispObject not(LispObject[] params) {
+        return new BooleanObject(!params[0].truthiness());
+    }
 
 }

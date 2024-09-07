@@ -23,6 +23,8 @@
  */
 package net.sourceforge.kleinlisp.functional;
 
+import java.util.function.BiFunction;
+
 /**
  * @author Danilo Oliveira
  */
@@ -42,4 +44,8 @@ public class Tuple2<K, V> {
     public V second() {
         return v;
     }
+    
+    public <R> R apply(BiFunction<K, V, R> func) {
+        return func.apply(k, v);
+    } 
 }

@@ -16,7 +16,7 @@ digit		= [0-9]
 symbol          = 
                     [+] | [-] | [%] | [/] |
                     [*] | [$] | [_] | [:] | [>] | [<] | [=] |
-                    [!] | [\?]
+                    [!] | [\?] | [.]
 
 letter		= {lowercase} | {uppercase}
 lowercase	= [a-z]
@@ -55,6 +55,7 @@ StringBuilder str = new StringBuilder();
     ")"                             { return symbol( sym.CLOSE_PAR ); }
     "["                             { return symbol( sym.OPEN_BRACKET ); }
     "]"                             { return symbol( sym.CLOSE_BRACKET ); }
+    "."                             { return symbol( sym.DOT ); }
 
     {identifier}                    { return symbol( sym.ATOM,  yytext() ); }
     {integer_literal}               { return symbol( sym.INT_LITERAL,  Integer.parseInt(yytext()) ); }

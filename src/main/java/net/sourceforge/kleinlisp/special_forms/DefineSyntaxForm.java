@@ -23,10 +23,20 @@
  */
 package net.sourceforge.kleinlisp.special_forms;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
+import net.sourceforge.kleinlisp.LispEnvironment;
 import net.sourceforge.kleinlisp.LispObject;
-import net.sourceforge.kleinlisp.evaluator.Evaluator;
+import net.sourceforge.kleinlisp.functional.Tuple2;
+import net.sourceforge.kleinlisp.macros.MacroDefinition;
+import net.sourceforge.kleinlisp.macros.MacroRule;
+import net.sourceforge.kleinlisp.macros.MacroTransformation;
+import net.sourceforge.kleinlisp.macros.PatternMatcher;
+import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 import net.sourceforge.kleinlisp.objects.VoidObject;
 
@@ -36,23 +46,79 @@ import net.sourceforge.kleinlisp.objects.VoidObject;
  */
 public class DefineSyntaxForm implements SpecialForm {
 
-    private final Evaluator evaluator;
+    private static final String SYNTAX_RULES = "syntax-rules";
+    private final LispEnvironment environment;
 
-    public DefineSyntaxForm(Evaluator evaluator) {
-        this.evaluator = evaluator;
+    public DefineSyntaxForm(LispEnvironment environment) {
+        this.environment = environment;
     }
 
     @Override
     public Supplier<LispObject> apply(LispObject t) {
-        ListObject body = t.asList().get().cdr().cdr().car().asList().get();
-        
-        List<LispObject> list = body.toList();
-        
-        System.out.println(list);
+        Optional<Tuple2<AtomObject, MacroDefinition>> macroDefOpt = t
+                .asList()
+                .map(l -> l.cdr())
+                .flatMap(o -> o.unpack(AtomObject.class, ListObject.class))
+                .map(o -> o.apply(this::parseMacroDefinition));
+        Tuple2<AtomObject, MacroDefinition> macroDef = macroDefOpt.get();
+        environment.registerMacro(macroDef.first(), macroDef.second());
 
         return () -> {
             return VoidObject.VOID;
         };
+    }
+
+    private Tuple2<AtomObject, MacroDefinition> parseMacroDefinition(AtomObject name, ListObject body) {
+        AtomObject atom = body.car().asAtom().get();
+        ListObject variables = body.cdr().car().asList().get();
+        ListObject rules = body.cdr().cdr();
+
+        MacroDefinition macro = getMacroDefinition(atom, variables, rules);
+
+        return new Tuple2<>(name, macro);
+    }
+
+    MacroDefinition getMacroDefinition(AtomObject head, ListObject variables, ListObject rules) {
+        if (head != environment.atomOf(SYNTAX_RULES)) {
+            return null;
+        }
+
+        Set<AtomObject> syntaxVariables = parseSyntaxVariables(variables);
+
+        List<MacroRule> macroRules = parseMacroRules(rules, syntaxVariables);
+
+        return new SyntaxRulesMacro(macroRules);
+    }
+
+    private Set<AtomObject> parseSyntaxVariables(ListObject list) {
+        Set<AtomObject> result = new HashSet<>();
+
+        for (LispObject obj : list) {
+            AtomObject atom = obj.asAtom().get();
+            result.add(atom);
+        }
+
+        return result;
+    }
+
+    private List<MacroRule> parseMacroRules(ListObject rules, Set<AtomObject> syntaxVariables) {
+        List<MacroRule> macroRules = new ArrayList<>();
+
+        for (LispObject obj : rules) {
+            Tuple2<ListObject, ListObject> tuple = obj
+                    .asList()
+                    .flatMap(o -> o.unpack(ListObject.class, ListObject.class))
+                    .get();
+
+            MacroRule rule = new MacroRule(
+                    new PatternMatcher(tuple.first(), syntaxVariables),
+                    new MacroTransformation(tuple.second())
+            );
+
+            macroRules.add(rule);
+        }
+
+        return macroRules;
     }
 
 }

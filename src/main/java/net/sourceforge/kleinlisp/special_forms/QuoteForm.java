@@ -21,37 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.sourceforge.kleinlisp;
+package net.sourceforge.kleinlisp.special_forms;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import org.junit.After;
-import org.junit.Before;
+import java.util.function.Supplier;
+import net.sourceforge.kleinlisp.LispObject;
 
-abstract public class BaseTestClass {
+/**
+ *
+ * @author danilo
+ */
+public class QuoteForm implements SpecialForm {
 
-    protected Lisp lisp;
-    private ByteArrayOutputStream redirectedOut;
-    private PrintStream originalOut;
-
-    @Before
-    public void setup() {
-        lisp = new Lisp();
-        originalOut = System.out;
-        redirectedOut = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(redirectedOut));
+    @Override
+    public Supplier<LispObject> apply(LispObject t) {
+        LispObject obj = t.asList().get().cdr();
+        
+        return () -> obj;
     }
     
-    @After
-    public void tearDown() {
-        System.setOut(originalOut);
-    }
-
-    protected int evalAsInt(String str) {
-        return lisp.evaluate(str).asInt().get();
-    }
-    
-    protected String getStdOut() {
-        return new String(redirectedOut.toByteArray());
-    }
 }

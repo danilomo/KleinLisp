@@ -54,5 +54,8 @@ public class Tuple3<K, V, T> {
         return "[ " + k + ", " + v + ", " + t + " ]";
     }
 
+    public <R> R apply(TriFunction<K, V, T, R> func) {
+        return func.apply(k, v, t);
+    } 
 
 }

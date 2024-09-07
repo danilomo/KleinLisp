@@ -49,12 +49,12 @@ public class SpecialForms {
 
     private void initForms() {
         this.insertForm("if", new IfForm(evaluator));
-        //this.insertForm("let" ,new LetForm(evaluator, environment));
         this.insertForm("lambda", new LambdaForm(evaluator, environment));
         this.insertForm("define", new DefineForm(evaluator, environment));
         this.insertForm("set!", new SetForm(evaluator, environment));
         this.insertForm("begin", new BeginForm(evaluator));
-        this.insertForm("define-syntax", new DefineSyntaxForm(evaluator));
+        this.insertForm("define-syntax", new DefineSyntaxForm(environment));
+        this.insertForm("quote", new QuoteForm());
     }
 
     SpecialForms insertForm(String name, SpecialForm form) {

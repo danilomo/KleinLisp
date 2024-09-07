@@ -49,8 +49,6 @@ public class PatternMatcher {
         PatternTreeWalker walker = new PatternTreeWalker();
         walker.walkTree(pattern, obj);
 
-        System.out.println(walker);
-
         return walker.getMatchResult();
     }
 
@@ -97,7 +95,7 @@ public class PatternMatcher {
                 
                 if (currentAtom.toString().equals("_")) {
                     recordPattern = false;
-                } else if (currentAtom.toString().equals("_REST_")) {
+                } else if (currentAtom.toString().equals("...")) {
                     ellipisis.put(last, refInput);
                     return;
                 } else if (syntaxVariables.contains(currentAtom)) {

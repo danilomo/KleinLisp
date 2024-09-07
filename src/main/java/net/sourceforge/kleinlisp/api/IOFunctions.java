@@ -51,4 +51,9 @@ public class IOFunctions {
         System.out.println(asString);
         return VoidObject.VOID;
     }
+    
+    public static LispObject newline(LispObject[] params) {
+        System.out.println();
+        return VoidObject.VOID;
+    }    
 }

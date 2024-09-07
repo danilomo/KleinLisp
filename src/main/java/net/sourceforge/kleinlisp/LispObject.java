@@ -163,6 +163,10 @@ public interface LispObject {
         if (clazz.equals(AtomObject.class)) {
             return (Optional<T>) this.asAtom();
         }
+        
+        if (clazz.equals(ListObject.class)) {
+            return (Optional<T>) this.asList();
+        }
 
         return Optional.empty();
     }

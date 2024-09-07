@@ -43,6 +43,8 @@ public class StandardMacros {
     }
 
     public ListObject when(ListObject body) {
+        body = body.cdr();
+        
         LispObject condition = body.car();
         ListObject statements = body.cdr();
 
@@ -59,6 +61,7 @@ public class StandardMacros {
         List<LispObject> parameters = new ArrayList<>();
         List<LispObject> values = new ArrayList<>();
         
+        list = list.cdr();
         LispObject head = list.car();
         LispObject tail = list.cdr();
         

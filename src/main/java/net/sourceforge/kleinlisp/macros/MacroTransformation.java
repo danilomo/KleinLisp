@@ -60,15 +60,19 @@ public class MacroTransformation {
     }
     
     private final ListObject transformationBody;
-    private final MatchResult match;
 
-    public MacroTransformation(ListObject transformationBody, MatchResult match) {
+    public MacroTransformation(ListObject transformationBody) {
         this.transformationBody = transformationBody;
-        this.match = match;
     }
     
     private class TransformationVisitor extends DefaultVisitor {
+        
+        final MatchResult match;
 
+        public TransformationVisitor(MatchResult match) {
+            this.match = match;
+        }
+        
         @Override
         public LispObject visit(ListObject obj) {
             ListBuffer buffer = new ListBuffer();
@@ -83,7 +87,7 @@ public class MacroTransformation {
                     last = atom;
                     atom = elem.asAtom().get();
                     
-                    if (atom.toString().equals("_REST_")) {
+                    if (atom.toString().equals("...")) {
                         ListObject ellipsis = match.getEllipsis(last).asList().get();
                         buffer.concat(ellipsis);
                         break;
@@ -103,31 +107,11 @@ public class MacroTransformation {
             }
             
             return buffer.getList();
-        }
-        
-        /*
-                    if (obj.toString().equals("_REST_")) {
-                LispObject rest = match.getEllipsis(last);
-                if (rest != null) {
-                    return rest;    
-                } else {
-                    return new ErrorObject("error expanding ellipsis, to define what to write");
-                }
-            }
-        
-        @Override
-        public LispObject visit(AtomObject obj) {           
-            if (match.getTransformation(obj) != null) {
-                return match.getTransformation(obj);
-            } 
-            
-            return obj;
-        }
-        */
+        }        
     }
     
-    public ListObject transform() {
-        TransformationVisitor visitor = new TransformationVisitor();
+    public ListObject transform(MatchResult match) {
+        TransformationVisitor visitor = new TransformationVisitor(match);
         
         return transformationBody.accept(visitor).asList().get();
     }

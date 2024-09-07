@@ -72,7 +72,7 @@ public class MacroExpander extends DefaultVisitor {
         
         if (macros.containsKey(atom)) {
             MacroDefinition macro = macros.get(atom);
-            return macroExpand(macro, obj.cdr());
+            return macroExpand(macro, obj);
         }
         
         return super.visit(obj);

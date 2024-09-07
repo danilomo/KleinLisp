@@ -21,37 +21,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.sourceforge.kleinlisp;
+package net.sourceforge.kleinlisp.special_forms;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import org.junit.After;
-import org.junit.Before;
+import java.util.List;
+import java.util.Optional;
+import net.sourceforge.kleinlisp.LispObject;
+import net.sourceforge.kleinlisp.macros.MacroDefinition;
+import net.sourceforge.kleinlisp.macros.MacroRule;
+import net.sourceforge.kleinlisp.objects.ListObject;
 
-abstract public class BaseTestClass {
+/**
+ *
+ * @author danilo
+ */
+public class SyntaxRulesMacro implements MacroDefinition {
 
-    protected Lisp lisp;
-    private ByteArrayOutputStream redirectedOut;
-    private PrintStream originalOut;
+    private final List<MacroRule> macroRules;
+    
+    public SyntaxRulesMacro(List<MacroRule> macroRules) {
+        this.macroRules = macroRules;
+    }
 
-    @Before
-    public void setup() {
-        lisp = new Lisp();
-        originalOut = System.out;
-        redirectedOut = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(redirectedOut));
+    @Override
+    public ListObject expand(ListObject object) {
+        for (MacroRule rule: macroRules) {
+            Optional<LispObject> result = rule.apply(object);
+            
+            if (result.isPresent()) {
+                return result.flatMap(LispObject::asList).get();
+            }
+        }
+        
+        throw new RuntimeException("Could not expand macro for Object: " + object);
     }
     
-    @After
-    public void tearDown() {
-        System.setOut(originalOut);
-    }
-
-    protected int evalAsInt(String str) {
-        return lisp.evaluate(str).asInt().get();
-    }
-    
-    protected String getStdOut() {
-        return new String(redirectedOut.toByteArray());
-    }
 }

@@ -98,10 +98,12 @@ public class LispEnvironment implements Environment {
         registerFunction(">=", BooleanFunctions::ge);
         registerFunction("=",  BooleanFunctions::eq);
         registerFunction("!=", BooleanFunctions::neq);
+        registerFunction("not", BooleanFunctions::not);
         
         registerFunction("print", IOFunctions::print);
         registerFunction("println", IOFunctions::println);
         registerFunction("display", IOFunctions::println);
+        registerFunction("newline", IOFunctions::newline);
     }
     
     private void initMacroTable() {
@@ -116,7 +118,11 @@ public class LispEnvironment implements Environment {
     
     public void registerMacro(String symbol, MacroDefinition macro) {
         macroTable.put(atomOf(symbol), macro);
-    }    
+    } 
+    
+    public void registerMacro(AtomObject symbol, MacroDefinition macro) {
+        macroTable.put(symbol, macro);
+    }      
 
     @Override
     public LispObject lookupValue(AtomObject atom) {

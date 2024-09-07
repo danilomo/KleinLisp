@@ -165,10 +165,17 @@ public class ListObject implements LispObject, Iterable<LispObject> {
     @Override
     public String toString() {
         String metastr = "";
+        
         if (meta != null) {
             //metastr = meta + "@";
         }
-        return metastr + "(" + String.join(" ", toList().stream().map(t -> t.toString()).collect(Collectors.toList())) + ")";
+        
+        return metastr + "[" + String.join(", ", 
+                toList()
+                        .stream()
+                        .map(t -> t.toString())
+                        .collect(Collectors.toList()))
+                + "]";
     }
 
     public List<LispObject> toList() {
@@ -227,10 +234,6 @@ public class ListObject implements LispObject, Iterable<LispObject> {
         Optional<K> first = this.car().as(c1);
         Optional<V> second = this.cdr().car().as(c2);
         Optional<T> third = this.cdr().cdr().car().as(c3);
-
-        System.out.println(first);
-        System.out.println(second);
-        System.out.println(third);
 
         if (first.isPresent() && second.isPresent() && third.isPresent()) {
             return Optional.of(new Tuple3(first.get(), second.get(), third.get()));

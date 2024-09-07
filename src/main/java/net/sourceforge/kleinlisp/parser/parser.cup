@@ -6,14 +6,14 @@ import net.sourceforge.kleinlisp.objects.*;
 
 
 parser code {:
-    private Environment environment;
+    private LispEnvironment environment;
 
-    public parser withEnvironment(Environment environment){
+    public parser withEnvironment(LispEnvironment environment){
         this.environment = environment;
         return this;
     }
 
-    public Environment environment(){
+    public LispEnvironment environment(){
         return environment;
     }
 :}
@@ -21,6 +21,7 @@ parser code {:
 terminal String ATOM;
 terminal String STRING_LITERAL;
 terminal QUOTE, OPEN_PAR, CLOSE_PAR, OPEN_BRACKET, CLOSE_BRACKET;
+terminal DOT;
 
 terminal Integer INT_LITERAL;
 terminal Double  DOUBLE_LITERAL;
@@ -46,7 +47,6 @@ self_evaluating_form ::=
 
 list_form ::=
     OPEN_PAR     form_list:l   CLOSE_PAR     {: RESULT = l; :} |
-    //OPEN_BRACKET form_list:l   CLOSE_BRACKET {: RESULT = new ListObject( new AtomObject("list", parser.environment()), l); :} |
     OPEN_PAR                   CLOSE_PAR     {: RESULT = ListObject.NIL;  :};
 
 form_list ::= 

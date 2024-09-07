@@ -21,37 +21,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.sourceforge.kleinlisp;
+package net.sourceforge.kleinlisp.macros;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import org.junit.After;
-import org.junit.Before;
+import java.util.Optional;
+import net.sourceforge.kleinlisp.LispObject;
+import net.sourceforge.kleinlisp.objects.ListObject;
 
-abstract public class BaseTestClass {
+/**
+ *
+ * @author danilo
+ */
+public class MacroRule {
+   
+    private PatternMatcher patternMatcher;
+    private MacroTransformation transformation;
 
-    protected Lisp lisp;
-    private ByteArrayOutputStream redirectedOut;
-    private PrintStream originalOut;
-
-    @Before
-    public void setup() {
-        lisp = new Lisp();
-        originalOut = System.out;
-        redirectedOut = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(redirectedOut));
-    }
-    
-    @After
-    public void tearDown() {
-        System.setOut(originalOut);
+    public MacroRule(PatternMatcher patternMatcher, MacroTransformation transformation) {
+        this.patternMatcher = patternMatcher;
+        this.transformation = transformation;
     }
 
-    protected int evalAsInt(String str) {
-        return lisp.evaluate(str).asInt().get();
-    }
-    
-    protected String getStdOut() {
-        return new String(redirectedOut.toByteArray());
+    public Optional<LispObject> apply(ListObject input) {
+        MatchResult match = patternMatcher.match(input);
+        
+        if (!match.isMatch()) {
+            return Optional.empty();
+        }
+        
+        return Optional.of(transformation.transform(match));
     }
 }

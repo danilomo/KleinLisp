@@ -48,75 +48,96 @@ public class MacrosTest extends BaseTestClass {
             }
 
             ListObject display(ListObject object) {
+                object = object.cdr();
+                
                 return new ListObject(atom("print"), object);
             }
         }
         MacroEnv env = new MacroEnv();
 
-        String script = "(when (= 1 1) (display 2) (display (+ 1 2)))";
-        lisp.environment().registerMacro("display", env::display);
+        String script = "(when (= 1 1) (__display 2) (__display (+ 1 2)))";
+        lisp.environment().registerMacro("__display", env::display);
         lisp.evaluate(script);
 
         Assert.assertEquals("23", getStdOut());
     }
 
     @Test
-    public void testPatternMatching() {        
+    public void testPatternMatching() {
         ListObject pattern = lisp.parse("(_ ana _ else bananinha)").asList().get();
         ListObject input = lisp.parse("(ronaldo 1 2 else 3)").asList().get();
-        
+
         System.out.println(pattern);
         System.out.println(input);
-        
+
         PatternMatcher pm = new PatternMatcher(pattern, new HashSet<>(Arrays.asList(
                 lisp.environment().atomOf("else")
         )));
         pm.match(input);
     }
-    
+
     @Test
-    public void testPatternMatching2() {        
+    public void testPatternMatching2() {
         ListObject pattern = lisp.parse("(_ ana else bananinha)").asList().get();
         ListObject input = lisp.parse("(ronaldo 1 2 else 3)").asList().get();
-        
+
         System.out.println(pattern);
         System.out.println(input);
-        
+
         PatternMatcher pm = new PatternMatcher(pattern, new HashSet<>(Arrays.asList(
                 lisp.environment().atomOf("else")
         )));
         pm.match(input);
     }
-    
-        
+
     @Test
-    public void testPatternMatching3() {        
+    public void testPatternMatching3() {
         ListObject pattern = lisp.parse("(_ (e1 e2 e3 _REST_) (e4 e5 e6 _REST_))").asList().get();
         ListObject input = lisp.parse("(cond (a b c 4 5 6) (d e f 7))").asList().get();
-        
+
         System.out.println(pattern);
         System.out.println(input);
-        
+
         PatternMatcher pm = new PatternMatcher(pattern, new HashSet<>(Arrays.asList(
                 lisp.environment().atomOf("else")
         )));
         pm.match(input);
-    } 
-    
+    }
+
     @Test
-    public void testPatternMatching4() {        
-        ListObject pattern = lisp.parse("(_ condition body _REST_)").asList().get();
+    public void testPatternMatching4() {
+        ListObject pattern = lisp.parse("(_ condition body ...)").asList().get();
         ListObject input = lisp.parse("(when (> 1 2) (print like) (print this) (print like) (print that))").asList().get();
-        ListObject transformation = lisp.parse("(if (not condition) (begin body _REST_))").asList().get();
-        
+        ListObject transformation = lisp.parse("(if (not condition) (begin body ...))").asList().get();
+
         System.out.println(pattern);
         System.out.println(input);
-        
+
         PatternMatcher pm = new PatternMatcher(pattern, new HashSet<>(Arrays.asList()));
         MatchResult match = pm.match(input);
+
+        MacroTransformation trans = new MacroTransformation(transformation);
+
+        System.out.println(trans.transform(match));
+    }
+
+    @Test
+    public void testDefineSyntaxWithoutKeyword() {
+        String macroDef = "(define-syntax unless\n"
+                + "  (syntax-rules ()\n"
+                + "    ((unless condition body ...)\n"
+                + "     (if (not condition)\n"
+                + "         (begin body ...) '() ))))";
+
+        lisp.evaluate(macroDef);
+        lisp.evaluate("(define x 3)");
+        lisp.evaluate("(unless (> x 5)\n"
+                + "  (display \"x is not greater than 5\")\n"
+                + "  (newline))");
         
-        MacroTransformation trans = new MacroTransformation(transformation, match);
-        
-        System.out.println(trans.transform());
-    }    
+        Assert.assertEquals(
+                "\"x is not greater than 5\"\n\n",
+                getStdOut()
+        );
+    }
 }
