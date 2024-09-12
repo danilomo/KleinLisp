@@ -25,6 +25,7 @@ package net.sourceforge.kleinlisp;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import net.sourceforge.kleinlisp.objects.AtomObject;
 import org.junit.After;
 import org.junit.Before;
 
@@ -51,7 +52,16 @@ abstract public class BaseTestClass {
         return lisp.evaluate(str).asInt().get();
     }
     
+    protected AtomObject evalAsAtom(String str) {
+        LispObject result = lisp.evaluate(str);
+        return result.asAtom().get();
+    }    
+    
     protected String getStdOut() {
         return new String(redirectedOut.toByteArray());
+    }
+    
+    protected void debug(Object value) {
+        originalOut.print("DEBUG: " +  value);
     }
 }

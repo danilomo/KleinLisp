@@ -23,7 +23,6 @@
  */
 package net.sourceforge.kleinlisp;
 
-import java.util.Arrays;
 import net.sourceforge.kleinlisp.objects.FunctionObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
 import static org.junit.Assert.assertEquals;
@@ -115,6 +114,28 @@ public class SpecialFormsTest extends BaseTestClass {
                 evalAsInt("(begin (println 1) (println 2) 3)"),
                 3
         );
+    }
+    
+    @Test
+    public void testCondForm() {
+        lisp.evaluate("(define (test x)"
+                + "(cond ((< x 0) 'negative) ((= x 0) 'zero) (else 'positive)))");
+               
+        assertEquals(
+                evalAsAtom("(test -1)"),
+                evalAsAtom("'negative")
+        );
+        
+        assertEquals(
+                evalAsAtom("(test 1)"),
+                evalAsAtom("'positive")
+        );
+        
+        assertEquals(
+                evalAsAtom("(test 0)"),
+                evalAsAtom("'zero")
+        );        
+        
     }
 
 }

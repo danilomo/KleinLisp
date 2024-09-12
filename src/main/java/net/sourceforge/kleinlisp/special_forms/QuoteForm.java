@@ -34,7 +34,7 @@ public class QuoteForm implements SpecialForm {
 
     @Override
     public Supplier<LispObject> apply(LispObject t) {
-        LispObject obj = t.asList().get().cdr();
+        LispObject obj = t.asList().get().cdr().car();
         
         return () -> obj;
     }

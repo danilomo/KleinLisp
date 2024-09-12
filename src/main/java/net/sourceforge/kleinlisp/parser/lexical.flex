@@ -10,13 +10,14 @@ import net.sourceforge.kleinlisp.parser.java_cup.*;
 %cup
 
 /*number*/
-double_literal          = ([1-9][0-9]*|0)([.][0-9]* )([eE]([+]|[-])?[0-9]+)?
-integer_literal         = ([1-9][0-9]*|0)
+double_literal          = [-]?([1-9][0-9]*|0)([.][0-9]* )([eE]([+]|[-])?[0-9]+)?
+integer_literal         = [-]?([1-9][0-9]*|0)
 digit		= [0-9]
 symbol          = 
-                    [+] | [-] | [%] | [/] |
+                    [+] | [%] | [/] |
                     [*] | [$] | [_] | [:] | [>] | [<] | [=] |
                     [!] | [\?] | [.]
+minus           = [-]
 
 letter		= {lowercase} | {uppercase}
 lowercase	= [a-z]
@@ -24,7 +25,7 @@ uppercase	= [A-Z]
 
 lineterminator	= \r | \n | \r\n
 
-identifier	= ({letter}|{symbol}) ({letter}|{digit}|{symbol})*
+identifier	= ({letter}|{symbol}) ({letter}|{digit}|{symbol}|{minus})*
 
 %{
 private void error(){
@@ -56,6 +57,7 @@ StringBuilder str = new StringBuilder();
     "["                             { return symbol( sym.OPEN_BRACKET ); }
     "]"                             { return symbol( sym.CLOSE_BRACKET ); }
     "."                             { return symbol( sym.DOT ); }
+    "-"                             { return symbol( sym.ATOM, "-" ); }
 
     {identifier}                    { return symbol( sym.ATOM,  yytext() ); }
     {integer_literal}               { return symbol( sym.INT_LITERAL,  Integer.parseInt(yytext()) ); }
