@@ -27,7 +27,6 @@ import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.BooleanObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
 
-import java.util.List;
 
 public class MathFunctions {
     public static LispObject add(LispObject[] params) {

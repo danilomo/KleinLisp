@@ -86,7 +86,7 @@ public class LispEnvironment implements Environment {
         registerFunction("-", MathFunctions::sub);
         registerFunction("*", MathFunctions::mul);
         registerFunction("/", MathFunctions::div);
-        registerFunction("%", MathFunctions::mod);
+        registerFunction("mod", MathFunctions::mod);
         registerFunction("list", ListFunctions::list);
         registerFunction("length", ListFunctions::length);
         registerFunction("car", ListFunctions::car);

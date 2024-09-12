@@ -31,7 +31,6 @@ import net.sourceforge.kleinlisp.evaluator.Evaluator;
 import net.sourceforge.kleinlisp.functional.Tuple2;
 import net.sourceforge.kleinlisp.objects.BooleanObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
-import net.sourceforge.kleinlisp.objects.VoidObject;
 
 /**
  *

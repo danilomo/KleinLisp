@@ -25,6 +25,7 @@ package net.sourceforge.kleinlisp;
 
 import net.sourceforge.kleinlisp.objects.FunctionObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
+import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
@@ -115,27 +116,40 @@ public class SpecialFormsTest extends BaseTestClass {
                 3
         );
     }
-    
+
     @Test
     public void testCondForm() {
         lisp.evaluate("(define (test x)"
                 + "(cond ((< x 0) 'negative) ((= x 0) 'zero) (else 'positive)))");
-               
+
         assertEquals(
                 evalAsAtom("(test -1)"),
                 evalAsAtom("'negative")
         );
-        
+
         assertEquals(
                 evalAsAtom("(test 1)"),
                 evalAsAtom("'positive")
         );
-        
+
         assertEquals(
                 evalAsAtom("(test 0)"),
                 evalAsAtom("'zero")
-        );        
+        );
+    }
+
+    @Test
+    public void testCaseForm() {
+        lisp.evaluate("(display (case (mod 35 10)\n"
+                + "((2 4 6 8) \"positive and even\")\n"
+                + "((1 3 5 7 9) \"positive and odd\")\n"
+                + "((-2 -4 -6 -8) \"negative and even\")\n"
+                + "((-1 -3 -5 -7 -9) \"negative and odd\")\n"
+                + "(else \"zero\")))");
         
+        Assert.assertTrue(
+            getStdOut().contains("positive and odd")
+        );
     }
 
 }
