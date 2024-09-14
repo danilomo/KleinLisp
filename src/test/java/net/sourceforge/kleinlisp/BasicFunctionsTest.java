@@ -44,7 +44,7 @@ public class BasicFunctionsTest  extends BaseTestClass {
         };
 
         for (Object[] arr : expressions) {
-            int result = lisp.evaluate(arr[0].toString()).asInt().get();
+            int result = lisp.evaluate(arr[0].toString()).asInt().value;
             int expected = (Integer) arr[1];
 
             System.out.println(result + ", " + expected);

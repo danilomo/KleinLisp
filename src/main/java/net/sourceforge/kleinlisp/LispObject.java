@@ -29,6 +29,8 @@ import net.sourceforge.kleinlisp.objects.ListObject;
 
 import java.util.Optional;
 import net.sourceforge.kleinlisp.objects.CellObject;
+import net.sourceforge.kleinlisp.objects.DoubleObject;
+import net.sourceforge.kleinlisp.objects.IntObject;
 
 /**
  * A Lisp object, i.e., something that can be evaluated in Lisp programs: atoms,
@@ -64,8 +66,8 @@ public interface LispObject {
      *
      * @return see description
      */
-    default Optional<Integer> asInt() {
-        return Optional.empty();
+    default IntObject asInt() {
+        return null;
     }
 
     /**
@@ -76,8 +78,8 @@ public interface LispObject {
      *
      * @return see description
      */
-    default Optional<Double> asDouble() {
-        return Optional.empty();
+    default DoubleObject asDouble() {
+        return null;
     }
 
     /**
@@ -88,8 +90,8 @@ public interface LispObject {
      *
      * @return see description
      */
-    default Optional<ListObject> asList() {
-        return Optional.empty();
+    default ListObject asList() {
+        return null;
     }
 
     /**
@@ -100,15 +102,15 @@ public interface LispObject {
      *
      * @return see description
      */
-    default Optional<FunctionObject> asFunction() {
-        return Optional.empty();
+    default FunctionObject asFunction() {
+        return null;
     }
 
     /**
      * @return see description
      */
-    default Optional<AtomObject> asAtom() {
-        return Optional.empty();
+    default AtomObject asAtom() {
+        return null;
     }
 
     /**
@@ -119,12 +121,12 @@ public interface LispObject {
      * @param clazz The Class reference for the T type
      * @return see description
      */
-    default <T> Optional<T> asObject(Class<T> clazz) {
-        return Optional.empty();
+    default <T> T asObject(Class<T> clazz) {
+        return null;
     }
     
-    default Optional<CellObject> asCell() {
-        return Optional.empty();
+    default CellObject asCell() {
+        return null;
     }
     
     default void set(LispObject value) {
@@ -141,31 +143,23 @@ public interface LispObject {
 
         if (clazz.equals(this.getClass())) {
             return Optional.of((T) this);
-        }
-
-        if (clazz.equals(Integer.class)) {
-            return (Optional<T>) this.asInt();
-        }
-
-        if (clazz.equals(Double.class)) {
-            return (Optional<T>) this.asDouble();
-        }
+        }      
 
         if (clazz.equals(String.class)) {
             return (Optional<T>) Optional.of(this.toString());
         }
 
         if (clazz.equals(Function.class)) {
-            Optional<Function> func = this.asFunction().flatMap(f -> Optional.of(f.function()));
+            Optional<Function> func = Optional.ofNullable(this.asFunction()).flatMap(f -> Optional.of(f.function()));
             return (Optional<T>) func;
         }
         
         if (clazz.equals(AtomObject.class)) {
-            return (Optional<T>) this.asAtom();
+            return Optional.of((T)this.asAtom());
         }
         
         if (clazz.equals(ListObject.class)) {
-            return (Optional<T>) this.asList();
+            return Optional.of((T)this.asList());
         }
 
         return Optional.empty();

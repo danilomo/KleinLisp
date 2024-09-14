@@ -39,7 +39,7 @@ public class IfForm implements SpecialForm {
 
     @Override
     public Supplier<LispObject> apply(LispObject obj) {
-        ListObject parameters = obj.asList().get();
+        ListObject parameters = obj.asList();
         parameters = parameters.cdr();
 
         LispObject cond = parameters.car();

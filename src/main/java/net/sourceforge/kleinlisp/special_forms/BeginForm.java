@@ -46,7 +46,6 @@ public class BeginForm  implements SpecialForm {
     public Supplier<LispObject> apply(LispObject obj) {
         List<Supplier<LispObject>> commands = obj
                 .asList()
-                .get()
                 .toList()
                 .stream()
                 .map(elem -> elem.accept(evaluator))

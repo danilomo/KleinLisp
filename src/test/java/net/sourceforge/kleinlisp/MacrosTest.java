@@ -64,8 +64,8 @@ public class MacrosTest extends BaseTestClass {
 
     @Test
     public void testPatternMatching() {
-        ListObject pattern = lisp.parse("(_ ana _ else bananinha)").asList().get();
-        ListObject input = lisp.parse("(ronaldo 1 2 else 3)").asList().get();
+        ListObject pattern = lisp.parse("(_ ana _ else bananinha)").asList();
+        ListObject input = lisp.parse("(ronaldo 1 2 else 3)").asList();
 
         System.out.println(pattern);
         System.out.println(input);
@@ -78,8 +78,8 @@ public class MacrosTest extends BaseTestClass {
 
     @Test
     public void testPatternMatching2() {
-        ListObject pattern = lisp.parse("(_ ana else bananinha)").asList().get();
-        ListObject input = lisp.parse("(ronaldo 1 2 else 3)").asList().get();
+        ListObject pattern = lisp.parse("(_ ana else bananinha)").asList();
+        ListObject input = lisp.parse("(ronaldo 1 2 else 3)").asList();
 
         System.out.println(pattern);
         System.out.println(input);
@@ -92,8 +92,8 @@ public class MacrosTest extends BaseTestClass {
 
     @Test
     public void testPatternMatching3() {
-        ListObject pattern = lisp.parse("(_ (e1 e2 e3 _REST_) (e4 e5 e6 _REST_))").asList().get();
-        ListObject input = lisp.parse("(cond (a b c 4 5 6) (d e f 7))").asList().get();
+        ListObject pattern = lisp.parse("(_ (e1 e2 e3 _REST_) (e4 e5 e6 _REST_))").asList();
+        ListObject input = lisp.parse("(cond (a b c 4 5 6) (d e f 7))").asList();
 
         System.out.println(pattern);
         System.out.println(input);
@@ -106,9 +106,9 @@ public class MacrosTest extends BaseTestClass {
 
     @Test
     public void testPatternMatching4() {
-        ListObject pattern = lisp.parse("(_ condition body ...)").asList().get();
-        ListObject input = lisp.parse("(when (> 1 2) (print like) (print this) (print like) (print that))").asList().get();
-        ListObject transformation = lisp.parse("(if (not condition) (begin body ...))").asList().get();
+        ListObject pattern = lisp.parse("(_ condition body ...)").asList();
+        ListObject input = lisp.parse("(when (> 1 2) (print like) (print this) (print like) (print that))").asList();
+        ListObject transformation = lisp.parse("(if (not condition) (begin body ...))").asList();
 
         System.out.println(pattern);
         System.out.println(input);

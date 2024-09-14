@@ -26,6 +26,7 @@ package net.sourceforge.kleinlisp.special_forms;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import net.sourceforge.kleinlisp.LispObject;
@@ -41,7 +42,7 @@ import net.sourceforge.kleinlisp.objects.VoidObject;
  */
 public class CaseForm implements SpecialForm {
 
-    private static Set<Object> CATCH_ALL = new HashSet<>();
+    private static final Set<Object> CATCH_ALL = new HashSet<>();
     
     private static class Branch {
 
@@ -73,12 +74,12 @@ public class CaseForm implements SpecialForm {
 
     @Override
     public Supplier<LispObject> apply(LispObject t) {
-        ListObject body = t.asList().get().cdr();
+        ListObject body = t.asList().cdr();
         LispObject value = body.car();
         LispObject rest = body.cdr();
 
         
-        List<Branch> branches = parseCaseBody(rest.asList().get());
+        List<Branch> branches = parseCaseBody(rest.asList());
         Supplier<LispObject> valueSupplier = value.accept(evaluator);
         
         return () -> {
@@ -106,18 +107,18 @@ public class CaseForm implements SpecialForm {
     }
     
     private Branch parseCaseBranch(LispObject obj) {
-        ListObject list = obj.asList().get();
+        ListObject list = obj.asList();
         LispObject cases = list.car();
         LispObject body = list.cdr().car();
         
         Supplier<LispObject> bodyEval = body.accept(evaluator);
         
-        if (cases.asAtom().map(a -> a.toString()).orElse("").equals("else")) {
+        if (Optional.ofNullable(cases.asAtom()).map(a -> a.toString()).orElse("").equals("else")) {
             return new Branch(CATCH_ALL, bodyEval);
         }
         
         Set<Object> casesSet = new HashSet<>();
-        for (LispObject case_: cases.asList().get()) {
+        for (LispObject case_: cases.asList()) {
             Object caseObj = toObj(case_);
             casesSet.add(caseObj);
         }
@@ -128,11 +129,11 @@ public class CaseForm implements SpecialForm {
     
     private Object toObj(LispObject value) {
         if (value instanceof AtomObject) {
-            return value.asAtom().get();
+            return value.asAtom();
         }
         
         if (value instanceof NumericObject) {
-            return value.asDouble().get();
+            return value.asDouble().value;
         }
         
         return VoidObject.VOID;

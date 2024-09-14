@@ -25,14 +25,13 @@ package net.sourceforge.kleinlisp.objects;
 
 import net.sourceforge.kleinlisp.LispVisitor;
 
-import java.util.Optional;
 
 /**
  * @author daolivei
  */
 public final class DoubleObject implements NumericObject {
 
-    private final double value;
+    public final double value;
 
     public DoubleObject(double value) {
         this.value = value;
@@ -63,13 +62,13 @@ public final class DoubleObject implements NumericObject {
     }
 
     @Override
-    public Optional<Integer> asInt() {
-        return Optional.of((int) value);
+    public IntObject asInt() {
+        return new IntObject((int) value);
     }
 
     @Override
-    public Optional<Double> asDouble() {
-        return Optional.of(value);
+    public DoubleObject asDouble() {
+        return this;
     }
 
 

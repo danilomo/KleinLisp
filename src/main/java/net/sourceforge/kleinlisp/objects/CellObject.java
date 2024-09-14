@@ -51,27 +51,27 @@ public class CellObject implements LispObject {
     }
 
     @Override
-    public Optional<Integer> asInt() {
+    public IntObject asInt() {
         return object.asInt();
     }
 
     @Override
-    public Optional<Double> asDouble() {
+    public DoubleObject asDouble() {
         return object.asDouble();
     }
 
     @Override
-    public Optional<AtomObject> asAtom() {
+    public AtomObject asAtom() {
         return object.asAtom();
     }
 
     @Override
-    public Optional<ListObject> asList() {
+    public ListObject asList() {
         return object.asList();
     }
 
     @Override
-    public Optional<FunctionObject> asFunction() {
+    public FunctionObject asFunction() {
         return object.asFunction();
     }
 
@@ -81,13 +81,13 @@ public class CellObject implements LispObject {
     }
 
     @Override
-    public <T> Optional<T> asObject(Class<T> clazz) {
+    public <T> T asObject(Class<T> clazz) {
         return object.asObject(clazz);
     } 
     
     @Override
-    public Optional<CellObject> asCell() {
-        return Optional.of(this);
+    public CellObject asCell() {
+        return this;
     }
     
     @Override

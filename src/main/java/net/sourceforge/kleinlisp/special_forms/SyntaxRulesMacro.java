@@ -48,7 +48,7 @@ public class SyntaxRulesMacro implements MacroDefinition {
             Optional<LispObject> result = rule.apply(object);
             
             if (result.isPresent()) {
-                return result.flatMap(LispObject::asList).get();
+                return result.map(LispObject::asList).get();
             }
         }
         

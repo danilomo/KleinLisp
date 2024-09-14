@@ -66,13 +66,13 @@ public class PatternMatcher {
             ListObject refInput = input;
 
             while (refPattern != ListObject.NIL && refInput != ListObject.NIL) {                
-                Optional<ListObject> listFromPattern = refPattern.car().asList();
+                ListObject listFromPattern = refPattern.car().asList();
                 
-                if (listFromPattern.isPresent()) {
-                    Optional<ListObject> listFromInput = refInput.car().asList();
+                if (listFromPattern != null) {
+                    ListObject listFromInput = refInput.car().asList();
                     
-                    if (listFromInput.isPresent()) {
-                        walkTree( listFromPattern.get(), listFromInput.get());
+                    if (listFromInput != null) {
+                        walkTree( listFromPattern, listFromInput);
                         
                         if (!matches) {
                             return;
@@ -88,7 +88,7 @@ public class PatternMatcher {
                 }
                 
                 last = currentAtom;
-                currentAtom = refPattern.car().asAtom().get();
+                currentAtom = refPattern.car().asAtom();
                 LispObject elem = refInput.car();
 
                 boolean recordPattern = true;

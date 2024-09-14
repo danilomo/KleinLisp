@@ -49,12 +49,12 @@ abstract public class BaseTestClass {
     }
 
     protected int evalAsInt(String str) {
-        return lisp.evaluate(str).asInt().get();
+        return lisp.evaluate(str).asInt().value;
     }
     
     protected AtomObject evalAsAtom(String str) {
         LispObject result = lisp.evaluate(str);
-        return result.asAtom().get();
+        return result.asAtom();
     }    
     
     protected String getStdOut() {

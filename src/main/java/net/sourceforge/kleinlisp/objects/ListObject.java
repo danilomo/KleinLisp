@@ -41,37 +41,8 @@ import java.util.stream.Collectors;
  */
 public class ListObject implements LispObject, Iterable<LispObject> {
 
-    public static final ListObject NIL = new ListObject() {
-        @Override
-        public String toString() {
-            return "()";
-        }
-
-        @Override
-        public Optional<Integer> asInt() {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<Double> asDouble() {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<ListObject> asList() {
-            return Optional.of(this);
-        }
-
-        @Override
-        public boolean truthiness() {
-            return false;
-        }
-
-        @Override
-        public int length() {
-            return 0;
-        }
-    };
+    public static final ListObject NIL = new ListObject();
+    
     private LispObject head;
     private LispObject tail;
     private final int length;
@@ -95,8 +66,8 @@ public class ListObject implements LispObject, Iterable<LispObject> {
         this.head = head;
         this.tail = tail;
 
-        if (tail.asList().isPresent()) {
-            this.length = 1 + tail.asList().get().length;
+        if (tail.asList() != null) {
+            this.length = 1 + tail.asList().length;
         } else {
             this.length = 2;
         }
@@ -191,8 +162,8 @@ public class ListObject implements LispObject, Iterable<LispObject> {
     }
 
     @Override
-    public Optional<ListObject> asList() {
-        return Optional.of(this);
+    public ListObject asList() {
+        return this;
     }
 
     @Override

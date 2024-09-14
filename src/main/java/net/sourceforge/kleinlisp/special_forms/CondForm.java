@@ -25,6 +25,7 @@ package net.sourceforge.kleinlisp.special_forms;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.evaluator.Evaluator;
@@ -57,7 +58,7 @@ public class CondForm implements SpecialForm {
 
     @Override
     public Supplier<LispObject> apply(LispObject t) {
-        ListObject body = t.asList().get().cdr();              
+        ListObject body = t.asList().cdr();              
         
         List<Branch> branches = parseCondBody(body);
         
@@ -84,16 +85,18 @@ public class CondForm implements SpecialForm {
     }
 
     private Branch parseCondBranch(LispObject obj) {
-        Tuple2<LispObject, LispObject> tuple = obj
-                .asList()
+        Tuple2<LispObject, LispObject> tuple = Optional
+                .ofNullable( obj
+                .asList())
                 .flatMap(l -> l.unpack(LispObject.class, LispObject.class))
                 .get();
         
         LispObject cond = tuple.first();
         LispObject body = tuple.second();
         
-        boolean isElse = cond
-                .asAtom()
+        boolean isElse = Optional
+                .ofNullable(cond
+                .asAtom())
                 .map(a -> a.toString().equals("else"))
                 .orElse(false);
         

@@ -83,12 +83,13 @@ public class MacroTransformation {
             while(pointer != ListObject.NIL) {
                 LispObject elem = pointer.car();
                 
-                if (elem.asAtom().isPresent()) {
+                //if (elem.asAtom().isPresent()) {
+                if (elem instanceof AtomObject) {
                     last = atom;
-                    atom = elem.asAtom().get();
+                    atom = elem.asAtom();
                     
                     if (atom.toString().equals("...")) {
-                        ListObject ellipsis = match.getEllipsis(last).asList().get();
+                        ListObject ellipsis = match.getEllipsis(last).asList();
                         buffer.concat(ellipsis);
                         break;
                     }
@@ -113,6 +114,6 @@ public class MacroTransformation {
     public ListObject transform(MatchResult match) {
         TransformationVisitor visitor = new TransformationVisitor(match);
         
-        return transformationBody.accept(visitor).asList().get();
+        return transformationBody.accept(visitor).asList();
     }
 }

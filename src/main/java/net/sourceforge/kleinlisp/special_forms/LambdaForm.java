@@ -154,7 +154,7 @@ public class LambdaForm implements SpecialForm {
 
     @Override
     public Supplier<LispObject> apply(LispObject obj) {
-        ListObject orig = obj.asList().get();
+        ListObject orig = obj.asList();
         ListObject list = orig.cdr();
         LambdaMeta meta = orig.getMeta(LambdaMeta.class);
 
@@ -205,13 +205,14 @@ public class LambdaForm implements SpecialForm {
                 if (obj == ListObject.NIL) {
                     return obj;
                 }
-                Optional<AtomObject> head = obj.car().asAtom();
+                
+                AtomObject head = obj.car().asAtom();
 
-                if (head.isEmpty()) {
+                if (head == null) {
                     return super.visit(obj);
                 }
 
-                if (head.get().specialForm() == SpecialFormEnum.LAMBDA) {
+                if (head.specialForm() == SpecialFormEnum.LAMBDA) {
                     return obj;
                 }
 
@@ -241,7 +242,7 @@ public class LambdaForm implements SpecialForm {
 
         };
 
-        return body.accept(visitor).asList().get();
+        return body.accept(visitor).asList();
     }
 
     private Supplier<LispObject> evaluateBody(ListObject body) {

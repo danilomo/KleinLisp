@@ -34,19 +34,19 @@ import net.sourceforge.kleinlisp.objects.ListObject;
 public class ListFunctions {
 
     public static LispObject length(LispObject[] params) {
-        ListObject arg = params[0].asList().get();
+        ListObject arg = params[0].asList();
 
         return new IntObject(arg.length());
     }
 
     public static LispObject car(LispObject[] params) {
-        ListObject arg = params[0].asList().get();
+        ListObject arg = params[0].asList();
 
         return arg.head();
     }
 
     public static LispObject cdr(LispObject[] params) {
-        ListObject arg = params[0].asList().get();
+        ListObject arg = params[0].asList();
 
         return arg.tail();
     }

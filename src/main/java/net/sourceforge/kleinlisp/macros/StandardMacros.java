@@ -65,8 +65,8 @@ public class StandardMacros {
         LispObject head = list.car();
         LispObject tail = list.cdr();
         
-        for(LispObject elem: head.asList().get()) {
-            ListObject tuple = elem.asList().get();
+        for(LispObject elem: head.asList()) {
+            ListObject tuple = elem.asList();
             parameters.add(tuple.car());
             values.add(tuple.cdr().car());            
         }

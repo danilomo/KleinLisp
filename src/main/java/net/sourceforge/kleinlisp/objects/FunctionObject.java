@@ -64,8 +64,8 @@ public final class FunctionObject implements LispObject {
     }
 
     @Override
-    public Optional<FunctionObject> asFunction() {
-        return Optional.of(this);
+    public FunctionObject asFunction() {
+        return this;
     }
 
     @Override

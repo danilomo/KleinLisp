@@ -166,7 +166,7 @@ public class ClosureVisitor extends DefaultVisitor {
             return obj;
         }
 
-        AtomObject head = obj.car().asAtom().orElse(null);
+        AtomObject head = obj.car().asAtom();
 
         if (head == null) {
             return super.visit(obj);
@@ -177,9 +177,9 @@ public class ClosureVisitor extends DefaultVisitor {
         }
 
         List<AtomObject> parameters = new ArrayList<>();
-        ListObject paramList = obj.cdr().car().asList().get();
+        ListObject paramList = obj.cdr().car().asList();
         for (LispObject param : paramList) {
-            AtomObject atom = param.asAtom().get();
+            AtomObject atom = param.asAtom();
             parameters.add(atom);
             definedSymbols.add(atom);
         }

@@ -35,7 +35,7 @@ public class ListFunctionsTest extends BaseTestClass {
     @Test
     public void testLen() {
         assertEquals(
-                lisp.evaluate("(length (list 1 2 3 4 5 6))").asInt().get().intValue(),
+                lisp.evaluate("(length (list 1 2 3 4 5 6))").asInt().value,
                 6
         );
     }
@@ -43,17 +43,17 @@ public class ListFunctionsTest extends BaseTestClass {
     @Test
     public void testCarAndCDR() {
         assertEquals(
-                lisp.evaluate("(car (list 6 5 4 3 2 1))").asInt().get().intValue(),
+                lisp.evaluate("(car (list 6 5 4 3 2 1))").asInt().value,
                 6
         );
 
         assertEquals(
-                lisp.evaluate("(length (cdr (list 6 5 4 3 2 1)))").asInt().get().intValue(),
+                lisp.evaluate("(length (cdr (list 6 5 4 3 2 1)))").asInt().value,
                 5
         );
 
         assertEquals(
-                lisp.evaluate("(car (cdr (list 6 5 4 3 2 1)))").asInt().get().intValue(),
+                lisp.evaluate("(car (cdr (list 6 5 4 3 2 1)))").asInt().value,
                 5
         );
 

@@ -62,13 +62,11 @@ public class MacroExpander extends DefaultVisitor {
             return obj;
         }
         
-        Optional<AtomObject> head = obj.car().asAtom();
+        AtomObject atom = obj.car().asAtom();
         
-        if (head.isEmpty()) {
+        if (atom == null) {
             return super.visit(obj);
         }
-        
-        AtomObject atom = head.get();
         
         if (macros.containsKey(atom)) {
             MacroDefinition macro = macros.get(atom);

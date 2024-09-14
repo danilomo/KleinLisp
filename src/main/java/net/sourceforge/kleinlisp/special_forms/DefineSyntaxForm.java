@@ -55,8 +55,9 @@ public class DefineSyntaxForm implements SpecialForm {
 
     @Override
     public Supplier<LispObject> apply(LispObject t) {
-        Optional<Tuple2<AtomObject, MacroDefinition>> macroDefOpt = t
-                .asList()
+        Optional<Tuple2<AtomObject, MacroDefinition>> macroDefOpt = Optional
+                .ofNullable(t
+                .asList())                
                 .map(l -> l.cdr())
                 .flatMap(o -> o.unpack(AtomObject.class, ListObject.class))
                 .map(o -> o.apply(this::parseMacroDefinition));
@@ -69,8 +70,8 @@ public class DefineSyntaxForm implements SpecialForm {
     }
 
     private Tuple2<AtomObject, MacroDefinition> parseMacroDefinition(AtomObject name, ListObject body) {
-        AtomObject atom = body.car().asAtom().get();
-        ListObject variables = body.cdr().car().asList().get();
+        AtomObject atom = body.car().asAtom();
+        ListObject variables = body.cdr().car().asList();
         ListObject rules = body.cdr().cdr();
 
         MacroDefinition macro = getMacroDefinition(atom, variables, rules);
@@ -94,7 +95,7 @@ public class DefineSyntaxForm implements SpecialForm {
         Set<AtomObject> result = new HashSet<>();
 
         for (LispObject obj : list) {
-            AtomObject atom = obj.asAtom().get();
+            AtomObject atom = obj.asAtom();
             result.add(atom);
         }
 
@@ -105,8 +106,9 @@ public class DefineSyntaxForm implements SpecialForm {
         List<MacroRule> macroRules = new ArrayList<>();
 
         for (LispObject obj : rules) {
-            Tuple2<ListObject, ListObject> tuple = obj
-                    .asList()
+            Tuple2<ListObject, ListObject> tuple = Optional
+                    .ofNullable(obj
+                    .asList())
                     .flatMap(o -> o.unpack(ListObject.class, ListObject.class))
                     .get();
 

@@ -64,8 +64,8 @@ public final class AtomObject implements LispObject {
     }
 
     @Override
-    public Optional<AtomObject> asAtom() {
-        return Optional.of(this);
+    public AtomObject asAtom() {
+        return this;
     }
 
     @Override

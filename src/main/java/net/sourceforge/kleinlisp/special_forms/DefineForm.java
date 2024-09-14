@@ -47,18 +47,18 @@ public class DefineForm implements SpecialForm {
     
     @Override
     public Supplier<LispObject> apply(LispObject t) {
-        ListObject list = t.asList().get();
+        ListObject list = t.asList();
         list = list.cdr();
         LispObject first = list.car();
         
-        Optional<AtomObject> idOpt = first.asAtom();
+        AtomObject idOpt = first.asAtom();
         
-        if (idOpt.isPresent()) {
-            AtomObject id = idOpt.get();
+        if (idOpt != null) {
+            AtomObject id = idOpt;
             LispObject value = list.cdr().car();
             environment.set(id, evaluator.evaluate(value));
         } else {
-            ListObject signature = first.asList().get();
+            ListObject signature = first.asList();
             
             defineFunction(signature, list.cdr());
         }
@@ -67,7 +67,7 @@ public class DefineForm implements SpecialForm {
     }
 
     private void defineFunction(ListObject signature, LispObject value) {
-        AtomObject id = signature.car().asAtom().get();
+        AtomObject id = signature.car().asAtom();
         LispObject parameters = signature.cdr();
         
         ListObject lambda = new ListObject(

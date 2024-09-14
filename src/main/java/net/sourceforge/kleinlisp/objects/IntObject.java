@@ -25,7 +25,6 @@ package net.sourceforge.kleinlisp.objects;
 
 import net.sourceforge.kleinlisp.LispVisitor;
 
-import java.util.Optional;
 
 /**
  * @author daolivei
@@ -63,13 +62,13 @@ public final class IntObject implements NumericObject {
     }
 
     @Override
-    public Optional<Integer> asInt() {
-        return Optional.of(value);
+    public IntObject asInt() {
+        return this;
     }
 
     @Override
-    public Optional<Double> asDouble() {
-        return Optional.of((double) value);
+    public DoubleObject asDouble() {
+        return new DoubleObject(value);
     }
 
 

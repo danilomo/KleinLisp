@@ -32,7 +32,7 @@ public class MathFunctions {
     public static LispObject add(LispObject[] params) {
         int sum = 0;
         for (LispObject i : params) {            
-            sum += i.asInt().get();
+            sum += i.asInt().value;
         }
         return new IntObject(sum);
     }
@@ -44,9 +44,9 @@ public class MathFunctions {
         for (LispObject i : params) {
             if (first) {
                 first = false;
-                sum = i.asInt().get();
+                sum = i.asInt().value;
             } else {
-                sum -= i.asInt().get();
+                sum -= i.asInt().value;
             }
         }
         return new IntObject(sum);
@@ -56,7 +56,7 @@ public class MathFunctions {
         int prod = 1;
 
         for (LispObject i : params) {
-            prod *= i.asInt().get();
+            prod *= i.asInt().value;
         }
         return new IntObject(prod);
     }
@@ -68,9 +68,9 @@ public class MathFunctions {
         for (LispObject i : params) {
             if (first) {
                 first = false;
-                prod = i.asInt().get();
+                prod = i.asInt().value;
             } else {
-                prod /= i.asInt().get();
+                prod /= i.asInt().value;
             }
         }
         return new IntObject(prod);
@@ -80,14 +80,14 @@ public class MathFunctions {
         int prod = 1;
 
         for (LispObject i : params) {
-            prod %= i.asInt().get();
+            prod %= i.asInt().value;
         }
         return new IntObject(prod);
     }
 
     public static LispObject lt(LispObject[] params) {
-        Integer i1 = params[0].asInt().get();
-        Integer i2 = params[1].asInt().get();
+        Integer i1 = params[0].asInt().value;
+        Integer i2 = params[1].asInt().value;
 
         return new BooleanObject(i1 < i2);
     }

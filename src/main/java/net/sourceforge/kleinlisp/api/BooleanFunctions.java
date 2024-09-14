@@ -30,43 +30,43 @@ import net.sourceforge.kleinlisp.objects.BooleanObject;
 public class BooleanFunctions {
 
     public static LispObject lt(LispObject[] params) {
-        int left = params[0].asInt().get();
-        int right = params[1].asInt().get();
+        int left = params[0].asInt().value;
+        int right = params[1].asInt().value;
 
         return new BooleanObject(left < right);
     }
 
     public static LispObject le(LispObject[] params) {
-        int left = params[0].asInt().get();
-        int right = params[1].asInt().get();
+        int left = params[0].asInt().value;
+        int right = params[1].asInt().value;
 
         return new BooleanObject(left <= right);
     }
 
     public static LispObject gt(LispObject[] params) {
-        int left = params[0].asInt().get();
-        int right = params[1].asInt().get();
+        int left = params[0].asInt().value;
+        int right = params[1].asInt().value;
 
         return new BooleanObject(left > right);
     }
 
     public static LispObject ge(LispObject[] params) {
-        int left = params[0].asInt().get();
-        int right = params[1].asInt().get();
+        int left = params[0].asInt().value;
+        int right = params[1].asInt().value;
 
         return new BooleanObject(left >= right);
     }
 
     public static LispObject eq(LispObject[] params) {
-        int left = params[0].asInt().get();
-        int right = params[1].asInt().get();
+        int left = params[0].asInt().value;
+        int right = params[1].asInt().value;
 
         return new BooleanObject(left == right);
     }
 
     public static LispObject neq(LispObject[] params) {
-        int left = params[0].asInt().get();
-        int right = params[1].asInt().get();
+        int left = params[0].asInt().value;
+        int right = params[1].asInt().value;
 
         return new BooleanObject(left != right);
     }

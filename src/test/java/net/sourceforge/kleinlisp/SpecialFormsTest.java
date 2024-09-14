@@ -38,7 +38,7 @@ public class SpecialFormsTest extends BaseTestClass {
     @Test
     public void testIfForm() {
         assertEquals(
-                lisp.evaluate("(if (< 3 2) 1 (+ 2 2 2))").asInt().get().intValue(),
+                lisp.evaluate("(if (< 3 2) 1 (+ 2 2 2))").asInt().value,
                 6
         );
     }
@@ -48,7 +48,7 @@ public class SpecialFormsTest extends BaseTestClass {
         lisp.evaluate("(define foo 10)");
         lisp.evaluate("(define bar 10)");
         assertEquals(
-                lisp.evaluate("(let ((x 1) (y (+ foo bar))) (+ x y 1))").asInt().get().intValue(),
+                lisp.evaluate("(let ((x 1) (y (+ foo bar))) (+ x y 1))").asInt().value,
                 22
         );
     }
@@ -75,7 +75,7 @@ public class SpecialFormsTest extends BaseTestClass {
 
     @Test
     public void testLambdaForm() {
-        FunctionObject obj = lisp.evaluate("(lambda (x y z) (+ x y z))").asFunction().get();
+        FunctionObject obj = lisp.evaluate("(lambda (x y z) (+ x y z))").asFunction();
 
         LispObject result = obj.function().evaluate(new LispObject[]{
             new IntObject(1),
@@ -84,7 +84,7 @@ public class SpecialFormsTest extends BaseTestClass {
         });
 
         assertEquals(
-                result.asInt().get().intValue(),
+                result.asInt().value,
                 3
         );
     }
@@ -94,7 +94,7 @@ public class SpecialFormsTest extends BaseTestClass {
         lisp.evaluate("(define foo (lambda (x y z) (+ x y z)))");
 
         assertEquals(
-                lisp.evaluate("(foo 1 2 3)").asInt().get().intValue(),
+                lisp.evaluate("(foo 1 2 3)").asInt().value,
                 6
         );
     }
@@ -104,7 +104,7 @@ public class SpecialFormsTest extends BaseTestClass {
         lisp.evaluate("(define (foo x y z) (+ x y z))");
 
         assertEquals(
-                lisp.evaluate("(foo 1 2 3)").asInt().get().intValue(),
+                lisp.evaluate("(foo 1 2 3)").asInt().value,
                 6
         );
     }
