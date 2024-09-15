@@ -32,7 +32,7 @@ import net.sourceforge.kleinlisp.LispVisitor;
 public final class BooleanObject implements LispObject {
 
     public static final BooleanObject TRUE = new BooleanObject(true);
-    public static final BooleanObject FALSE = new BooleanObject(true);
+    public static final BooleanObject FALSE = new BooleanObject(false);
 
     private final boolean value;
 

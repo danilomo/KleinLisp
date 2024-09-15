@@ -43,7 +43,7 @@ public class ListObject implements LispObject, Iterable<LispObject> {
 
     public static final ListObject NIL = new ListObject();
     
-    private LispObject head;
+    private final LispObject head;
     private LispObject tail;
     private final int length;
     private Object meta;
@@ -69,7 +69,7 @@ public class ListObject implements LispObject, Iterable<LispObject> {
         if (tail.asList() != null) {
             this.length = 1 + tail.asList().length;
         } else {
-            this.length = 2;
+            this.length = 1;
         }
 
     }

@@ -62,6 +62,6 @@ abstract public class BaseTestClass {
     }
     
     protected void debug(Object value) {
-        originalOut.print("DEBUG: " +  value);
+        originalOut.println("DEBUG: " +  value);
     }
 }

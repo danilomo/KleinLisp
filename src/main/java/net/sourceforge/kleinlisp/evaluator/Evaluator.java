@@ -95,6 +95,12 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
         if (form.isPresent()) {
             return form.get().apply(list);
         }
+        
+        Supplier<LispObject> commonCase = CommonCases.apply(list, this);
+        
+        if (commonCase != null) {
+            return commonCase;
+        }
 
         Supplier<LispObject> headEval = head.accept(this);
         List<Supplier<LispObject>> parameters = new ArrayList<>();

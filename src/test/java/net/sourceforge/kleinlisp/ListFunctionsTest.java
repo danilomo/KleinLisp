@@ -58,5 +58,11 @@ public class ListFunctionsTest extends BaseTestClass {
         );
 
     }
+    
+    @Test 
+    public void testxxx() {
+        LispObject list = lisp.evaluate("(- 4 3)");
+        debug(list);
+    }
 
 }
