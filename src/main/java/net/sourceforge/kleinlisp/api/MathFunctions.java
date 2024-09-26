@@ -29,6 +29,7 @@ import net.sourceforge.kleinlisp.objects.IntObject;
 
 
 public class MathFunctions {
+
     public static LispObject add(LispObject[] params) {
         int sum = 0;
         for (LispObject i : params) {            

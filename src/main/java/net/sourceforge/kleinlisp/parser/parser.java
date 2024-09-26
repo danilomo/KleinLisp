@@ -12,6 +12,7 @@ import net.sourceforge.kleinlisp.objects.*;
 /** CUP v0.11a beta 20060608 generated parser.
   * @version Wed Sep 18 22:11:43 CEST 2024
   */
+@SuppressWarnings("all")
 public class parser extends java_cup.runtime.lr_parser {
 
   /** Default constructor. */
@@ -139,6 +140,7 @@ public class parser extends java_cup.runtime.lr_parser {
 }
 
 /** Cup generated class to encapsulate user supplied action code.*/
+@SuppressWarnings("all")
 class CUP$parser$actions {
   private final parser parser;
 

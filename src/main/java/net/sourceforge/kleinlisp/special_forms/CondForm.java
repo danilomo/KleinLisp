@@ -64,7 +64,10 @@ public class CondForm implements SpecialForm {
         
         return () -> {
             for (Branch b: branches) {
-                if (b.condition.get().truthiness()) {
+		LispObject val = b.condition.get();
+		
+		System.out.println(String.format("[%s] - [%s]", val, val.truthiness()));
+                if (val.truthiness()) {
                     return b.body.get();
                 }
             }
@@ -86,7 +89,7 @@ public class CondForm implements SpecialForm {
 
     private Branch parseCondBranch(LispObject obj) {
         Tuple2<LispObject, LispObject> tuple = Optional
-                .ofNullable( obj
+                .ofNullable(obj
                 .asList())
                 .flatMap(l -> l.unpack(LispObject.class, LispObject.class))
                 .get();
@@ -103,7 +106,7 @@ public class CondForm implements SpecialForm {
         Supplier<LispObject> condEval;
         
         if (isElse) {
-            condEval = () -> BooleanObject.FALSE;
+            condEval = () -> BooleanObject.TRUE;
         } else {
             condEval = cond.accept(evaluator);
         }

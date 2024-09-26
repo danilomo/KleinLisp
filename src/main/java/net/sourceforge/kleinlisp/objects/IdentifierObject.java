@@ -72,8 +72,9 @@ public class IdentifierObject implements LispObject {
 
     @Override
     public String toString() {
-        return String.format("%s[%d, %d]", atom, line, col);
+	return atom.toString();
     }
+
 
     
 }

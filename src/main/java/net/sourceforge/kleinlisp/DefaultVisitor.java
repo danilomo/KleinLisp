@@ -101,7 +101,7 @@ public class DefaultVisitor implements LispVisitor<LispObject> {
 
     @Override
     public LispObject visit(IdentifierObject obj) {
-        return obj;
+        return obj.asAtom();
     }
 
     

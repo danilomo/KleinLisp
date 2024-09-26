@@ -28,17 +28,17 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+
+import net.sourceforge.kleinlisp.CompositeEnvironment;
 import net.sourceforge.kleinlisp.DefaultVisitor;
 import net.sourceforge.kleinlisp.Environment;
 import net.sourceforge.kleinlisp.Function;
 import net.sourceforge.kleinlisp.LispEnvironment;
-import net.sourceforge.kleinlisp.CompositeEnvironment;
 import net.sourceforge.kleinlisp.LispObject;
-import static net.sourceforge.kleinlisp.evaluator.ClosureVisitor.LambdaMeta;
+import net.sourceforge.kleinlisp.evaluator.ClosureVisitor.LambdaMeta;
 import net.sourceforge.kleinlisp.evaluator.Evaluator;
 import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.CellObject;
@@ -234,7 +234,6 @@ public class LambdaForm implements SpecialForm {
                     return environment.stackTop().getEnv().lookupValue(id);
                 };
                 Consumer<LispObject> setter = (obj) -> {
-                    //environment.stackTop().getEnv().set(id, obj);
                     environment.stackTop().getEnv().lookupValue(id).set(obj);
                 };
                 return new ComputedLispObject(getter, setter);

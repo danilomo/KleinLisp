@@ -46,7 +46,7 @@ public class FunctionCall implements Supplier<LispObject> {
     @Override
     public LispObject get() {
         Optional<Function> function = Optional
-                .ofNullable( head.get().asFunction())
+                .ofNullable(head.get().asFunction())
                 .flatMap(
                         f -> Optional.of(f.function())
                 );

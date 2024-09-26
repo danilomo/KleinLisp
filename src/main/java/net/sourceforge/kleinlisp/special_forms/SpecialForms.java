@@ -73,9 +73,14 @@ public class SpecialForms {
     }
 
     public Optional<SpecialForm> get(LispObject obj) {
-        if (obj instanceof AtomObject) {
+        /*if (obj instanceof AtomObject) {
             return get((AtomObject) obj);
-        }
+	    }*/
+	AtomObject atom = obj.asAtom();
+
+	if (atom != null) {
+	    return get(atom);
+	}
 
         return Optional.empty();
     }

@@ -23,14 +23,14 @@
  */
 package net.sourceforge.kleinlisp;
 
-import net.sourceforge.kleinlisp.objects.AtomObject;
-import net.sourceforge.kleinlisp.objects.FunctionObject;
-import net.sourceforge.kleinlisp.objects.ListObject;
-
 import java.util.Optional;
+
+import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.CellObject;
 import net.sourceforge.kleinlisp.objects.DoubleObject;
+import net.sourceforge.kleinlisp.objects.FunctionObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
+import net.sourceforge.kleinlisp.objects.ListObject;
 
 /**
  * A Lisp object, i.e., something that can be evaluated in Lisp programs: atoms,
@@ -135,6 +135,7 @@ public interface LispObject {
                 + "|");
     }
 
+    @SuppressWarnings("all")
     default <T> Optional<T> as(Class<T> clazz) {
 
         if (clazz.equals(LispObject.class)) {

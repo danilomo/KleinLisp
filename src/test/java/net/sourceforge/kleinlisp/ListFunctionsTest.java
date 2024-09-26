@@ -65,7 +65,7 @@ public class ListFunctionsTest extends BaseTestClass {
                 + "\n"
                 + "(a b c 4 2 3"
                 + "\n"
-                + " d 1)");
+                + " d 1))");
         debug(list);
     }
 

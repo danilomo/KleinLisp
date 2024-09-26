@@ -74,9 +74,7 @@ public class LetForm implements SpecialForm {
                 lambda,
                 ListObject.fromList(values)
         );
-        transformedExp = ClosureVisitor.addClosureMeta(transformedExp);
-        System.out.println(">>>" + values);
-        System.out.println(">>>" + transformedExp);
+        transformedExp = ClosureVisitor.addClosureMeta(transformedExp);        
         return transformedExp.accept(evaluator);
     }
     

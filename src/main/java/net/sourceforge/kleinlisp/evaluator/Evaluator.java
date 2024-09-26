@@ -49,7 +49,6 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
     }
 
     public LispObject evaluate(LispObject obj) {
-
         LispObject transformed = ClosureVisitor
                 .addClosureMeta(environment.expandMacros(
                         obj
@@ -95,17 +94,17 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
         if (form.isPresent()) {
             return form.get().apply(list);
         }
-        
-        Supplier<LispObject> commonCase = CommonCases.apply(list, this);
-        
-        if (commonCase != null) {
-            return commonCase;
-        }
+
+	// TODO: good performance optimization can be done here
+        //Supplier<LispObject> commonCase = CommonCases.apply(list, this);        
+        //if (commonCase != null) {
+	//return commonCase;
+        //}
 
         Supplier<LispObject> headEval = head.accept(this);
         List<Supplier<LispObject>> parameters = new ArrayList<>();
 
-        for (LispObject obj : list.cdr()) {
+        for (LispObject obj : list.cdr()) {	   
             parameters.add(obj.accept(this));
         }
 
@@ -145,8 +144,5 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
     @Override
     public Supplier<LispObject> visit(IdentifierObject obj) {
         return obj.asAtom().accept(this);
-    }
-    
-    
-
+    }    
 }

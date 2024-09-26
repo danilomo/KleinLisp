@@ -12,6 +12,7 @@ import net.sourceforge.kleinlisp.*;
  * on 9/18/24, 9:50 PM from the specification file
  * <tt>lexical.flex</tt>
  */
+@SuppressWarnings("all")
 class LexicalAnalyzer implements java_cup.runtime.Scanner {
 
   /** This character denotes the end of file */

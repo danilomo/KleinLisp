@@ -120,21 +120,22 @@ public class SpecialFormsTest extends BaseTestClass {
     @Test
     public void testCondForm() {
         lisp.evaluate("(define (test x)"
+		+ "(println x)" 
                 + "(cond ((< x 0) 'negative) ((= x 0) 'zero) (else 'positive)))");
 
         assertEquals(
-                evalAsAtom("(test -1)"),
-                evalAsAtom("'negative")
+		     evalAsAtom("'negative"),
+		     evalAsAtom("(test -1)")
         );
 
         assertEquals(
-                evalAsAtom("(test 1)"),
-                evalAsAtom("'positive")
+		     evalAsAtom("'positive"),
+		     evalAsAtom("(test 1)")
         );
 
         assertEquals(
-                evalAsAtom("(test 0)"),
-                evalAsAtom("'zero")
+		     evalAsAtom("'zero"),
+		     evalAsAtom("(test 0)")
         );
     }
 
