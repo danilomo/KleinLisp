@@ -1,18 +1,18 @@
 /*
  * MIT License
- * 
+ *
  * Copyright (c) 2018 Danilo Oliveira
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
 import java_cup.runtime.Symbol;
 import net.sourceforge.kleinlisp.evaluator.Evaluator;
 import net.sourceforge.kleinlisp.parser.SourceLexicalAnalyzer;
@@ -38,52 +37,51 @@ import net.sourceforge.kleinlisp.parser.sym;
  */
 public class Lisp {
 
-    private final LispEnvironment environment;
-    private final Parser parser;
-    private final Evaluator evaluator;
+  private final LispEnvironment environment;
+  private final Parser parser;
+  private final Evaluator evaluator;
 
-    public Lisp() {
-        environment = new LispEnvironment();
-        parser = Parser.defaultParser();
-        evaluator = new Evaluator(environment);
+  public Lisp() {
+    environment = new LispEnvironment();
+    parser = Parser.defaultParser();
+    evaluator = new Evaluator(environment);
+  }
+
+  public LispObject parse(String expression) {
+    return parser.parse(expression, environment);
+  }
+
+  public LispObject evaluate(String expression) {
+    return evaluator.evaluate(parse(expression));
+  }
+
+  public LispEnvironment environment() {
+    return environment;
+  }
+
+  public Evaluator evaluator() {
+    return evaluator;
+  }
+
+  public void runScript(Path path) throws IOException {
+    try (InputStream in = Files.newInputStream(path)) {
+      runScript(in);
     }
+  }
 
-    public LispObject parse(String expression) {
-        return parser.parse(expression, environment);
+  public void runScript(InputStream in) throws IOException {
+    SourceLexicalAnalyzer sla = new SourceLexicalAnalyzer(in);
+
+    while (true) {
+      Symbol s = sla.next_token();
+      if (s.value == null) {
+        return;
+      }
+
+      evaluate(s.value.toString());
+      if (s.sym == sym.EOF) {
+        return;
+      }
     }
-
-    public LispObject evaluate(String expression) {
-        return evaluator.evaluate(parse(expression));
-    }
-
-    public LispEnvironment environment() {
-        return environment;
-    }
-
-    public Evaluator evaluator() {
-        return evaluator;
-    }
-
-    public void runScript(Path path) throws IOException {
-        try (InputStream in = Files.newInputStream(path)) {
-            runScript(in);
-        }
-    }
-
-    public void runScript(InputStream in) throws IOException {
-        SourceLexicalAnalyzer sla = new SourceLexicalAnalyzer(in);
-
-        while (true) {
-            Symbol s = sla.next_token();
-            if (s.value == null) {
-                return;
-            }
-
-            evaluate(s.value.toString());
-            if (s.sym == sym.EOF) {
-                return;
-            }
-        }
-    }
-
+  }
 }

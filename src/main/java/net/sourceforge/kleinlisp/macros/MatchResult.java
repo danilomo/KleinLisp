@@ -1,18 +1,18 @@
 /*
  * MIT License
- * 
+ *
  * Copyright (c) 2018 Danilo Oliveira
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,30 +28,30 @@ import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.AtomObject;
 
 /**
- *
  * @author danilo
  */
 public class MatchResult {
 
-    private final Map<AtomObject, LispObject> patterns;
-    private final Map<AtomObject, LispObject> ellipisis;
-    boolean match;
+  private final Map<AtomObject, LispObject> patterns;
+  private final Map<AtomObject, LispObject> ellipisis;
+  boolean match;
 
-    public MatchResult(Map<AtomObject, LispObject> patterns, Map<AtomObject, LispObject> ellipisis, boolean match) {
-        this.patterns = patterns;
-        this.ellipisis = ellipisis;
-        this.match = match;
-    }
-    
-    public boolean isMatch() {
-        return match;
-    }
-    
-    public LispObject getTransformation(AtomObject atom) {
-        return patterns.get(atom);
-    }
-    
-    public LispObject getEllipsis(AtomObject atom) {
-        return ellipisis.get(atom);
-    }
+  public MatchResult(
+      Map<AtomObject, LispObject> patterns, Map<AtomObject, LispObject> ellipisis, boolean match) {
+    this.patterns = patterns;
+    this.ellipisis = ellipisis;
+    this.match = match;
+  }
+
+  public boolean isMatch() {
+    return match;
+  }
+
+  public LispObject getTransformation(AtomObject atom) {
+    return patterns.get(atom);
+  }
+
+  public LispObject getEllipsis(AtomObject atom) {
+    return ellipisis.get(atom);
+  }
 }

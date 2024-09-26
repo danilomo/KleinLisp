@@ -1,18 +1,18 @@
 /*
  * MIT License
- * 
+ *
  * Copyright (c) 2018 Danilo Oliveira
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -29,39 +29,39 @@ import net.sourceforge.kleinlisp.objects.AtomObject;
 import org.junit.After;
 import org.junit.Before;
 
-abstract public class BaseTestClass {
+public abstract class BaseTestClass {
 
-    protected Lisp lisp;
-    private ByteArrayOutputStream redirectedOut;
-    private PrintStream originalOut;
+  protected Lisp lisp;
+  private ByteArrayOutputStream redirectedOut;
+  private PrintStream originalOut;
 
-    @Before
-    public void setup() {
-        lisp = new Lisp();
-        originalOut = System.out;
-        redirectedOut = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(redirectedOut));
-    }
-    
-    @After
-    public void tearDown() {
-        System.setOut(originalOut);
-    }
+  @Before
+  public void setup() {
+    lisp = new Lisp();
+    originalOut = System.out;
+    redirectedOut = new ByteArrayOutputStream();
+    System.setOut(new PrintStream(redirectedOut));
+  }
 
-    protected int evalAsInt(String str) {
-        return lisp.evaluate(str).asInt().value;
-    }
-    
-    protected AtomObject evalAsAtom(String str) {
-        LispObject result = lisp.evaluate(str);
-        return result.asAtom();
-    }    
-    
-    protected String getStdOut() {
-        return new String(redirectedOut.toByteArray());
-    }
-    
-    protected void debug(Object value) {
-        originalOut.println("DEBUG: " +  value);
-    }
+  @After
+  public void tearDown() {
+    System.setOut(originalOut);
+  }
+
+  protected int evalAsInt(String str) {
+    return lisp.evaluate(str).asInt().value;
+  }
+
+  protected AtomObject evalAsAtom(String str) {
+    LispObject result = lisp.evaluate(str);
+    return result.asAtom();
+  }
+
+  protected String getStdOut() {
+    return new String(redirectedOut.toByteArray());
+  }
+
+  protected void debug(Object value) {
+    originalOut.println("DEBUG: " + value);
+  }
 }

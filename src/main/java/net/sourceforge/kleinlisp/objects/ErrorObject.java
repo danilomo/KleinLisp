@@ -1,18 +1,18 @@
 /*
  * MIT License
- * 
+ *
  * Copyright (c) 2018 Danilo Oliveira
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -31,39 +31,38 @@ import net.sourceforge.kleinlisp.LispVisitor;
  */
 public final class ErrorObject implements LispObject {
 
-    private final Exception error;
+  private final Exception error;
 
-    public ErrorObject(String message) {
-        this.error = new Exception(message);
-    }
+  public ErrorObject(String message) {
+    this.error = new Exception(message);
+  }
 
-    public ErrorObject(Exception error) {
-        this.error = error;
-    }
+  public ErrorObject(Exception error) {
+    this.error = error;
+  }
 
-    @Override
-    public Object asObject() {
-        return error;
-    }
+  @Override
+  public Object asObject() {
+    return error;
+  }
 
-    @Override
-    public boolean truthiness() {
-        throw new RuntimeException("Cannot evaluate error as boolean");
-    }
+  @Override
+  public boolean truthiness() {
+    throw new RuntimeException("Cannot evaluate error as boolean");
+  }
 
-    @Override
-    public <T> T accept(LispVisitor<T> visitor) {
-        return visitor.visit(this);
-    }
+  @Override
+  public <T> T accept(LispVisitor<T> visitor) {
+    return visitor.visit(this);
+  }
 
-    @Override
-    public String toString() {
-        return "LispError: " + error.getMessage();
-    }
+  @Override
+  public String toString() {
+    return "LispError: " + error.getMessage();
+  }
 
-    @Override
-    public boolean error() {
-        return true;
-    }
-
+  @Override
+  public boolean error() {
+    return true;
+  }
 }

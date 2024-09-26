@@ -1,18 +1,18 @@
 /*
  * MIT License
- * 
+ *
  * Copyright (c) 2018 Danilo Oliveira
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -37,106 +37,101 @@ import net.sourceforge.kleinlisp.objects.NumericObject;
 import net.sourceforge.kleinlisp.objects.VoidObject;
 
 /**
- *
  * @author danilo
  */
 public class CaseForm implements SpecialForm {
 
-    private static final Set<Object> CATCH_ALL = new HashSet<>();
-    
-    private static class Branch {
+  private static final Set<Object> CATCH_ALL = new HashSet<>();
 
-        final Set<Object> cases;
-        final Supplier<LispObject> body;
-        final boolean catchAll;
-        
-        public Branch(Set<Object> cases, Supplier<LispObject> body) {
-            this.cases = cases;
-            this.body = body;
-            this.catchAll = cases == CATCH_ALL;
-        }
+  private static class Branch {
 
-        private boolean match(Object obj) {
-            if (catchAll) {
-                return true;
-            }
-            
-            return cases.contains(obj);
-        }
+    final Set<Object> cases;
+    final Supplier<LispObject> body;
+    final boolean catchAll;
 
+    public Branch(Set<Object> cases, Supplier<LispObject> body) {
+      this.cases = cases;
+      this.body = body;
+      this.catchAll = cases == CATCH_ALL;
     }
 
-    private final Evaluator evaluator;
+    private boolean match(Object obj) {
+      if (catchAll) {
+        return true;
+      }
 
-    public CaseForm(Evaluator evaluator) {
-        this.evaluator = evaluator;
+      return cases.contains(obj);
+    }
+  }
+
+  private final Evaluator evaluator;
+
+  public CaseForm(Evaluator evaluator) {
+    this.evaluator = evaluator;
+  }
+
+  @Override
+  public Supplier<LispObject> apply(LispObject t) {
+    ListObject body = t.asList().cdr();
+    LispObject value = body.car();
+    LispObject rest = body.cdr();
+
+    List<Branch> branches = parseCaseBody(rest.asList());
+    Supplier<LispObject> valueSupplier = value.accept(evaluator);
+
+    return () -> {
+      Object obj = toObj(valueSupplier.get());
+
+      for (Branch branch : branches) {
+        if (branch.match(obj)) {
+          return branch.body.get();
+        }
+      }
+
+      return VoidObject.VOID;
+    };
+  }
+
+  private List<Branch> parseCaseBody(ListObject body) {
+    List<Branch> output = new ArrayList<>();
+
+    for (LispObject obj : body) {
+      Branch branch = parseCaseBranch(obj);
+      output.add(branch);
     }
 
-    @Override
-    public Supplier<LispObject> apply(LispObject t) {
-        ListObject body = t.asList().cdr();
-        LispObject value = body.car();
-        LispObject rest = body.cdr();
+    return output;
+  }
 
-        
-        List<Branch> branches = parseCaseBody(rest.asList());
-        Supplier<LispObject> valueSupplier = value.accept(evaluator);
-        
-        return () -> {
-            Object obj = toObj(valueSupplier.get());
-            
-            for (Branch branch: branches) {
-                if (branch.match(obj)) {
-                    return branch.body.get();
-                }
-            }
-            
-            return VoidObject.VOID;
-        };
+  private Branch parseCaseBranch(LispObject obj) {
+    ListObject list = obj.asList();
+    LispObject cases = list.car();
+    LispObject body = list.cdr().car();
+
+    Supplier<LispObject> bodyEval = body.accept(evaluator);
+
+    if (Optional.ofNullable(cases.asAtom()).map(a -> a.toString()).orElse("").equals("else")) {
+      return new Branch(CATCH_ALL, bodyEval);
     }
 
-    private List<Branch> parseCaseBody(ListObject body) {
-        List<Branch> output = new ArrayList<>();
-        
-        for (LispObject obj: body) {
-            Branch branch = parseCaseBranch(obj);
-            output.add(branch);
-        }
-        
-        return output;        
+    Set<Object> casesSet = new HashSet<>();
+    for (LispObject case_ : cases.asList()) {
+      Object caseObj = toObj(case_);
+      casesSet.add(caseObj);
     }
-    
-    private Branch parseCaseBranch(LispObject obj) {
-        ListObject list = obj.asList();
-        LispObject cases = list.car();
-        LispObject body = list.cdr().car();
-        
-        Supplier<LispObject> bodyEval = body.accept(evaluator);
-        
-        if (Optional.ofNullable(cases.asAtom()).map(a -> a.toString()).orElse("").equals("else")) {
-            return new Branch(CATCH_ALL, bodyEval);
-        }
-        
-        Set<Object> casesSet = new HashSet<>();
-        for (LispObject case_: cases.asList()) {
-            Object caseObj = toObj(case_);
-            casesSet.add(caseObj);
-        }
-        
-        
-        return new Branch(casesSet, bodyEval);
-    }    
-    
-    private Object toObj(LispObject value) {
-        if (value instanceof AtomObject) {
-            return value.asAtom();
-        }
-        
-        if (value instanceof NumericObject) {
-            return value.asDouble().value;
-        }
-        
-        return VoidObject.VOID;
+
+    return new Branch(casesSet, bodyEval);
+  }
+
+  private Object toObj(LispObject value) {
+    if (value instanceof AtomObject) {
+      return value.asAtom();
     }
-    
+
+    if (value instanceof NumericObject) {
+      return value.asDouble().value;
+    }
+
+    return VoidObject.VOID;
+  }
 }

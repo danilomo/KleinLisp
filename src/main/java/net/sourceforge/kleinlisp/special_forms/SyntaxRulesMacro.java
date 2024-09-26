@@ -1,18 +1,18 @@
 /*
  * MIT License
- * 
+ *
  * Copyright (c) 2018 Danilo Oliveira
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -31,28 +31,26 @@ import net.sourceforge.kleinlisp.macros.MacroRule;
 import net.sourceforge.kleinlisp.objects.ListObject;
 
 /**
- *
  * @author danilo
  */
 public class SyntaxRulesMacro implements MacroDefinition {
 
-    private final List<MacroRule> macroRules;
-    
-    public SyntaxRulesMacro(List<MacroRule> macroRules) {
-        this.macroRules = macroRules;
+  private final List<MacroRule> macroRules;
+
+  public SyntaxRulesMacro(List<MacroRule> macroRules) {
+    this.macroRules = macroRules;
+  }
+
+  @Override
+  public ListObject expand(ListObject object) {
+    for (MacroRule rule : macroRules) {
+      Optional<LispObject> result = rule.apply(object);
+
+      if (result.isPresent()) {
+        return result.map(LispObject::asList).get();
+      }
     }
 
-    @Override
-    public ListObject expand(ListObject object) {
-        for (MacroRule rule: macroRules) {
-            Optional<LispObject> result = rule.apply(object);
-            
-            if (result.isPresent()) {
-                return result.map(LispObject::asList).get();
-            }
-        }
-        
-        throw new RuntimeException("Could not expand macro for Object: " + object);
-    }
-    
+    throw new RuntimeException("Could not expand macro for Object: " + object);
+  }
 }

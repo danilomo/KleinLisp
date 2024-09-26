@@ -1,18 +1,18 @@
 /*
  * MIT License
- * 
+ *
  * Copyright (c) 2018 Danilo Oliveira
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -23,31 +23,28 @@
  */
 package net.sourceforge.kleinlisp.parser;
 
+import java.io.ByteArrayInputStream;
+import net.sourceforge.kleinlisp.LispEnvironment;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.Parser;
 import net.sourceforge.kleinlisp.objects.ErrorObject;
-
-import java.io.ByteArrayInputStream;
-import net.sourceforge.kleinlisp.LispEnvironment;
 
 /**
  * @author daolivei
  */
 public class CUPParser implements Parser {
 
-    @Override
-    public LispObject parse(String expression, LispEnvironment env) {
-        parser p = null;
-        try {
-            ByteArrayInputStream in =
-                    new ByteArrayInputStream(expression.getBytes());
-            p = new parser(new LexicalAnalyzer(in)).withEnvironment(env);
+  @Override
+  public LispObject parse(String expression, LispEnvironment env) {
+    parser p = null;
+    try {
+      ByteArrayInputStream in = new ByteArrayInputStream(expression.getBytes());
+      p = new parser(new LexicalAnalyzer(in)).withEnvironment(env);
 
-            return (LispObject) p.parse().value;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return new ErrorObject(ex);
-        }
+      return (LispObject) p.parse().value;
+    } catch (Exception ex) {
+      ex.printStackTrace();
+      return new ErrorObject(ex);
     }
-
+  }
 }

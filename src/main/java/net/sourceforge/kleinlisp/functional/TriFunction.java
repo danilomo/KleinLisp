@@ -5,9 +5,8 @@
 package net.sourceforge.kleinlisp.functional;
 
 /**
- *
  * @author danilo
  */
 public interface TriFunction<K, V, T, R> {
-    R apply(K k, V v, T t);
+  R apply(K k, V v, T t);
 }
