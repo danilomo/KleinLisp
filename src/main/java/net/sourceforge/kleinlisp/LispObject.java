@@ -167,6 +167,8 @@ public interface LispObject {
 
     <T> T accept(LispVisitor<T> visitor);
 
-    boolean error();
+    default boolean error() {
+        return false;
+    }
 
 }

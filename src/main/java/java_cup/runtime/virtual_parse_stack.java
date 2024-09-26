@@ -1,4 +1,4 @@
-package net.sourceforge.kleinlisp.parser.java_cup;
+package java_cup.runtime;
 
 import java.util.Stack;
 
@@ -16,7 +16,7 @@ import java.util.Stack;
  *
  * @author Frank Flannery
  * @version last updated: 7/3/96
- * @see net.sourceforge.kleinlisp.parser.java_cup.lr_parser
+ * @see java_cup.runtime.lr_parser
  */
 
 public class virtual_parse_stack {

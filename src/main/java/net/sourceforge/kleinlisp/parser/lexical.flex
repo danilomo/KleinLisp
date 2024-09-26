@@ -1,6 +1,7 @@
 package net.sourceforge.kleinlisp.parser;
 
-import net.sourceforge.kleinlisp.parser.java_cup.*;
+import java_cup.runtime.*;
+import net.sourceforge.kleinlisp.*;
 
 %%
 %unicode
@@ -29,8 +30,10 @@ identifier	= ({letter}|{symbol}) ({letter}|{digit}|{symbol}|{minus})*
 
 %{
 private void error(){
-    System.err.print("Sintax error on line " + (yyline+1));
-    System.err.println(". Unrecognizable token: \"" + yytext() + "\"");
+    //System.err.print("Sintax error on line " + (yyline+1));
+    //System.err.println(". Unrecognizable token: \"" + yytext() + "\"");
+    SourceRef ref = new SourceRef("", yyline, yycolumn);
+    throw new LispException(ref, "Unrecognizable token: \"" + yytext() + "\"");
 }
 
 private Symbol symbol(int type) {

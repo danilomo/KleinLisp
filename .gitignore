@@ -2,4 +2,6 @@
 /nbproject/
 KleinLisp.iml
 /.idea/
-/.project/
+/.project
+/.classpath
+/.settings

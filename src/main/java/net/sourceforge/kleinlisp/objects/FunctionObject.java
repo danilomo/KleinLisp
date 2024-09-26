@@ -27,7 +27,6 @@ import net.sourceforge.kleinlisp.Function;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.LispVisitor;
 
-import java.util.Optional;
 
 /**
  * @author daolivei

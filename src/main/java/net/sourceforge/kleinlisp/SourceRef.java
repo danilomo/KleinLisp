@@ -21,41 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.sourceforge.kleinlisp.parser;
-
-import java_cup.runtime.Symbol;
-
-import java.io.*;
+package net.sourceforge.kleinlisp;
 
 /**
- * @author daolivei
+ *
+ * @author danilo
  */
-public class LON {
+public class SourceRef {
+    
+    private final String source;
+    private final int line;
+    private final int column;    
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) throws Exception {
-//        SourceLexicalAnalyzer sla = new SourceLexicalAnalyzer(new FileInputStream(new File("/uni-mainz.de/homes/daolivei/.emacs.d/init.el")));
-
-        String code = "(a de e ( dfsdf ) ) ;;;;;dfsfds\n  \t\t\n(a)";
-
-        InputStream in = new ByteArrayInputStream(code.getBytes());
-
-        SourceLexicalAnalyzer sla = new SourceLexicalAnalyzer(in);
-
-        sla = new SourceLexicalAnalyzer(new FileInputStream(new
-                File("/home/danilo/.emacs.d/init.el")));
-
-        System.out.println("___");
-        while (true) {
-            Symbol s = sla.next_token();
-            System.out.println(s.value);
-            System.out.println("___");
-            if (s.sym == sym.EOF) {
-                return;
-            }
-        }
+    public SourceRef(String source, int line, int column) {
+        this.source = source;
+        this.line = line;
+        this.column = column;     
     }
-
+    
 }

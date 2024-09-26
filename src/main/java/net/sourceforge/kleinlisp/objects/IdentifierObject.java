@@ -21,41 +21,59 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.sourceforge.kleinlisp.parser;
+package net.sourceforge.kleinlisp.objects;
 
-import java_cup.runtime.Symbol;
-
-import java.io.*;
+import net.sourceforge.kleinlisp.LispObject;
+import net.sourceforge.kleinlisp.LispVisitor;
 
 /**
- * @author daolivei
+ *
+ * @author danilo
  */
-public class LON {
+public class IdentifierObject implements LispObject {
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) throws Exception {
-//        SourceLexicalAnalyzer sla = new SourceLexicalAnalyzer(new FileInputStream(new File("/uni-mainz.de/homes/daolivei/.emacs.d/init.el")));
+    private AtomObject atom;
+    private final int line;
+    private final int col;
 
-        String code = "(a de e ( dfsdf ) ) ;;;;;dfsfds\n  \t\t\n(a)";
-
-        InputStream in = new ByteArrayInputStream(code.getBytes());
-
-        SourceLexicalAnalyzer sla = new SourceLexicalAnalyzer(in);
-
-        sla = new SourceLexicalAnalyzer(new FileInputStream(new
-                File("/home/danilo/.emacs.d/init.el")));
-
-        System.out.println("___");
-        while (true) {
-            Symbol s = sla.next_token();
-            System.out.println(s.value);
-            System.out.println("___");
-            if (s.sym == sym.EOF) {
-                return;
-            }
-        }
+    public IdentifierObject(AtomObject atom, int line, int col) {
+        this.atom = atom;
+        this.line = line;
+        this.col = col;
     }
 
+    public int getLine() {
+        return line;
+    }
+
+    public int getCol() {
+        return col;
+    }    
+    
+    @Override
+    public Object asObject() {
+        return atom.asObject();
+    }
+
+    @Override
+    public boolean truthiness() {
+        return true;
+    }
+
+    @Override
+    public AtomObject asAtom() {
+        return atom;
+    }
+    
+    @Override
+    public <T> T accept(LispVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s[%d, %d]", atom, line, col);
+    }
+
+    
 }

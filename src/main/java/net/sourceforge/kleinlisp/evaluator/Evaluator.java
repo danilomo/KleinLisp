@@ -142,4 +142,11 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
         return () -> obj.get();
     }
 
+    @Override
+    public Supplier<LispObject> visit(IdentifierObject obj) {
+        return obj.asAtom().accept(this);
+    }
+    
+    
+
 }

@@ -43,7 +43,7 @@ public class ListObject implements LispObject, Iterable<LispObject> {
 
     public static final ListObject NIL = new ListObject();
     
-    private final LispObject head;
+    private LispObject head;
     private LispObject tail;
     private final int length;
     private Object meta;
@@ -121,6 +121,23 @@ public class ListObject implements LispObject, Iterable<LispObject> {
     public int length() {
         return length;
     }
+    
+    public ListObject last() {
+        ListObject pointer = this;
+        while (pointer.tail instanceof ListObject && pointer != NIL) {
+            pointer = (ListObject) pointer.tail;
+        }
+        
+        return pointer;
+    }
+
+    public void setTail(LispObject tail) {
+        this.tail = tail;
+    }
+
+    public void setHead(LispObject head) {
+        this.head = head;
+    }    
 
     @Override
     public Object asObject() {
@@ -135,6 +152,10 @@ public class ListObject implements LispObject, Iterable<LispObject> {
 
     @Override
     public String toString() {
+        /*if (!(last().tail() instanceof ListObject)) {
+            return improperListAsStr();
+        }*/
+        
         String metastr = "";
         
         if (meta != null) {
@@ -258,6 +279,21 @@ public class ListObject implements LispObject, Iterable<LispObject> {
 
     public void setCdr(LispObject list) {
         this.tail = list;
+    }
+
+    private String improperListAsStr() {
+        StringBuilder builder = new StringBuilder();
+        ListObject pointer = this;
+        builder.append("(");
+        
+        while (pointer.tail instanceof ListObject && pointer != NIL) {
+            builder.append(pointer.car().toString()).append(" ");
+            pointer = (ListObject) pointer.tail;
+        }
+        
+        builder.append(" . ").append(pointer.tail().toString()).append(")");
+       
+       return builder.toString();
     }
 
     private class ListFormIterator implements Iterator<LispObject> {

@@ -1,4 +1,4 @@
-package net.sourceforge.kleinlisp.parser.java_cup;
+package java_cup.runtime;
 
 /**
  * Default Implementation for SymbolFactory, creates

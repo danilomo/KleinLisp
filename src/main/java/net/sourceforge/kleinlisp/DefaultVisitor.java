@@ -97,6 +97,13 @@ public class DefaultVisitor implements LispVisitor<LispObject> {
     @Override
     public LispObject visit(CellObject obj) {
         return obj;
-    }     
+    } 
+
+    @Override
+    public LispObject visit(IdentifierObject obj) {
+        return obj;
+    }
+
+    
 
 }

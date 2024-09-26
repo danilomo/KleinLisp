@@ -27,9 +27,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import java_cup.runtime.Symbol;
 import net.sourceforge.kleinlisp.evaluator.Evaluator;
 import net.sourceforge.kleinlisp.parser.SourceLexicalAnalyzer;
-import net.sourceforge.kleinlisp.parser.java_cup.Symbol;
 import net.sourceforge.kleinlisp.parser.sym;
 
 /**
@@ -44,7 +45,7 @@ public class Lisp {
     public Lisp() {
         environment = new LispEnvironment();
         parser = Parser.defaultParser();
-        evaluator = new Evaluator(environment);
+        evaluator = new Evaluator(environment);	
     }
 
     public LispObject parse(String expression) {

@@ -1,6 +1,5 @@
 package net.sourceforge.kleinlisp.parser;
-
-import net.sourceforge.kleinlisp.parser.java_cup.*;
+    
 import net.sourceforge.kleinlisp.*;
 import net.sourceforge.kleinlisp.objects.*;
 
@@ -37,21 +36,26 @@ start with form;
 form ::= 
     self_evaluating_form:f {: RESULT = f; :} |
     list_form:f {: RESULT = f; :} |
-    quoted_form:f {: RESULT = f; :};
+    quoted_form:f {: RESULT = f; :} ;
 
 self_evaluating_form ::=
     INT_LITERAL:i    {: RESULT = new IntObject(i);    :} |
     DOUBLE_LITERAL:d {: RESULT = new DoubleObject(d); :} |
     STRING_LITERAL:s {: RESULT = new StringObject(s); :} |
-    ATOM:a           {: RESULT = parser.environment().atomOf(a);   :};
+    ATOM:a           {: 
+                        AtomObject atom = parser.environment().atomOf(a); 
+                        RESULT = new IdentifierObject(atom, aleft, aright);  
+                     :};
 
 list_form ::=
-    OPEN_PAR     form_list:l   CLOSE_PAR     {: RESULT = l; :} |
-    OPEN_PAR                   CLOSE_PAR     {: RESULT = ListObject.NIL;  :};
+    OPEN_PAR     form_list:l                CLOSE_PAR     {: RESULT = l; :} |
+    OPEN_PAR     form_list:l DOT form:last  CLOSE_PAR     {: ((ListObject) l).last().setTail(last); RESULT = l; :} |
+    OPEN_PAR                                CLOSE_PAR     {: RESULT = ListObject.NIL;  :};
 
 form_list ::= 
     form:head form_list:tail {: RESULT = new ListObject( head, tail );         :} |
-    form:head                {: RESULT = new ListObject( head, ListObject.NIL ); :};
+    form:head                {: RESULT = new ListObject( head, ListObject.NIL ); :} |
+    error:e {: parser.report_error("Syntax error, skip rest",e); :};
 
 quoted_form ::= 
     QUOTE form:f {: RESULT = new ListObject( parser.environment().atomOf("quote"), new ListObject(f, ListObject.NIL) ); :};

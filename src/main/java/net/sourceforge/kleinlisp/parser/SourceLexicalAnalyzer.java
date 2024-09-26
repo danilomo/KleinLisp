@@ -23,8 +23,8 @@
  */
 package net.sourceforge.kleinlisp.parser;
 
-import net.sourceforge.kleinlisp.parser.java_cup.Scanner;
-import net.sourceforge.kleinlisp.parser.java_cup.Symbol;
+import java_cup.runtime.Scanner;
+import java_cup.runtime.Symbol;
 
 
 /**
