@@ -24,28 +24,43 @@
 package net.sourceforge.kleinlisp.evaluator;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
 import net.sourceforge.kleinlisp.Function;
+import net.sourceforge.kleinlisp.LispArgumentError;
+import net.sourceforge.kleinlisp.LispEnvironment;
 import net.sourceforge.kleinlisp.LispObject;
-import net.sourceforge.kleinlisp.objects.ListObject;
+import net.sourceforge.kleinlisp.objects.FunctionObject;
 
 /**
- * @author danilo
+ * @author Danilo Oliveira
  */
 public class FunctionCall implements Supplier<LispObject> {
+
+  private final LispEnvironment env;
+  private final SourceRef ref;
   private final Supplier<LispObject> head;
   private final List<Supplier<LispObject>> parameters;
 
-  public FunctionCall(Supplier<LispObject> head, List<Supplier<LispObject>> parameters) {
+  public FunctionCall(
+      LispEnvironment env,
+      SourceRef ref,
+      Supplier<LispObject> head,
+      List<Supplier<LispObject>> parameters) {
+    this.env = env;
+    this.ref = ref;
     this.head = head;
     this.parameters = parameters;
   }
 
   @Override
   public LispObject get() {
-    Optional<Function> function =
-        Optional.ofNullable(head.get().asFunction()).flatMap(f -> Optional.of(f.function()));
+    FunctionObject functionObj = head.get().asFunction();
+
+    if (functionObj == null) {
+      throw new LispArgumentError(String.format("Value [%s] isn't a valid function"));
+    }
+
+    Function function = functionObj.function();
 
     LispObject[] params = new LispObject[parameters.size()];
     int i = 0;
@@ -55,6 +70,11 @@ public class FunctionCall implements Supplier<LispObject> {
       i++;
     }
 
-    return function.flatMap(f -> Optional.of(f.evaluate(params))).orElse(ListObject.NIL);
+    env.addFuncCall(functionObj.functionName(), ref);
+    LispObject result = function.evaluate(params);
+    env.popFuncCall();
+
+    return result;
   }
+
 }

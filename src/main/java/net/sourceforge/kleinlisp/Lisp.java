@@ -23,14 +23,9 @@
  */
 package net.sourceforge.kleinlisp;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java_cup.runtime.Symbol;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import net.sourceforge.kleinlisp.evaluator.Evaluator;
-import net.sourceforge.kleinlisp.parser.SourceLexicalAnalyzer;
-import net.sourceforge.kleinlisp.parser.sym;
 
 /**
  * @author daolivei
@@ -48,11 +43,35 @@ public class Lisp {
   }
 
   public LispObject parse(String expression) {
-    return parser.parse(expression, environment);
+    AtomicReference<LispObject> ref = new AtomicReference<>();
+    Consumer<LispObject> consumer =
+        obj -> {
+          ref.set(obj);
+        };
+    parser.parse(expression, environment, consumer);
+
+    return ref.get();
+  }
+
+  public LispObject evaluate(LispObject obj) {
+    try {
+      return evaluator.evaluate(obj);
+    } catch (LispRuntimeException ex) {
+      ex.setLispStackTrace(environment().getFunctionCalls());
+      throw ex;
+    }
   }
 
   public LispObject evaluate(String expression) {
-    return evaluator.evaluate(parse(expression));
+    AtomicReference<LispObject> ref = new AtomicReference<>();
+    Consumer<LispObject> consumer =
+        obj -> {
+          LispObject response = evaluate(obj);
+          ref.set(response);
+        };
+    parser.parse(expression, environment, consumer);
+
+    return ref.get();
   }
 
   public LispEnvironment environment() {
@@ -61,27 +80,5 @@ public class Lisp {
 
   public Evaluator evaluator() {
     return evaluator;
-  }
-
-  public void runScript(Path path) throws IOException {
-    try (InputStream in = Files.newInputStream(path)) {
-      runScript(in);
-    }
-  }
-
-  public void runScript(InputStream in) throws IOException {
-    SourceLexicalAnalyzer sla = new SourceLexicalAnalyzer(in);
-
-    while (true) {
-      Symbol s = sla.next_token();
-      if (s.value == null) {
-        return;
-      }
-
-      evaluate(s.value.toString());
-      if (s.sym == sym.EOF) {
-        return;
-      }
-    }
   }
 }

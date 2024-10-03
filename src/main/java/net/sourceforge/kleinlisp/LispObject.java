@@ -28,6 +28,7 @@ import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.CellObject;
 import net.sourceforge.kleinlisp.objects.DoubleObject;
 import net.sourceforge.kleinlisp.objects.FunctionObject;
+import net.sourceforge.kleinlisp.objects.IdentifierObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 
@@ -109,6 +110,10 @@ public interface LispObject {
    * @return see description
    */
   default AtomObject asAtom() {
+    return null;
+  }
+
+  default IdentifierObject asIdentifier() {
     return null;
   }
 

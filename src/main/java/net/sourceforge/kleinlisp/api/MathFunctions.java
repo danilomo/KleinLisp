@@ -23,6 +23,7 @@
  */
 package net.sourceforge.kleinlisp.api;
 
+import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.BooleanObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
@@ -32,6 +33,9 @@ public class MathFunctions {
   public static LispObject add(LispObject[] params) {
     int sum = 0;
     for (LispObject i : params) {
+      if (i.asInt() == null) {
+        throw new LispArgumentError("Wrong argument type passed to + function");
+      }
       sum += i.asInt().value;
     }
     return new IntObject(sum);

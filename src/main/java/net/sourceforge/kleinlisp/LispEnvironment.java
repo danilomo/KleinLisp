@@ -31,17 +31,42 @@ import net.sourceforge.kleinlisp.api.BooleanFunctions;
 import net.sourceforge.kleinlisp.api.IOFunctions;
 import net.sourceforge.kleinlisp.api.ListFunctions;
 import net.sourceforge.kleinlisp.api.MathFunctions;
+import net.sourceforge.kleinlisp.evaluator.SourceRef;
 import net.sourceforge.kleinlisp.macros.MacroDefinition;
 import net.sourceforge.kleinlisp.macros.MacroExpander;
 import net.sourceforge.kleinlisp.macros.StandardMacros;
 import net.sourceforge.kleinlisp.objects.AtomFactory;
 import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.FunctionObject;
+import net.sourceforge.kleinlisp.objects.IdentifierObject;
 
 /**
- * @author daolivei
+ * @author Danilo Oliveira
  */
 public class LispEnvironment implements Environment {
+
+  public static class FunctionRef {
+    private final String functionName;
+    private final SourceRef ref;
+
+    public FunctionRef(String functionName, SourceRef ref) {
+      this.functionName = functionName;
+      this.ref = ref;
+    }
+
+    public SourceRef getRef() {
+      return ref;
+    }
+
+    public String getFunctionName() {
+      return functionName;
+    }
+
+    @Override
+    public String toString() {
+      return String.format("%s[%d], at %s", ref.getSourceFile(), ref.getLine(), functionName);
+    }
+  }
 
   public static class FunctionStack {
     private final LispObject[] parameters;
@@ -70,15 +95,35 @@ public class LispEnvironment implements Environment {
   private final Map<AtomObject, MacroDefinition> macroTable;
   private final AtomFactory atomFactory;
   private final List<FunctionStack> stack;
+  private final List<FunctionRef> functionCalls;
 
   public LispEnvironment() {
     this.objects = new HashMap<>();
     this.names = new HashMap<>();
     this.atomFactory = new AtomFactory(this);
     this.stack = new ArrayList<>();
+    this.functionCalls = new ArrayList<>();
     this.macroTable = new HashMap<>();
     initFunctionTable();
     initMacroTable();
+  }
+
+  public void addFuncCall(String funcName, SourceRef ref) {
+    functionCalls.add(new FunctionRef(funcName, ref));
+  }
+
+  public void popFuncCall() {
+    functionCalls.remove(functionCalls.size() - 1);
+  }
+
+  public List<FunctionRef> getFunctionCalls() {
+    return functionCalls;
+  }
+
+  public void printStackTrace() {
+    for (FunctionRef ref : functionCalls) {
+      System.out.println(">>" + ref);
+    }
   }
 
   private void initFunctionTable() {
@@ -113,7 +158,12 @@ public class LispEnvironment implements Environment {
   }
 
   public void registerFunction(String symbol, net.sourceforge.kleinlisp.Function func) {
-    set(atomOf(symbol), new FunctionObject(func));
+    AtomObject atom = atomOf(symbol);
+
+    FunctionObject function = new FunctionObject(func);
+    function.setIdentifier(new IdentifierObject(atom, -1, -1));
+
+    set(atom, function);
   }
 
   public void registerMacro(String symbol, MacroDefinition macro) {

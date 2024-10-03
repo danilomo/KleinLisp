@@ -64,7 +64,6 @@ public class CondForm implements SpecialForm {
       for (Branch b : branches) {
         LispObject val = b.condition.get();
 
-        System.out.println(String.format("[%s] - [%s]", val, val.truthiness()));
         if (val.truthiness()) {
           return b.body.get();
         }

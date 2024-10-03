@@ -29,11 +29,8 @@ lineterminator	= \r | \n | \r\n
 identifier	= ({letter}|{symbol}) ({letter}|{digit}|{symbol}|{minus})*
 
 %{
-private void error(){
-    //System.err.print("Sintax error on line " + (yyline+1));
-    //System.err.println(". Unrecognizable token: \"" + yytext() + "\"");
-    SourceRef ref = new SourceRef("", yyline, yycolumn);
-    throw new LispException(ref, "Unrecognizable token: \"" + yytext() + "\"");
+private void error(){    
+    throw new SyntaxError(String.format("Unrecognizable token: '%s' at line %d, column %d", yytext(), yyline, yycolumn));
 }
 
 private Symbol symbol(int type) {
@@ -50,7 +47,6 @@ StringBuilder str = new StringBuilder();
 %state END
 
 %%
-
 
 <YYINITIAL> {
     "\""                            {str.setLength(0); yybegin(STRING);}
@@ -90,3 +86,5 @@ StringBuilder str = new StringBuilder();
 	\n 	{}
 	.	{}
 }
+
+. { error(); }

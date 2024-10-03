@@ -81,8 +81,7 @@ public class MacroTransformation {
       while (pointer != ListObject.NIL) {
         LispObject elem = pointer.car();
 
-        // if (elem.asAtom().isPresent()) {
-        if (elem instanceof AtomObject) {
+        if (elem.asAtom() != null) {
           last = atom;
           atom = elem.asAtom();
 

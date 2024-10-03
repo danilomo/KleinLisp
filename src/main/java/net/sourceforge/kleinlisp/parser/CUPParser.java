@@ -24,10 +24,11 @@
 package net.sourceforge.kleinlisp.parser;
 
 import java.io.ByteArrayInputStream;
+import java.util.function.Consumer;
 import net.sourceforge.kleinlisp.LispEnvironment;
+import net.sourceforge.kleinlisp.LispException;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.Parser;
-import net.sourceforge.kleinlisp.objects.ErrorObject;
 
 /**
  * @author daolivei
@@ -35,16 +36,19 @@ import net.sourceforge.kleinlisp.objects.ErrorObject;
 public class CUPParser implements Parser {
 
   @Override
-  public LispObject parse(String expression, LispEnvironment env) {
+  public void parse(String expression, LispEnvironment env, Consumer<LispObject> consumer) {
     parser p = null;
+
     try {
       ByteArrayInputStream in = new ByteArrayInputStream(expression.getBytes());
-      p = new parser(new LexicalAnalyzer(in)).withEnvironment(env);
+      p = new parser(new LexicalAnalyzer(in)).withEnvironment(env).withConsumer(consumer);
 
-      return (LispObject) p.parse().value;
+      p.parse();
+    } catch (LispException ex) {
+      throw ex;
     } catch (Exception ex) {
       ex.printStackTrace();
-      return new ErrorObject(ex);
+      throw new RuntimeException(ex);
     }
   }
 }

@@ -23,12 +23,27 @@
  */
 package net.sourceforge.kleinlisp;
 
+import java.util.Collections;
+import java.util.List;
+import net.sourceforge.kleinlisp.LispEnvironment.FunctionRef;
+
 /**
+ *
  * @author danilo
  */
-public class LispException extends RuntimeException {
+public class LispRuntimeException extends LispException {
 
-  public LispException(String message) {
+  private List<FunctionRef> lispStackTrace = Collections.emptyList();
+
+  public LispRuntimeException(String message) {
     super(message);
+  }
+
+  void setLispStackTrace(List<FunctionRef> stackTrace) {
+    this.lispStackTrace = stackTrace;
+  }
+
+  public List<FunctionRef> getLispStackTrace() {
+    return lispStackTrace;
   }
 }

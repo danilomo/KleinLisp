@@ -26,15 +26,9 @@ package net.sourceforge.kleinlisp;
 /**
  * @author danilo
  */
-public class SourceRef {
+public class LispArgumentError extends LispRuntimeException {
 
-  private final String source;
-  private final int line;
-  private final int column;
-
-  public SourceRef(String source, int line, int column) {
-    this.source = source;
-    this.line = line;
-    this.column = column;
+  public LispArgumentError(String message) {
+    super(message);
   }
 }

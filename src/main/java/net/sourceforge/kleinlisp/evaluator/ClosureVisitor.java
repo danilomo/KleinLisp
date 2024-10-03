@@ -33,6 +33,7 @@ import java.util.Set;
 import net.sourceforge.kleinlisp.DefaultVisitor;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.AtomObject;
+import net.sourceforge.kleinlisp.objects.IdentifierObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 import net.sourceforge.kleinlisp.special_forms.SpecialFormEnum;
 
@@ -213,5 +214,17 @@ public class ClosureVisitor extends DefaultVisitor {
     }
 
     return obj;
+  }
+
+  @Override
+  public LispObject visit(IdentifierObject obj) {
+    //    return this.visit(obj.asAtom());
+    LispObject result = obj.asAtom().accept(this);
+
+    if (result.asAtom() != null) {
+      return new IdentifierObject(result.asAtom(), obj.getLine(), obj.getCol());
+    }
+
+    return result;
   }
 }

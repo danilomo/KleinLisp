@@ -24,8 +24,10 @@
 package net.sourceforge.kleinlisp.objects;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import net.sourceforge.kleinlisp.LispObject;
@@ -45,7 +47,7 @@ public class ListObject implements LispObject, Iterable<LispObject> {
   private LispObject head;
   private LispObject tail;
   private final int length;
-  private Object meta;
+  private Map<Class<?>, Object> meta = null;
 
   private ListObject() {
     this.head = null;
@@ -54,11 +56,19 @@ public class ListObject implements LispObject, Iterable<LispObject> {
   }
 
   public <T> T getMeta(Class<T> clazz) {
-    return (T) meta;
+    if (meta == null) {
+      return null;
+    }
+
+    return clazz.cast(meta.get(clazz));
   }
 
   public void setMeta(Object meta) {
-    this.meta = meta;
+    if (this.meta == null) {
+      this.meta = new HashMap<>();
+    }
+
+    this.meta.put(meta.getClass(), meta);
   }
 
   public ListObject(LispObject head, LispObject tail) {

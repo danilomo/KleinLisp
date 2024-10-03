@@ -43,10 +43,11 @@ import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.CellObject;
 import net.sourceforge.kleinlisp.objects.ComputedLispObject;
 import net.sourceforge.kleinlisp.objects.FunctionObject;
+import net.sourceforge.kleinlisp.objects.IdentifierObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 
 /**
- * @author danilo
+ * @author Danilo Oliveira
  */
 public class LambdaForm implements SpecialForm {
 
@@ -152,6 +153,8 @@ public class LambdaForm implements SpecialForm {
   @Override
   public Supplier<LispObject> apply(LispObject obj) {
     ListObject orig = obj.asList();
+    IdentifierObject id = orig.car().asIdentifier();
+
     ListObject list = orig.cdr();
     LambdaMeta meta = orig.getMeta(LambdaMeta.class);
 
@@ -171,8 +174,11 @@ public class LambdaForm implements SpecialForm {
       }
 
       LambdaFunction function = new LambdaFunction(functionSupplier, meta, env);
+      FunctionObject functionObj = new FunctionObject(function);
 
-      return new FunctionObject(function);
+      functionObj.setIdentifier(id);
+
+      return functionObj;
     };
   }
 
@@ -180,6 +186,18 @@ public class LambdaForm implements SpecialForm {
       ListObject body, List<AtomObject> fromParameters, Set<AtomObject> fromClosure) {
     DefaultVisitor visitor =
         new DefaultVisitor() {
+
+          @Override
+          public LispObject visit(IdentifierObject obj) {
+            LispObject result = obj.asAtom().accept(this);
+
+            if (result.asAtom() != null) {
+              return new IdentifierObject(result.asAtom(), obj.getLine(), obj.getCol());
+            }
+
+            return result;
+          }
+
           @Override
           public LispObject visit(AtomObject obj) {
 

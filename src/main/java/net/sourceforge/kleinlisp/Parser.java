@@ -23,6 +23,7 @@
  */
 package net.sourceforge.kleinlisp;
 
+import java.util.function.Consumer;
 import net.sourceforge.kleinlisp.parser.CUPParser;
 
 /**
@@ -33,5 +34,5 @@ public interface Parser {
     return new CUPParser();
   }
 
-  LispObject parse(String expression, LispEnvironment env);
+  void parse(String expression, LispEnvironment env, Consumer<LispObject> consumer);
 }

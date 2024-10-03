@@ -65,12 +65,17 @@ public class IdentifierObject implements LispObject {
   }
 
   @Override
+  public IdentifierObject asIdentifier() {
+    return this;
+  }
+
+  @Override
   public <T> T accept(LispVisitor<T> visitor) {
     return visitor.visit(this);
   }
 
   @Override
   public String toString() {
-    return atom.toString();
+    return atom.toString() + "[" + line + ", " + col + "]";
   }
 }

@@ -91,12 +91,6 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
       return form.get().apply(list);
     }
 
-    // TODO: good performance optimization can be done here
-    // Supplier<LispObject> commonCase = CommonCases.apply(list, this);
-    // if (commonCase != null) {
-    // return commonCase;
-    // }
-
     Supplier<LispObject> headEval = head.accept(this);
     List<Supplier<LispObject>> parameters = new ArrayList<>();
 
@@ -104,7 +98,32 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
       parameters.add(obj.accept(this));
     }
 
-    return new FunctionCall(headEval, parameters);
+    return new FunctionCall(environment, getSourceRef(list), headEval, parameters);
+  }
+
+  private SourceRef getSourceRef(ListObject list) {
+    if (list == ListObject.NIL) {
+      return null;
+    }
+
+    LispObject car = list.car();
+
+    if (car.asIdentifier() != null) {
+      return asSourceRef(car.asIdentifier());
+    }
+
+    if (car.asList() != null) {
+      SourceRef result = getSourceRef(car.asList());
+      if (result != null) {
+        return result;
+      }
+    }
+
+    return getSourceRef(list.cdr());
+  }
+
+  private SourceRef asSourceRef(IdentifierObject id) {
+    return new SourceRef("xxx.scm", id.getLine());
   }
 
   @Override

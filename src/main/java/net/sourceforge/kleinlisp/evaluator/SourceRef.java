@@ -21,14 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.sourceforge.kleinlisp;
+package net.sourceforge.kleinlisp.evaluator;
 
-/**
- * @author danilo
- */
-public class LispException extends RuntimeException {
+public class SourceRef {
 
-  public LispException(String message) {
-    super(message);
+  private final String sourceFile;
+  private final int line;
+
+  public SourceRef(String sourceFile, int line) {
+    this.sourceFile = sourceFile;
+    this.line = line;
+  }
+
+  public String getSourceFile() {
+    return sourceFile;
+  }
+
+  public int getLine() {
+    return line;
+  }
+
+  @Override
+  public String toString() {
+    return "SourceRef [line=" + line + ", " + sourceFile + "]";
   }
 }

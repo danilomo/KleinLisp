@@ -32,6 +32,7 @@ import net.sourceforge.kleinlisp.LispVisitor;
  */
 public final class FunctionObject implements LispObject {
 
+  private IdentifierObject identifier;
   private final Function function;
 
   public FunctionObject(Function function) {
@@ -48,7 +49,10 @@ public final class FunctionObject implements LispObject {
 
   @Override
   public String toString() {
-    return "Function: " + function.toString();
+    if (identifier == null) {
+      return "";
+    }
+    return identifier.toString();
   }
 
   @Override
@@ -74,5 +78,21 @@ public final class FunctionObject implements LispObject {
   @Override
   public boolean error() {
     return false;
+  }
+
+  public void setIdentifier(IdentifierObject identifier) {
+    this.identifier = identifier;
+  }
+
+  public IdentifierObject getIdentifier() {
+    return identifier;
+  }
+
+  public String functionName() {
+    if (identifier == null) {
+      return "*unamed function*";
+    }
+    
+    return identifier.asAtom().toString();
   }
 }

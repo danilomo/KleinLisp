@@ -1,19 +1,39 @@
 package net.sourceforge.kleinlisp.parser;
     
 import net.sourceforge.kleinlisp.*;
+import net.sourceforge.kleinlisp.evaluator.*;
 import net.sourceforge.kleinlisp.objects.*;
-
+import java.util.function.Consumer;
 
 parser code {:
     private LispEnvironment environment;
+    private Consumer<LispObject> consumer = obj -> {};
+    private String sourceFile = "xxx.scm";
 
     public parser withEnvironment(LispEnvironment environment){
         this.environment = environment;
         return this;
     }
 
+    public parser withConsumer(Consumer<LispObject> consumer){
+        this.consumer = consumer;
+        return this;
+    }
+
     public LispEnvironment environment(){
         return environment;
+    }
+
+    public void accept(LispObject obj) {
+        consumer.accept(obj);
+    }
+
+    public void syntaxError(Object e, int line, int col) {
+        throw new SyntaxError(line, col);
+    }
+
+    public String getSourceFile(){
+        return sourceFile;
     }
 :}
 
@@ -30,13 +50,18 @@ non terminal LispObject list_form;
 non terminal LispObject form_list;
 non terminal LispObject quoted_form;
 non terminal LispObject form;
+non terminal forms;
 
-start with form;
+start with forms;
+
+forms ::= forms:fs form:f {: parser.accept(f); :} | 
+          form:f {: parser.accept(f); :} |
+          error:e {: parser.syntaxError(e, eleft, eright); :};
 
 form ::= 
     self_evaluating_form:f {: RESULT = f; :} |
     list_form:f {: RESULT = f; :} |
-    quoted_form:f {: RESULT = f; :} ;
+    quoted_form:f {: RESULT = f; :};
 
 self_evaluating_form ::=
     INT_LITERAL:i    {: RESULT = new IntObject(i);    :} |
@@ -54,8 +79,7 @@ list_form ::=
 
 form_list ::= 
     form:head form_list:tail {: RESULT = new ListObject( head, tail );         :} |
-    form:head                {: RESULT = new ListObject( head, ListObject.NIL ); :} |
-    error:e {: parser.report_error("Syntax error, skip rest",e); :};
+    form:head                {: RESULT = new ListObject( head, ListObject.NIL ); :};
 
 quoted_form ::= 
     QUOTE form:f {: RESULT = new ListObject( parser.environment().atomOf("quote"), new ListObject(f, ListObject.NIL) ); :};
