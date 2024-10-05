@@ -24,12 +24,10 @@
 package net.sourceforge.kleinlisp.parser;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Consumer;
-
 import net.sourceforge.kleinlisp.LispEnvironment;
 import net.sourceforge.kleinlisp.LispException;
 import net.sourceforge.kleinlisp.LispObject;
@@ -46,9 +44,7 @@ public class CUPParser implements Parser {
 
     try {
       ByteArrayInputStream in = new ByteArrayInputStream(expression.getBytes());
-      p = new parser(new LexicalAnalyzer(in))
-        .withEnvironment(env)
-        .withConsumer(consumer);
+      p = new parser(new LexicalAnalyzer(in)).withEnvironment(env).withConsumer(consumer);
 
       p.parse();
     } catch (LispException ex) {
@@ -64,10 +60,11 @@ public class CUPParser implements Parser {
 
     try {
       BufferedInputStream in = new BufferedInputStream(Files.newInputStream(path));
-      p = new parser(new LexicalAnalyzer(in))
-        .withEnvironment(env)
-        .withSourceFile(path.toAbsolutePath().toString())
-        .withConsumer(consumer);
+      p =
+          new parser(new LexicalAnalyzer(in))
+              .withEnvironment(env)
+              .withSourceFile(path.toAbsolutePath().toString())
+              .withConsumer(consumer);
 
       p.parse();
     } catch (LispException ex) {
@@ -75,5 +72,5 @@ public class CUPParser implements Parser {
     } catch (Exception ex) {
       throw new RuntimeException(ex);
     }
-  }  
+  }
 }

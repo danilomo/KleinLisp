@@ -114,7 +114,7 @@ public class RuntimeErrorsTest extends BaseTestClass {
             });
 
     lisp.environment().printStackTrace();
-    
+
     assertFalse(ex.getLispStackTrace().isEmpty());
   }
 }
