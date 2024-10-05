@@ -192,7 +192,7 @@ public class LambdaForm implements SpecialForm {
             LispObject result = obj.asAtom().accept(this);
 
             if (result.asAtom() != null) {
-              return new IdentifierObject(result.asAtom(), obj.getLine(), obj.getCol());
+              return new IdentifierObject(result.asAtom(), obj.getSource(), obj.getLine(), obj.getCol());
             }
 
             return result;

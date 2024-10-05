@@ -161,7 +161,7 @@ public class LispEnvironment implements Environment {
     AtomObject atom = atomOf(symbol);
 
     FunctionObject function = new FunctionObject(func);
-    function.setIdentifier(new IdentifierObject(atom, -1, -1));
+    function.setIdentifier(new IdentifierObject(atom, "<java module>", -1, -1));
 
     set(atom, function);
   }

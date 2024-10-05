@@ -23,6 +23,10 @@
  */
 package net.sourceforge.kleinlisp;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import net.sourceforge.kleinlisp.evaluator.Evaluator;
@@ -72,6 +76,10 @@ public class Lisp {
     parser.parse(expression, environment, consumer);
 
     return ref.get();
+  }
+
+  public void execute(Path path) {
+    parser.parse(path, environment, this::evaluate);
   }
 
   public LispEnvironment environment() {

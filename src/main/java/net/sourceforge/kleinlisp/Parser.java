@@ -23,7 +23,9 @@
  */
 package net.sourceforge.kleinlisp;
 
+import java.nio.file.Path;
 import java.util.function.Consumer;
+
 import net.sourceforge.kleinlisp.parser.CUPParser;
 
 /**
@@ -35,4 +37,6 @@ public interface Parser {
   }
 
   void parse(String expression, LispEnvironment env, Consumer<LispObject> consumer);
+  
+  void parse(Path path, LispEnvironment env, Consumer<LispObject> consumer);  
 }

@@ -31,12 +31,14 @@ import net.sourceforge.kleinlisp.LispVisitor;
  */
 public class IdentifierObject implements LispObject {
 
-  private AtomObject atom;
+  private final AtomObject atom;
+  private final String source;
   private final int line;
   private final int col;
 
-  public IdentifierObject(AtomObject atom, int line, int col) {
+  public IdentifierObject(AtomObject atom, String source, int line, int col) {
     this.atom = atom;
+    this.source = source;
     this.line = line;
     this.col = col;
   }
@@ -47,6 +49,10 @@ public class IdentifierObject implements LispObject {
 
   public int getCol() {
     return col;
+  }
+
+  public String getSource() {
+    return source;
   }
 
   @Override

@@ -23,8 +23,13 @@
  */
 package net.sourceforge.kleinlisp;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 /**
  * @author Danilo Oliveira
@@ -33,7 +38,7 @@ public class RuntimeErrorsTest extends BaseTestClass {
 
   @Test
   public void testAddition() {
-    Assert.assertThrows(
+    assertThrows(
         LispArgumentError.class,
         () -> {
           lisp.evaluate("(+ 1 2 'test)");
@@ -42,7 +47,7 @@ public class RuntimeErrorsTest extends BaseTestClass {
 
   @Test
   public void testSyntaticError() {
-    Assert.assertThrows(
+    assertThrows(
         SyntaxError.class,
         () -> {
           lisp.parse("1 2 3 (+2 3) (+ 1 2) ³  (+ 1 2)");
@@ -51,18 +56,21 @@ public class RuntimeErrorsTest extends BaseTestClass {
 
   @Test
   public void testMalformedSExp() {
-    Assert.assertThrows(
-        SyntaxError.class,
-        () -> {
-          LispObject p = lisp.parse("1 2 3 (+2 3) (+ 1 2)  (+ 1 2) (+ 1");
-          debug(p);
-        });
+    String[] exps = {"1 2 3 (+2 3) (+ 1 2)  (+ 1 2) (+ 1", "(+ 2 (())))", "((1 2 3)", "(1 2 3 ) )"};
+    for (String exp : exps) {
+      assertThrows(
+          SyntaxError.class,
+          () -> {
+            LispObject p = lisp.parse(exp);
+            debug(p);
+          });
+    }
   }
 
   @Test
-  public void testRuntimeError() {
+  public void testRuntimeError(@TempDir Path tempDir) {
     LispRuntimeException ex =
-        Assert.assertThrows(
+        assertThrows(
             LispRuntimeException.class,
             () -> {
               String script =
@@ -79,6 +87,34 @@ public class RuntimeErrorsTest extends BaseTestClass {
               lisp.evaluate(script);
             });
     debug("Stack trace: " + ex.getLispStackTrace());
-    Assert.assertFalse(ex.getLispStackTrace().isEmpty());
+    assertFalse(ex.getLispStackTrace().isEmpty());
+  }
+
+  @Test
+  public void testRuntimeErrorFromScript(@TempDir Path tempDir) throws Exception {
+    disableStdoutCapture();
+    String script =
+        "(define (bar a b)\n"
+            + " (+ a b))\n"
+            + "\n"
+            + "(define (foo a b)\n"
+            + "  (println a)\n"
+            + "  (println b)\n"
+            + "  (bar a b))\n"
+            + "\n"
+            + "(foo 1 'dois)\n";
+    Path scriptFile = tempDir.resolve("script.scm");
+    Files.write(scriptFile, script.getBytes());
+
+    LispRuntimeException ex =
+        assertThrows(
+            LispRuntimeException.class,
+            () -> {
+              lisp.execute(scriptFile);
+            });
+
+    lisp.environment().printStackTrace();
+    
+    assertFalse(ex.getLispStackTrace().isEmpty());
   }
 }

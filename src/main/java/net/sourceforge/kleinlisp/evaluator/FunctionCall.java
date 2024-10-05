@@ -76,5 +76,4 @@ public class FunctionCall implements Supplier<LispObject> {
 
     return result;
   }
-
 }

@@ -23,12 +23,12 @@
  */
 package net.sourceforge.kleinlisp;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import net.sourceforge.kleinlisp.objects.FunctionObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author danilo
@@ -117,6 +117,6 @@ public class SpecialFormsTest extends BaseTestClass {
             + "((-1 -3 -5 -7 -9) \"negative and odd\")\n"
             + "(else \"zero\")))");
 
-    Assert.assertTrue(getStdOut().contains("positive and odd"));
+    assertTrue(getStdOut().contains("positive and odd"));
   }
 }

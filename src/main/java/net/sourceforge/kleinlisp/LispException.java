@@ -31,4 +31,8 @@ public class LispException extends RuntimeException {
   public LispException(String message) {
     super(message);
   }
+
+  public LispException(Throwable ex) {
+    super(ex);
+  }  
 }

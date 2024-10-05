@@ -92,7 +92,7 @@ public final class FunctionObject implements LispObject {
     if (identifier == null) {
       return "*unamed function*";
     }
-    
+
     return identifier.asAtom().toString();
   }
 }

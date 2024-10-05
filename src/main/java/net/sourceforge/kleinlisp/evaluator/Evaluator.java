@@ -123,7 +123,7 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
   }
 
   private SourceRef asSourceRef(IdentifierObject id) {
-    return new SourceRef("xxx.scm", id.getLine());
+    return new SourceRef(id.getSource(), id.getLine());
   }
 
   @Override

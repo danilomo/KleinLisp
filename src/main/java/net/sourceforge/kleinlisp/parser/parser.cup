@@ -8,11 +8,16 @@ import java.util.function.Consumer;
 parser code {:
     private LispEnvironment environment;
     private Consumer<LispObject> consumer = obj -> {};
-    private String sourceFile = "xxx.scm";
+    private String sourceFile = "";
 
     public parser withEnvironment(LispEnvironment environment){
         this.environment = environment;
         return this;
+    }
+
+    public parser withSourceFile(String sourceFile) {
+        this.sourceFile = sourceFile;
+	return this;
     }
 
     public parser withConsumer(Consumer<LispObject> consumer){
@@ -68,8 +73,9 @@ self_evaluating_form ::=
     DOUBLE_LITERAL:d {: RESULT = new DoubleObject(d); :} |
     STRING_LITERAL:s {: RESULT = new StringObject(s); :} |
     ATOM:a           {: 
-                        AtomObject atom = parser.environment().atomOf(a); 
-                        RESULT = new IdentifierObject(atom, aleft, aright);  
+                        AtomObject atom = parser.environment().atomOf(a);
+			String source = parser.getSourceFile();
+                        RESULT = new IdentifierObject(atom, source, aleft, aright);  
                      :};
 
 list_form ::=

@@ -23,6 +23,8 @@
  */
 package net.sourceforge.kleinlisp;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import net.sourceforge.kleinlisp.macros.MacroTransformation;
@@ -30,8 +32,7 @@ import net.sourceforge.kleinlisp.macros.MatchResult;
 import net.sourceforge.kleinlisp.macros.PatternMatcher;
 import net.sourceforge.kleinlisp.macros.StandardMacros;
 import net.sourceforge.kleinlisp.objects.ListObject;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author danilo
@@ -58,7 +59,7 @@ public class MacrosTest extends BaseTestClass {
     lisp.environment().registerMacro("__display", env::display);
     lisp.evaluate(script);
 
-    Assert.assertEquals("23", getStdOut());
+    assertEquals("23", getStdOut());
   }
 
   @Test
@@ -135,6 +136,6 @@ public class MacrosTest extends BaseTestClass {
     lisp.evaluate(
         "(unless (> x 5)\n" + "  (display \"x is not greater than 5\")\n" + "  (newline))");
 
-    Assert.assertEquals("\"x is not greater than 5\"\n\n", getStdOut());
+    assertEquals("\"x is not greater than 5\"\n\n", getStdOut());
   }
 }

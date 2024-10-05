@@ -26,8 +26,8 @@ package net.sourceforge.kleinlisp;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import net.sourceforge.kleinlisp.objects.AtomObject;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 public abstract class BaseTestClass {
 
@@ -35,7 +35,7 @@ public abstract class BaseTestClass {
   private ByteArrayOutputStream redirectedOut;
   private PrintStream originalOut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     lisp = new Lisp();
     originalOut = System.out;
@@ -43,9 +43,9 @@ public abstract class BaseTestClass {
     System.setOut(new PrintStream(redirectedOut));
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
-    System.setOut(originalOut);
+    disableStdoutCapture();
   }
 
   protected int evalAsInt(String str) {
@@ -59,6 +59,10 @@ public abstract class BaseTestClass {
 
   protected String getStdOut() {
     return new String(redirectedOut.toByteArray());
+  }
+
+  protected void disableStdoutCapture() {
+    System.setOut(originalOut);
   }
 
   protected void debug(Object value) {
