@@ -171,9 +171,9 @@ public class ListObject implements LispObject, Iterable<LispObject> {
     }
 
     return metastr
-        + "["
-        + String.join(", ", toList().stream().map(t -> t.toString()).collect(Collectors.toList()))
-        + "]";
+        + "("
+        + String.join(" ", toList().stream().map(t -> t.toString()).collect(Collectors.toList()))
+        + ")";
   }
 
   public List<LispObject> toList() {

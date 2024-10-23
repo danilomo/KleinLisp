@@ -21,67 +21,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.sourceforge.kleinlisp.objects;
+package net.sourceforge.kleinlisp;
 
-import net.sourceforge.kleinlisp.LispObject;
-import net.sourceforge.kleinlisp.LispVisitor;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.stream.Collectors;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
- * @author danilo
+ * @author Danilo Oliveira
  */
-public class IdentifierObject implements LispObject {
+public class TCOTest {
 
-  private final AtomObject atom;
-  private final String source;
-  private final int line;
-  private final int col;
+  private String readFile(String filename) throws Exception {
+    InputStream is = TCOTest.class.getClassLoader().getResourceAsStream(filename);
 
-  public IdentifierObject(AtomObject atom, String source, int line, int col) {
-    this.atom = atom;
-    this.source = source;
-    this.line = line;
-    this.col = col;
+    String result =
+        new BufferedReader(new InputStreamReader(is)).lines().collect(Collectors.joining("\n"));
+
+    return result;
   }
 
-  public int getLine() {
-    return line;
-  }
+  @Test
+  public void evaluateTailRecursiveFunction() throws Exception {
+    Lisp lisp = new Lisp();
+    lisp.environment().setStackSize(5);
 
-  public int getCol() {
-    return col;
-  }
+    String script = readFile("fib.scm");
 
-  public String getSource() {
-    return source;
-  }
-
-  @Override
-  public Object asObject() {
-    return atom.asObject();
-  }
-
-  @Override
-  public boolean truthiness() {
-    return true;
-  }
-
-  @Override
-  public AtomObject asAtom() {
-    return atom;
-  }
-
-  @Override
-  public IdentifierObject asIdentifier() {
-    return this;
-  }
-
-  @Override
-  public <T> T accept(LispVisitor<T> visitor) {
-    return visitor.visit(this);
-  }
-
-  @Override
-  public String toString() {
-    return atom.toString(); // + "[" + line + ", " + col + "]";
+    lisp.evaluate(script);
+    Assertions.assertEquals(55, lisp.evaluate("(iter 0 1 10)").asInt().value);
   }
 }

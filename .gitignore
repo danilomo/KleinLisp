@@ -3,6 +3,7 @@
 KleinLisp.iml
 /.idea/
 /.project
+/.proj/**
 /.classpath
 /.settings
 /.projectile

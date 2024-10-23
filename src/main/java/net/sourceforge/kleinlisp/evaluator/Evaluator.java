@@ -41,9 +41,11 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
 
   private final SpecialForms forms;
   private final LispEnvironment environment;
+  private final AtomObject recur;
 
   public Evaluator(LispEnvironment environment) {
     this.environment = environment;
+    this.recur = environment.atomOf("recur");
     this.forms = new SpecialForms(environment, this);
   }
 
@@ -85,6 +87,10 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
 
     LispObject head = list.head();
 
+    if (head.asList() != null && head.asList().car().asAtom() == recur) {
+      return tailCall(list);
+    }
+
     Optional<SpecialForm> form = forms.get(head);
 
     if (form.isPresent()) {
@@ -99,6 +105,20 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
     }
 
     return new FunctionCall(environment, getSourceRef(list), headEval, parameters);
+  }
+
+  public Supplier<LispObject> tailCall(ListObject list) {
+    ListObject recur = list.head().asList();
+    LispObject head = recur.cdr().car();
+
+    Supplier<LispObject> headEval = head.accept(this);
+    List<Supplier<LispObject>> parameters = new ArrayList<>();
+
+    for (LispObject obj : list.cdr()) {
+      parameters.add(obj.accept(this));
+    }
+
+    return new TailFunctionCall(environment, headEval, parameters);
   }
 
   private SourceRef getSourceRef(ListObject list) {

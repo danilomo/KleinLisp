@@ -69,12 +69,15 @@ public class DefineForm implements SpecialForm {
     AtomObject id = signature.car().asAtom();
     LispObject parameters = signature.cdr();
 
+    TcoOptimizer optm = new TcoOptimizer(value, id, environment);
+    optm.optimize();
+
     ListObject lambda = new ListObject(lambdaAtom, new ListObject(parameters, value));
 
     LispObject function = evaluator.evaluate(lambda);
     FunctionObject functionObj = function.asFunction();
 
-    functionObj.setIdentifier(signature.car().asIdentifier());
+    functionObj.setIdentifier(id.asIdentifier());
 
     environment.set(id, function);
   }

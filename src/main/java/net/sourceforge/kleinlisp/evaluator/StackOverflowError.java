@@ -21,67 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.sourceforge.kleinlisp.objects;
+package net.sourceforge.kleinlisp.evaluator;
 
-import net.sourceforge.kleinlisp.LispObject;
-import net.sourceforge.kleinlisp.LispVisitor;
+import net.sourceforge.kleinlisp.LispException;
 
 /**
+ *
  * @author danilo
  */
-public class IdentifierObject implements LispObject {
+public class StackOverflowError extends LispException {
 
-  private final AtomObject atom;
-  private final String source;
-  private final int line;
-  private final int col;
-
-  public IdentifierObject(AtomObject atom, String source, int line, int col) {
-    this.atom = atom;
-    this.source = source;
-    this.line = line;
-    this.col = col;
-  }
-
-  public int getLine() {
-    return line;
-  }
-
-  public int getCol() {
-    return col;
-  }
-
-  public String getSource() {
-    return source;
-  }
-
-  @Override
-  public Object asObject() {
-    return atom.asObject();
-  }
-
-  @Override
-  public boolean truthiness() {
-    return true;
-  }
-
-  @Override
-  public AtomObject asAtom() {
-    return atom;
-  }
-
-  @Override
-  public IdentifierObject asIdentifier() {
-    return this;
-  }
-
-  @Override
-  public <T> T accept(LispVisitor<T> visitor) {
-    return visitor.visit(this);
-  }
-
-  @Override
-  public String toString() {
-    return atom.toString(); // + "[" + line + ", " + col + "]";
+  public StackOverflowError() {
+    super("Stack overflow error");
   }
 }

@@ -78,7 +78,7 @@ public class LambdaForm implements SpecialForm {
     }
   }
 
-  private class LambdaFunction implements Function {
+  public class LambdaFunction implements Function {
 
     private final Supplier<LispObject> body;
     private final LambdaMeta meta;
@@ -105,11 +105,16 @@ public class LambdaForm implements SpecialForm {
       }
 
       environment.stackPush(parameters, cenv);
-
       LispObject result = body.get();
       environment.stackPop();
 
       return result;
+    }
+
+    public LispObject evaluateTailCall(LispObject[] parameters) {
+      environment.setStackTop(parameters);
+
+      return body.get();
     }
 
     private Environment upvaluesObj(LispObject[] parameters) {

@@ -46,6 +46,7 @@ import net.sourceforge.kleinlisp.objects.IdentifierObject;
 public class LispEnvironment implements Environment {
 
   public static class FunctionRef {
+
     private final String functionName;
     private final SourceRef ref;
 
@@ -69,6 +70,7 @@ public class LispEnvironment implements Environment {
   }
 
   public static class FunctionStack {
+
     private final LispObject[] parameters;
     private final Environment env;
 
@@ -96,6 +98,7 @@ public class LispEnvironment implements Environment {
   private final AtomFactory atomFactory;
   private final List<FunctionStack> stack;
   private final List<FunctionRef> functionCalls;
+  private int stackSize = 200;
 
   public LispEnvironment() {
     this.objects = new HashMap<>();
@@ -200,6 +203,10 @@ public class LispEnvironment implements Environment {
   }
 
   public void stackPush(LispObject[] parameters, Environment env) {
+    if (stack.size() == stackSize) {
+      throw new StackOverflowError();
+    }
+
     stack.add(new FunctionStack(parameters, env));
   }
 
@@ -217,5 +224,15 @@ public class LispEnvironment implements Environment {
 
   public LispObject expandMacros(LispObject obj) {
     return MacroExpander.expandMacro(macroTable, obj);
+  }
+
+  public void setStackTop(LispObject[] parameters) {
+    for (int i = 0; i < parameters.length; i++) {
+      stack.get(stack.size() - 1).setParameterAt(i, parameters[i]);
+    }
+  }
+
+  public void setStackSize(int size) {
+    this.stackSize = size;
   }
 }
