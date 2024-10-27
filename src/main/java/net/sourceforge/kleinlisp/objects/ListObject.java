@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.LispVisitor;
 import net.sourceforge.kleinlisp.functional.Tuple2;
@@ -132,7 +131,8 @@ public class ListObject implements LispObject, Iterable<LispObject> {
 
   public ListObject last() {
     ListObject pointer = this;
-    while (pointer.tail instanceof ListObject && pointer != NIL) {
+
+    while (pointer.tail instanceof ListObject && pointer.tail != NIL) {
       pointer = (ListObject) pointer.tail;
     }
 
@@ -160,20 +160,11 @@ public class ListObject implements LispObject, Iterable<LispObject> {
 
   @Override
   public String toString() {
-    /*if (!(last().tail() instanceof ListObject)) {
-        return improperListAsStr();
-    }*/
-
-    String metastr = "";
-
-    if (meta != null) {
-      // metastr = meta + "@";
+    if (this == NIL) {
+      return "()";
     }
 
-    return metastr
-        + "("
-        + String.join(" ", toList().stream().map(t -> t.toString()).collect(Collectors.toList()))
-        + ")";
+    return listToStr();
   }
 
   public List<LispObject> toList() {
@@ -288,17 +279,28 @@ public class ListObject implements LispObject, Iterable<LispObject> {
     this.tail = list;
   }
 
-  private String improperListAsStr() {
+  private String listToStr() {
     StringBuilder builder = new StringBuilder();
     ListObject pointer = this;
+
     builder.append("(");
 
-    while (pointer.tail instanceof ListObject && pointer != NIL) {
+    while (pointer.tail instanceof ListObject && pointer.tail != NIL) {
       builder.append(pointer.car().toString()).append(" ");
       pointer = (ListObject) pointer.tail;
     }
 
-    builder.append(" . ").append(pointer.tail().toString()).append(")");
+    if (pointer.tail == NIL) {
+      builder.append(pointer.head.toString());
+      builder.append(")");
+      return builder.toString();
+    }
+
+    builder
+        .append(pointer.head.toString())
+        .append(" . ")
+        .append(pointer.tail.toString())
+        .append(")");
 
     return builder.toString();
   }

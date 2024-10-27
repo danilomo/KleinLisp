@@ -57,6 +57,11 @@ public final class StringObject implements LispObject {
   }
 
   @Override
+  public StringObject asString() {
+    return this;
+  }
+
+  @Override
   public <T> T accept(LispVisitor<T> visitor) {
     return visitor.visit(this);
   }

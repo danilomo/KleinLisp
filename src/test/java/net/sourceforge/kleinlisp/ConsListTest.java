@@ -23,55 +23,52 @@
  */
 package net.sourceforge.kleinlisp;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-public abstract class BaseTestClass {
+/**
+ * @author danilo
+ */
+public class ConsListTest extends BaseTestClass {
 
-  protected Lisp lisp;
-  private ByteArrayOutputStream redirectedOut;
-  private PrintStream originalOut;
-
-  @BeforeEach
-  public void setup() {
-    lisp = new Lisp();
-    originalOut = System.out;
-    redirectedOut = new ByteArrayOutputStream();
-    System.setOut(new PrintStream(redirectedOut));
-  }
-
-  @AfterEach
-  public void tearDown() {
+  @Test
+  public void testLast() {
     disableStdoutCapture();
+
+    ListObject list = evalAsList("'(1 2 3 4 5 6)");
+    ListObject last = list.last();
+
+    Assertions.assertEquals(6, last.car().asInt().value);
   }
 
-  protected int evalAsInt(String str) {
-    return lisp.evaluate(str).asInt().value;
+  @Test
+  public void testConsPair() {
+    disableStdoutCapture();
+
+    ListObject list = evalAsList("'(1 . \"2\")");
+    LispObject head = list.head();
+    LispObject tail = list.tail();
+
+    Assertions.assertEquals(1, head.asInt().value);
+    Assertions.assertEquals("2", tail.asString().value());
   }
 
-  protected AtomObject evalAsAtom(String str) {
-    LispObject result = lisp.evaluate(str);
-    return result.asAtom();
+  @Test
+  public void testWellFormedList() {
+    disableStdoutCapture();
+
+    ListObject list = evalAsList("'(1 2 3 4 5 6)");
+
+    Assertions.assertEquals("(1 2 3 4 5 6)", list.toString());
   }
 
-  protected ListObject evalAsList(String str) {
-    LispObject result = lisp.evaluate(str);
-    return result.asList();
-  }
+  @Test
+  public void testMalformedList() {
+    disableStdoutCapture();
 
-  protected String getStdOut() {
-    return new String(redirectedOut.toByteArray());
-  }
+    ListObject malformed = evalAsList("'(1 2 3 4 . 5)");
 
-  protected void disableStdoutCapture() {
-    System.setOut(originalOut);
-  }
-
-  protected void debug(Object value) {
-    originalOut.println("DEBUG: " + value);
+    Assertions.assertEquals("(1 2 3 4 . 5)", malformed.toString());
   }
 }

@@ -50,6 +50,7 @@ public class CUPParser implements Parser {
     } catch (LispException ex) {
       throw ex;
     } catch (Exception ex) {
+      ex.printStackTrace();
       throw new RuntimeException(ex);
     }
   }

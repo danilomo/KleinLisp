@@ -31,6 +31,7 @@ import net.sourceforge.kleinlisp.objects.FunctionObject;
 import net.sourceforge.kleinlisp.objects.IdentifierObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
+import net.sourceforge.kleinlisp.objects.StringObject;
 
 /**
  * A Lisp object, i.e., something that can be evaluated in Lisp programs: atoms, strings, number
@@ -110,6 +111,10 @@ public interface LispObject {
    * @return see description
    */
   default AtomObject asAtom() {
+    return null;
+  }
+
+  default StringObject asString() {
     return null;
   }
 
