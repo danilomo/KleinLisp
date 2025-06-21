@@ -1,0 +1,6 @@
+(println (= 5 5))
+(println (= 3 4))
+(println (> 7 3))
+(println (< 2 8))
+(println (>= 5 5))
+(println (<= 4 3))

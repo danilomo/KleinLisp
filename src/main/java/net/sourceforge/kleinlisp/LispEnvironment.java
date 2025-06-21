@@ -139,6 +139,8 @@ public class LispEnvironment implements Environment {
     registerFunction("length", ListFunctions::length);
     registerFunction("car", ListFunctions::car);
     registerFunction("cdr", ListFunctions::cdr);
+    registerFunction("cons", ListFunctions::cons);
+    registerFunction("null?", ListFunctions::isNull);
 
     registerFunction("<", BooleanFunctions::lt);
     registerFunction(">", BooleanFunctions::gt);

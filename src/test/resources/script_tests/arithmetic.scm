@@ -1,0 +1,5 @@
+(println (+ 1 2 3))
+(println (- 10 3))
+(println (* 4 5))
+(println (/ 15 3))
+(println (+ (* 2 3) (- 8 2)))

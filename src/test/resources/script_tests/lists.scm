@@ -1,0 +1,7 @@
+(define lst '(1 2 3 4))
+(println (car lst))
+(println (cdr lst))
+(println (cons 0 lst))
+(println (length lst))
+(println (null? '()))
+(println (null? lst))

@@ -24,6 +24,7 @@
 package net.sourceforge.kleinlisp.api;
 
 import net.sourceforge.kleinlisp.LispObject;
+import net.sourceforge.kleinlisp.objects.BooleanObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 
@@ -48,6 +49,17 @@ public class ListFunctions {
     ListObject arg = params[0].asList();
 
     return arg.tail();
+  }
+
+  public static LispObject cons(LispObject[] params) {
+    return new ListObject(params[0], params[1]);
+  }
+
+  public static LispObject isNull(LispObject[] params) {
+    if (params[0] == null || params[0] == ListObject.NIL) {
+      return BooleanObject.TRUE;
+    }
+    return BooleanObject.FALSE;
   }
 
   public static LispObject list(LispObject[] params) {
