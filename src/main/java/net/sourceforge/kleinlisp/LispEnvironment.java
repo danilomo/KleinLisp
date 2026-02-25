@@ -71,10 +71,12 @@ public class LispEnvironment implements Environment {
 
   public static class FunctionStack {
 
-    private final LispObject[] parameters;
-    private final Environment env;
+    private LispObject[] parameters;
+    private Environment env;
 
-    public FunctionStack(LispObject[] parameters, Environment env) {
+    public FunctionStack() {}
+
+    public void set(LispObject[] parameters, Environment env) {
       this.parameters = parameters;
       this.env = env;
     }
@@ -87,6 +89,10 @@ public class LispEnvironment implements Environment {
       parameters[i] = obj;
     }
 
+    public void setParameters(LispObject[] parameters) {
+      this.parameters = parameters;
+    }
+
     public Environment getEnv() {
       return env;
     }
@@ -96,7 +102,8 @@ public class LispEnvironment implements Environment {
   private final Map<AtomObject, String> names;
   private final Map<AtomObject, MacroDefinition> macroTable;
   private final AtomFactory atomFactory;
-  private final List<FunctionStack> stack;
+  private final FunctionStack[] stack;
+  private int stackPointer = 0;
   private final List<FunctionRef> functionCalls;
   private final List<Environment> letEnvStack;
   private int stackSize = 10000;
@@ -106,7 +113,10 @@ public class LispEnvironment implements Environment {
     this.objects = new HashMap<>();
     this.names = new HashMap<>();
     this.atomFactory = new AtomFactory(this);
-    this.stack = new ArrayList<>();
+    this.stack = new FunctionStack[stackSize];
+    for (int i = 0; i < stackSize; i++) {
+      this.stack[i] = new FunctionStack();
+    }
     this.functionCalls = new ArrayList<>();
     this.macroTable = new HashMap<>();
     this.letEnvStack = new ArrayList<>();
@@ -224,23 +234,22 @@ public class LispEnvironment implements Environment {
   }
 
   public void stackPush(LispObject[] parameters, Environment env) {
-    if (stack.size() == stackSize) {
+    if (stackPointer == stackSize) {
       throw new StackOverflowError();
     }
-
-    stack.add(new FunctionStack(parameters, env));
+    stack[stackPointer++].set(parameters, env);
   }
 
   public void stackPop() {
-    stack.remove(stack.size() - 1);
+    stackPointer--;
   }
 
   public FunctionStack stackTop() {
-    return stack.get(stack.size() - 1);
+    return stack[stackPointer - 1];
   }
 
   public boolean isStackEmpty() {
-    return stack.isEmpty();
+    return stackPointer == 0;
   }
 
   public LispObject expandMacros(LispObject obj) {
@@ -248,9 +257,7 @@ public class LispEnvironment implements Environment {
   }
 
   public void setStackTop(LispObject[] parameters) {
-    for (int i = 0; i < parameters.length; i++) {
-      stack.get(stack.size() - 1).setParameterAt(i, parameters[i]);
-    }
+    stack[stackPointer - 1].setParameters(parameters);
   }
 
   public void setStackSize(int size) {
