@@ -1,9 +1,9 @@
 (define (make-list n)
-  (define (loop i acc)
+  (define (make-list-loop i acc)
     (if (<= i 0)
         acc
-        (loop (- i 1) (cons i acc))))
-  (loop n '()))
+        (make-list-loop (- i 1) (cons i acc))))
+  (make-list-loop n '()))
 
 (define (sum-list lst)
   (if (null? lst)
@@ -11,11 +11,11 @@
       (+ (car lst) (sum-list (cdr lst)))))
 
 (define (reverse-list lst)
-  (define (loop lst acc)
+  (define (reverse-list-loop lst acc)
     (if (null? lst)
         acc
-        (loop (cdr lst) (cons (car lst) acc))))
-  (loop lst '()))
+        (reverse-list-loop (cdr lst) (cons (car lst) acc))))
+  (reverse-list-loop lst '()))
 
 (define (list-benchmark n)
   (let ((lst (make-list n)))

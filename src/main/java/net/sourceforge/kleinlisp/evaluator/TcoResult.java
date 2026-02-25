@@ -21,41 +21,50 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.sourceforge.kleinlisp.special_forms;
+package net.sourceforge.kleinlisp.evaluator;
 
 import java.util.function.Supplier;
 import net.sourceforge.kleinlisp.LispObject;
-import net.sourceforge.kleinlisp.evaluator.Evaluator;
-import net.sourceforge.kleinlisp.objects.ListObject;
 
-public class IfForm implements SpecialForm {
+/**
+ * Represents the result of evaluating a lambda body. Can be either a final value or a continuation
+ * for a tail call (trampoline pattern for TCO).
+ */
+public class TcoResult {
+  private final LispObject value;
+  private final Supplier<TcoResult> continuation;
 
-  private final Evaluator evaluator;
-
-  public IfForm(Evaluator evaluator) {
-    this.evaluator = evaluator;
+  private TcoResult(LispObject value, Supplier<TcoResult> continuation) {
+    this.value = value;
+    this.continuation = continuation;
   }
 
-  @Override
-  public Supplier<LispObject> apply(LispObject obj) {
-    ListObject parameters = obj.asList();
-    parameters = parameters.cdr();
+  public static TcoResult ofValue(LispObject value) {
+    return new TcoResult(value, null);
+  }
 
-    LispObject cond = parameters.car();
-    LispObject trueForm = parameters.cdr().car();
-    ListObject elseTail = parameters.cdr().cdr();
-    LispObject elseForm = (elseTail != ListObject.NIL) ? elseTail.car() : null;
+  public static TcoResult ofContinuation(Supplier<TcoResult> continuation) {
+    return new TcoResult(null, continuation);
+  }
 
-    final Supplier<LispObject> condS = cond.accept(evaluator);
-    final Supplier<LispObject> trueS = trueForm.accept(evaluator);
-    final Supplier<LispObject> elseS = (elseForm != null) ? elseForm.accept(evaluator) : null;
+  public boolean isContinuation() {
+    return continuation != null;
+  }
 
-    return () -> {
-      if (condS.get().truthiness()) {
-        return trueS.get();
-      } else {
-        return (elseS != null) ? elseS.get() : ListObject.NIL;
-      }
-    };
+  public LispObject getValue() {
+    return value;
+  }
+
+  public Supplier<TcoResult> getContinuation() {
+    return continuation;
+  }
+
+  /** Trampoline: repeatedly invoke continuations until a final value is reached. */
+  public LispObject trampoline() {
+    TcoResult result = this;
+    while (result.isContinuation()) {
+      result = result.getContinuation().get();
+    }
+    return result.getValue();
   }
 }

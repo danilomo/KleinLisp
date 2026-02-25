@@ -101,6 +101,10 @@ public class TcoOptimizer {
     switch (specialForm) {
       case IF:
         optimizeIf(name, list);
+        break;
+      case LET:
+        optimizeLet(name, list);
+        break;
       default:
         break;
     }
@@ -111,10 +115,30 @@ public class TcoOptimizer {
 
     LispObject cond = tail.car();
     LispObject trueForm = tail.cdr().car();
-    LispObject elseForm = tail.cdr().cdr().car();
+    ListObject elseTail = tail.cdr().cdr();
+    LispObject elseForm = (elseTail != ListObject.NIL) ? elseTail.car() : null;
 
     optimizeTailCall(name, cond.asList());
     optimizeTailCall(name, trueForm.asList());
-    optimizeTailCall(name, elseForm.asList());
+    if (elseForm != null) {
+      optimizeTailCall(name, elseForm.asList());
+    }
+  }
+
+  private void optimizeLet(AtomObject name, ListObject list) {
+    // let form: (let ((var1 val1) ...) body...)
+    ListObject tail = list.cdr();
+    // tail.car() is the bindings list, tail.cdr() is the body
+    ListObject body = tail.cdr();
+
+    // Find the last expression in the body (which is in tail position)
+    LispObject lastExpr = null;
+    for (LispObject obj : body) {
+      lastExpr = obj;
+    }
+
+    if (lastExpr != null) {
+      optimizeTailCall(name, lastExpr.asList());
+    }
   }
 }

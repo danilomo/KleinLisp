@@ -26,13 +26,17 @@ package net.sourceforge.kleinlisp.special_forms;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
+import net.sourceforge.kleinlisp.Environment;
 import net.sourceforge.kleinlisp.LispEnvironment;
 import net.sourceforge.kleinlisp.LispObject;
-import net.sourceforge.kleinlisp.evaluator.ClosureVisitor;
 import net.sourceforge.kleinlisp.evaluator.Evaluator;
+import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 
 /**
+ * Implements 'let' with direct environment binding instead of lambda transformation. This allows
+ * TCO to work correctly through let forms.
+ *
  * @author danilo
  */
 public class LetForm implements SpecialForm {
@@ -47,25 +51,57 @@ public class LetForm implements SpecialForm {
 
   @Override
   public Supplier<LispObject> apply(LispObject obj) {
-    List<LispObject> parameters = new ArrayList<>();
-    List<LispObject> values = new ArrayList<>();
     ListObject list = obj.asList().cdr();
 
     LispObject head = list.car();
-    LispObject tail = list.cdr();
+    ListObject body = list.cdr();
+
+    // Parse bindings: ((var1 val1) (var2 val2) ...)
+    List<AtomObject> names = new ArrayList<>();
+    List<Supplier<LispObject>> valueSuppliers = new ArrayList<>();
 
     for (LispObject elem : head.asList()) {
       ListObject tuple = elem.asList();
-      parameters.add(tuple.car());
-      values.add(tuple.cdr().car());
+      AtomObject name = tuple.car().asAtom();
+      LispObject valueExpr = tuple.cdr().car();
+
+      names.add(name);
+      valueSuppliers.add(valueExpr.accept(evaluator));
     }
 
-    ListObject lambda =
-        new ListObject(
-            environment.atomOf("lambda"), new ListObject(ListObject.fromList(parameters), tail));
+    // Compile body expressions
+    List<Supplier<LispObject>> bodySuppliers = new ArrayList<>();
+    for (LispObject expr : body) {
+      bodySuppliers.add(expr.accept(evaluator));
+    }
 
-    LispObject transformedExp = new ListObject(lambda, ListObject.fromList(values));
-    transformedExp = ClosureVisitor.addClosureMeta(transformedExp);
-    return transformedExp.accept(evaluator);
+    return () -> {
+      // Evaluate binding values
+      LispObject[] values = new LispObject[valueSuppliers.size()];
+      for (int i = 0; i < valueSuppliers.size(); i++) {
+        values[i] = valueSuppliers.get(i).get();
+      }
+
+      // Create a new environment with the bindings
+      Environment letEnv = new LambdaForm.MapEnvironment();
+      for (int i = 0; i < names.size(); i++) {
+        letEnv.set(names.get(i), values[i]);
+      }
+
+      // Push the let environment onto the stack
+      environment.pushLetEnv(letEnv);
+
+      try {
+        // Evaluate body expressions, return the last one
+        LispObject result = ListObject.NIL;
+        for (Supplier<LispObject> supplier : bodySuppliers) {
+          result = supplier.get();
+        }
+        return result;
+      } finally {
+        // Pop the let environment
+        environment.popLetEnv();
+      }
+    };
   }
 }

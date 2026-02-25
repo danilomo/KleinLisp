@@ -4,11 +4,11 @@
       (+ (fib (- n 1)) (fib (- n 2)))))
 
 (define (benchmark-fib n iterations)
-  (define (loop i)
+  (define (benchmark-fib-loop n i)
     (if (> i 0)
         (begin
           (fib n)
-          (loop (- i 1)))))
-  (loop iterations))
+          (benchmark-fib-loop n (- i 1)))))
+  (benchmark-fib-loop n iterations))
 
 (benchmark-fib 30 10)

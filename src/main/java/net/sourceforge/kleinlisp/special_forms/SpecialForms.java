@@ -56,6 +56,7 @@ public class SpecialForms {
     this.insertForm("quote", new QuoteForm());
     this.insertForm("cond", new CondForm(evaluator));
     this.insertForm("case", new CaseForm(evaluator));
+    this.insertForm("let", new LetForm(evaluator, environment));
   }
 
   SpecialForms insertForm(String name, SpecialForm form) {

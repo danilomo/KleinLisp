@@ -1,9 +1,9 @@
 (define (factorial n)
-  (define (fact-iter n acc)
+  (define (factorial-iter n acc)
     (if (<= n 1)
         acc
-        (fact-iter (- n 1) (* n acc))))
-  (fact-iter n 1))
+        (factorial-iter (- n 1) (* n acc))))
+  (factorial-iter n 1))
 
 (define (countdown n)
   (if (<= n 0)

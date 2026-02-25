@@ -10,7 +10,8 @@
     (if (> i 0)
         (begin
           (fib n)
-          (loop (- i 1)))))
+          (loop (- i 1)))
+        (void)))
   (loop iterations))
 
 (benchmark-fib 30 10)

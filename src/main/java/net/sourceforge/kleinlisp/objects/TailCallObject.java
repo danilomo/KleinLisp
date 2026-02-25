@@ -21,41 +21,51 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.sourceforge.kleinlisp.special_forms;
+package net.sourceforge.kleinlisp.objects;
 
-import java.util.function.Supplier;
 import net.sourceforge.kleinlisp.LispObject;
-import net.sourceforge.kleinlisp.evaluator.Evaluator;
-import net.sourceforge.kleinlisp.objects.ListObject;
+import net.sourceforge.kleinlisp.LispVisitor;
+import net.sourceforge.kleinlisp.special_forms.LambdaForm.LambdaFunction;
 
-public class IfForm implements SpecialForm {
+/**
+ * Special marker object returned by tail calls to signal the trampoline. Instead of recursively
+ * calling the function, this object carries the function and parameters for the next iteration.
+ */
+public class TailCallObject implements LispObject {
 
-  private final Evaluator evaluator;
+  private final LambdaFunction function;
+  private final LispObject[] parameters;
 
-  public IfForm(Evaluator evaluator) {
-    this.evaluator = evaluator;
+  public TailCallObject(LambdaFunction function, LispObject[] parameters) {
+    this.function = function;
+    this.parameters = parameters;
+  }
+
+  public LambdaFunction getFunction() {
+    return function;
+  }
+
+  public LispObject[] getParameters() {
+    return parameters;
   }
 
   @Override
-  public Supplier<LispObject> apply(LispObject obj) {
-    ListObject parameters = obj.asList();
-    parameters = parameters.cdr();
+  public Object asObject() {
+    return this;
+  }
 
-    LispObject cond = parameters.car();
-    LispObject trueForm = parameters.cdr().car();
-    ListObject elseTail = parameters.cdr().cdr();
-    LispObject elseForm = (elseTail != ListObject.NIL) ? elseTail.car() : null;
+  @Override
+  public <T> T accept(LispVisitor<T> visitor) {
+    throw new UnsupportedOperationException("TailCallObject should not be visited");
+  }
 
-    final Supplier<LispObject> condS = cond.accept(evaluator);
-    final Supplier<LispObject> trueS = trueForm.accept(evaluator);
-    final Supplier<LispObject> elseS = (elseForm != null) ? elseForm.accept(evaluator) : null;
+  @Override
+  public boolean truthiness() {
+    return true;
+  }
 
-    return () -> {
-      if (condS.get().truthiness()) {
-        return trueS.get();
-      } else {
-        return (elseS != null) ? elseS.get() : ListObject.NIL;
-      }
-    };
+  @Override
+  public String toString() {
+    return "#<tail-call>";
   }
 }

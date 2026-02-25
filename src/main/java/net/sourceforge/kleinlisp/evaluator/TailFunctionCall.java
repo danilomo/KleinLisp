@@ -30,9 +30,13 @@ import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispEnvironment;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.FunctionObject;
+import net.sourceforge.kleinlisp.objects.TailCallObject;
 import net.sourceforge.kleinlisp.special_forms.LambdaForm.LambdaFunction;
 
 /**
+ * Handles tail calls by returning a TailCallObject marker instead of recursing. The trampoline in
+ * LambdaFunction.evaluate() will handle the continuation.
+ *
  * @author Danilo Oliveira
  */
 public class TailFunctionCall implements Supplier<LispObject> {
@@ -66,8 +70,13 @@ public class TailFunctionCall implements Supplier<LispObject> {
       i++;
     }
 
-    LispObject result = ((LambdaFunction) function).evaluateTailCall(params);
+    // Return a TailCallObject marker instead of recursing
+    // The trampoline in LambdaFunction.evaluate() will handle this
+    if (function instanceof LambdaFunction) {
+      return new TailCallObject((LambdaFunction) function, params);
+    }
 
-    return result;
+    // For non-lambda functions (builtins), just call directly
+    return function.evaluate(params);
   }
 }

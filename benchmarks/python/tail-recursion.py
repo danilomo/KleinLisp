@@ -1,16 +1,14 @@
 def factorial(n):
-    def fact_iter(n, acc):
-        if n <= 1:
-            return acc
-        else:
-            return fact_iter(n - 1, n * acc)
-    return fact_iter(n, 1)
+    acc = 1
+    while n > 1:
+        acc *= n
+        n -= 1
+    return acc
 
 def countdown(n):
-    if n <= 0:
-        return 0
-    else:
-        return countdown(n - 1)
+    while n > 0:
+        n -= 1
+    return 0
 
 def tail_rec_benchmark():
     factorial(1000)

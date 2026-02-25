@@ -45,8 +45,7 @@ public class Lisp {
 
   public LispObject parse(String expression) {
     AtomicReference<LispObject> ref = new AtomicReference<>();
-    Consumer<LispObject> consumer =
-            ref::set;
+    Consumer<LispObject> consumer = ref::set;
     parser.parse(expression, environment, consumer);
 
     return ref.get();

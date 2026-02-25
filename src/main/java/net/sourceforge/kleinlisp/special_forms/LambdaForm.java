@@ -45,6 +45,7 @@ import net.sourceforge.kleinlisp.objects.ComputedLispObject;
 import net.sourceforge.kleinlisp.objects.FunctionObject;
 import net.sourceforge.kleinlisp.objects.IdentifierObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
+import net.sourceforge.kleinlisp.objects.TailCallObject;
 
 /**
  * @author Danilo Oliveira
@@ -106,6 +107,18 @@ public class LambdaForm implements SpecialForm {
 
       environment.stackPush(parameters, cenv);
       LispObject result = body.get();
+
+      // Trampoline loop for TCO: handle tail calls without recursion
+      while (result instanceof TailCallObject) {
+        TailCallObject tailCall = (TailCallObject) result;
+        LambdaFunction targetFunc = tailCall.getFunction();
+        LispObject[] newParams = tailCall.getParameters();
+
+        // Reuse the stack frame by updating parameters
+        environment.setStackTop(newParams);
+        result = targetFunc.body.get();
+      }
+
       environment.stackPop();
 
       return result;
@@ -115,6 +128,10 @@ public class LambdaForm implements SpecialForm {
       environment.setStackTop(parameters);
 
       return body.get();
+    }
+
+    public Supplier<LispObject> getBody() {
+      return body;
     }
 
     private Environment upvaluesObj(LispObject[] parameters) {
@@ -134,7 +151,7 @@ public class LambdaForm implements SpecialForm {
         } else {
           LispObject cell = env.lookupValue(id);
 
-          cell.set(cell);
+          closureEnv.set(id, cell);
         }
       }
 

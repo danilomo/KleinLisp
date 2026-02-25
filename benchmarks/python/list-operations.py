@@ -5,9 +5,10 @@ def make_list(n):
     return acc
 
 def sum_list(lst):
-    if not lst:
-        return 0
-    return lst[0] + sum_list(lst[1:])
+    total = 0
+    for item in lst:
+        total += item
+    return total
 
 def reverse_list(lst):
     acc = []

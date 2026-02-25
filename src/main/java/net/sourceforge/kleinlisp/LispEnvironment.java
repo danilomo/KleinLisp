@@ -98,7 +98,8 @@ public class LispEnvironment implements Environment {
   private final AtomFactory atomFactory;
   private final List<FunctionStack> stack;
   private final List<FunctionRef> functionCalls;
-  private int stackSize = 200;
+  private final List<Environment> letEnvStack;
+  private int stackSize = 10000;
 
   public LispEnvironment() {
     this.objects = new HashMap<>();
@@ -107,6 +108,7 @@ public class LispEnvironment implements Environment {
     this.stack = new ArrayList<>();
     this.functionCalls = new ArrayList<>();
     this.macroTable = new HashMap<>();
+    this.letEnvStack = new ArrayList<>();
     initFunctionTable();
     initMacroTable();
   }
@@ -159,7 +161,7 @@ public class LispEnvironment implements Environment {
   private void initMacroTable() {
     StandardMacros macros = new StandardMacros(this);
     registerMacro("when", macros::when);
-    registerMacro("let", macros::let);
+    // Note: 'let' is now implemented as a special form for TCO compatibility
   }
 
   public void registerFunction(String symbol, net.sourceforge.kleinlisp.Function func) {
@@ -181,6 +183,14 @@ public class LispEnvironment implements Environment {
 
   @Override
   public LispObject lookupValue(AtomObject atom) {
+    // First check the let environment stack (innermost first)
+    for (int i = letEnvStack.size() - 1; i >= 0; i--) {
+      Environment letEnv = letEnvStack.get(i);
+      if (letEnv.exists(atom)) {
+        return letEnv.lookupValue(atom);
+      }
+    }
+    // Fall back to global environment
     return objects.get(atom);
   }
 
@@ -236,5 +246,13 @@ public class LispEnvironment implements Environment {
 
   public void setStackSize(int size) {
     this.stackSize = size;
+  }
+
+  public void pushLetEnv(Environment env) {
+    letEnvStack.add(env);
+  }
+
+  public void popLetEnv() {
+    letEnvStack.remove(letEnvStack.size() - 1);
   }
 }

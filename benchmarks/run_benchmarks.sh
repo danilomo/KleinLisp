@@ -5,11 +5,14 @@
 
 set -e
 
+# Use C locale for consistent number formatting (decimal point, not comma)
+export LC_NUMERIC=C
+
 BENCHMARKS=("fibonacci" "let-performance" "list-operations" "tail-recursion")
 LANGUAGES=("kleinlisp" "guile" "racket" "ruby" "python")
 
 echo "Building KleinLisp..."
-mvn package -q
+mvn package -q -DskipTests
 
 echo "=== Performance Benchmark Results ==="
 echo "Date: $(date)"
@@ -25,7 +28,7 @@ run_benchmark() {
     case $lang in
         "kleinlisp")
             file="benchmarks/kleinlisp/${benchmark}.scm"
-            cmd="java -jar target/KleinLisp-0.0.1.jar $file"
+            cmd="java -Xss4m -jar target/KleinLisp-0.0.1.jar $file"
             ;;
         "guile")
             file="benchmarks/guile/${benchmark}.scm"
