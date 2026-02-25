@@ -97,6 +97,12 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
       return form.get().apply(list);
     }
 
+    // Try fast path for common arithmetic/comparison operations
+    Supplier<LispObject> fastPath = CommonCases.apply(list, this);
+    if (fastPath != null) {
+      return fastPath;
+    }
+
     Supplier<LispObject> headEval = head.accept(this);
     List<Supplier<LispObject>> parameters = new ArrayList<>();
 

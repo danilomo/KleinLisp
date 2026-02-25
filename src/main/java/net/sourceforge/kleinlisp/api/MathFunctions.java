@@ -38,7 +38,7 @@ public class MathFunctions {
       }
       sum += i.asInt().value;
     }
-    return new IntObject(sum);
+    return IntObject.valueOf(sum);
   }
 
   public static LispObject sub(LispObject[] params) {
@@ -53,7 +53,7 @@ public class MathFunctions {
         sum -= i.asInt().value;
       }
     }
-    return new IntObject(sum);
+    return IntObject.valueOf(sum);
   }
 
   public static LispObject mul(LispObject[] params) {
@@ -62,7 +62,7 @@ public class MathFunctions {
     for (LispObject i : params) {
       prod *= i.asInt().value;
     }
-    return new IntObject(prod);
+    return IntObject.valueOf(prod);
   }
 
   public static LispObject div(LispObject[] params) {
@@ -77,7 +77,7 @@ public class MathFunctions {
         prod /= i.asInt().value;
       }
     }
-    return new IntObject(prod);
+    return IntObject.valueOf(prod);
   }
 
   public static LispObject mod(LispObject[] params) {
@@ -86,13 +86,13 @@ public class MathFunctions {
     for (LispObject i : params) {
       prod %= i.asInt().value;
     }
-    return new IntObject(prod);
+    return IntObject.valueOf(prod);
   }
 
   public static LispObject lt(LispObject[] params) {
-    Integer i1 = params[0].asInt().value;
-    Integer i2 = params[1].asInt().value;
+    int i1 = params[0].asInt().value;
+    int i2 = params[1].asInt().value;
 
-    return new BooleanObject(i1 < i2);
+    return i1 < i2 ? BooleanObject.TRUE : BooleanObject.FALSE;
   }
 }

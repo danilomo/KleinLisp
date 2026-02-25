@@ -23,7 +23,6 @@
  */
 package net.sourceforge.kleinlisp.evaluator;
 
-import java.util.List;
 import java.util.function.Supplier;
 import net.sourceforge.kleinlisp.Function;
 import net.sourceforge.kleinlisp.LispArgumentError;
@@ -39,17 +38,18 @@ public class FunctionCall implements Supplier<LispObject> {
   private final LispEnvironment env;
   private final SourceRef ref;
   private final Supplier<LispObject> head;
-  private final List<Supplier<LispObject>> parameters;
+  private final Supplier<LispObject>[] parameters;
 
+  @SuppressWarnings("unchecked")
   public FunctionCall(
       LispEnvironment env,
       SourceRef ref,
       Supplier<LispObject> head,
-      List<Supplier<LispObject>> parameters) {
+      java.util.List<Supplier<LispObject>> parameters) {
     this.env = env;
     this.ref = ref;
     this.head = head;
-    this.parameters = parameters;
+    this.parameters = parameters.toArray(new Supplier[0]);
   }
 
   @Override
@@ -62,12 +62,10 @@ public class FunctionCall implements Supplier<LispObject> {
 
     Function function = functionObj.function();
 
-    LispObject[] params = new LispObject[parameters.size()];
-    int i = 0;
-    for (Supplier<LispObject> param : parameters) {
-      LispObject obj = param.get();
-      params[i] = obj;
-      i++;
+    int len = parameters.length;
+    LispObject[] params = new LispObject[len];
+    for (int i = 0; i < len; i++) {
+      params[i] = parameters[i].get();
     }
 
     env.addFuncCall(functionObj.functionName(), ref);

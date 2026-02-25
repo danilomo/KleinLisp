@@ -100,6 +100,7 @@ public class LispEnvironment implements Environment {
   private final List<FunctionRef> functionCalls;
   private final List<Environment> letEnvStack;
   private int stackSize = 10000;
+  private boolean trackStackTrace = true;
 
   public LispEnvironment() {
     this.objects = new HashMap<>();
@@ -114,11 +115,19 @@ public class LispEnvironment implements Environment {
   }
 
   public void addFuncCall(String funcName, SourceRef ref) {
-    functionCalls.add(new FunctionRef(funcName, ref));
+    if (trackStackTrace) {
+      functionCalls.add(new FunctionRef(funcName, ref));
+    }
   }
 
   public void popFuncCall() {
-    functionCalls.remove(functionCalls.size() - 1);
+    if (trackStackTrace) {
+      functionCalls.remove(functionCalls.size() - 1);
+    }
+  }
+
+  public void setTrackStackTrace(boolean track) {
+    this.trackStackTrace = track;
   }
 
   public List<FunctionRef> getFunctionCalls() {

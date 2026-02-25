@@ -36,7 +36,7 @@ public class ListFunctions {
   public static LispObject length(LispObject[] params) {
     ListObject arg = params[0].asList();
 
-    return new IntObject(arg.length());
+    return IntObject.valueOf(arg.length());
   }
 
   public static LispObject car(LispObject[] params) {

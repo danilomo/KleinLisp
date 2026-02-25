@@ -24,6 +24,7 @@
 package net.sourceforge.kleinlisp.evaluator;
 
 import java.util.function.Supplier;
+import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.BooleanObject;
@@ -52,6 +53,27 @@ public class CommonCases {
         return minus(list.cdr(), evaluator);
       case "<":
         return lessthan(list.cdr(), evaluator);
+      case "<=":
+        return lessthanOrEqual(list.cdr(), evaluator);
+      case ">":
+        return greaterThan(list.cdr(), evaluator);
+      case ">=":
+        return greaterThanOrEqual(list.cdr(), evaluator);
+      case "car":
+        if (list.length() == 2) {
+          return car(list.cdr(), evaluator);
+        }
+        break;
+      case "cdr":
+        if (list.length() == 2) {
+          return cdr(list.cdr(), evaluator);
+        }
+        break;
+      case "null?":
+        if (list.length() == 2) {
+          return isNull(list.cdr(), evaluator);
+        }
+        break;
     }
 
     return null;
@@ -62,7 +84,12 @@ public class CommonCases {
     Supplier<LispObject> right = list.cdr().car().accept(evaluator);
 
     return () -> {
-      return new IntObject(left.get().asInt().value + right.get().asInt().value);
+      IntObject leftInt = left.get().asInt();
+      IntObject rightInt = right.get().asInt();
+      if (leftInt == null || rightInt == null) {
+        throw new LispArgumentError("Wrong argument type passed to + function");
+      }
+      return IntObject.valueOf(leftInt.value + rightInt.value);
     };
   }
 
@@ -71,7 +98,12 @@ public class CommonCases {
     Supplier<LispObject> right = list.cdr().car().accept(evaluator);
 
     return () -> {
-      return new IntObject(left.get().asInt().value - right.get().asInt().value);
+      IntObject leftInt = left.get().asInt();
+      IntObject rightInt = right.get().asInt();
+      if (leftInt == null || rightInt == null) {
+        throw new LispArgumentError("Wrong argument type passed to - function");
+      }
+      return IntObject.valueOf(leftInt.value - rightInt.value);
     };
   }
 
@@ -80,11 +112,72 @@ public class CommonCases {
     Supplier<LispObject> right = list.cdr().car().accept(evaluator);
 
     return () -> {
-      if (left.get().asInt().value < right.get().asInt().value) {
-        return BooleanObject.TRUE;
+      IntObject leftInt = left.get().asInt();
+      IntObject rightInt = right.get().asInt();
+      if (leftInt == null || rightInt == null) {
+        throw new LispArgumentError("Wrong argument type passed to < function");
       }
+      return leftInt.value < rightInt.value ? BooleanObject.TRUE : BooleanObject.FALSE;
+    };
+  }
 
-      return BooleanObject.FALSE;
+  private static Supplier<LispObject> lessthanOrEqual(ListObject list, Evaluator evaluator) {
+    Supplier<LispObject> left = list.car().accept(evaluator);
+    Supplier<LispObject> right = list.cdr().car().accept(evaluator);
+
+    return () -> {
+      IntObject leftInt = left.get().asInt();
+      IntObject rightInt = right.get().asInt();
+      if (leftInt == null || rightInt == null) {
+        throw new LispArgumentError("Wrong argument type passed to <= function");
+      }
+      return leftInt.value <= rightInt.value ? BooleanObject.TRUE : BooleanObject.FALSE;
+    };
+  }
+
+  private static Supplier<LispObject> greaterThan(ListObject list, Evaluator evaluator) {
+    Supplier<LispObject> left = list.car().accept(evaluator);
+    Supplier<LispObject> right = list.cdr().car().accept(evaluator);
+
+    return () -> {
+      IntObject leftInt = left.get().asInt();
+      IntObject rightInt = right.get().asInt();
+      if (leftInt == null || rightInt == null) {
+        throw new LispArgumentError("Wrong argument type passed to > function");
+      }
+      return leftInt.value > rightInt.value ? BooleanObject.TRUE : BooleanObject.FALSE;
+    };
+  }
+
+  private static Supplier<LispObject> greaterThanOrEqual(ListObject list, Evaluator evaluator) {
+    Supplier<LispObject> left = list.car().accept(evaluator);
+    Supplier<LispObject> right = list.cdr().car().accept(evaluator);
+
+    return () -> {
+      IntObject leftInt = left.get().asInt();
+      IntObject rightInt = right.get().asInt();
+      if (leftInt == null || rightInt == null) {
+        throw new LispArgumentError("Wrong argument type passed to >= function");
+      }
+      return leftInt.value >= rightInt.value ? BooleanObject.TRUE : BooleanObject.FALSE;
+    };
+  }
+
+  private static Supplier<LispObject> car(ListObject list, Evaluator evaluator) {
+    Supplier<LispObject> arg = list.car().accept(evaluator);
+    return () -> arg.get().asList().head();
+  }
+
+  private static Supplier<LispObject> cdr(ListObject list, Evaluator evaluator) {
+    Supplier<LispObject> arg = list.car().accept(evaluator);
+    return () -> arg.get().asList().tail();
+  }
+
+  private static Supplier<LispObject> isNull(ListObject list, Evaluator evaluator) {
+    Supplier<LispObject> arg = list.car().accept(evaluator);
+    return () -> {
+      LispObject val = arg.get();
+      return (val == null || val == ListObject.NIL) ? BooleanObject.TRUE : BooleanObject.FALSE;
     };
   }
 }

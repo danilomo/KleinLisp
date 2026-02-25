@@ -32,45 +32,45 @@ public class BooleanFunctions {
     int left = params[0].asInt().value;
     int right = params[1].asInt().value;
 
-    return new BooleanObject(left < right);
+    return left < right ? BooleanObject.TRUE : BooleanObject.FALSE;
   }
 
   public static LispObject le(LispObject[] params) {
     int left = params[0].asInt().value;
     int right = params[1].asInt().value;
 
-    return new BooleanObject(left <= right);
+    return left <= right ? BooleanObject.TRUE : BooleanObject.FALSE;
   }
 
   public static LispObject gt(LispObject[] params) {
     int left = params[0].asInt().value;
     int right = params[1].asInt().value;
 
-    return new BooleanObject(left > right);
+    return left > right ? BooleanObject.TRUE : BooleanObject.FALSE;
   }
 
   public static LispObject ge(LispObject[] params) {
     int left = params[0].asInt().value;
     int right = params[1].asInt().value;
 
-    return new BooleanObject(left >= right);
+    return left >= right ? BooleanObject.TRUE : BooleanObject.FALSE;
   }
 
   public static LispObject eq(LispObject[] params) {
     int left = params[0].asInt().value;
     int right = params[1].asInt().value;
 
-    return new BooleanObject(left == right);
+    return left == right ? BooleanObject.TRUE : BooleanObject.FALSE;
   }
 
   public static LispObject neq(LispObject[] params) {
     int left = params[0].asInt().value;
     int right = params[1].asInt().value;
 
-    return new BooleanObject(left != right);
+    return left != right ? BooleanObject.TRUE : BooleanObject.FALSE;
   }
 
   public static LispObject not(LispObject[] params) {
-    return new BooleanObject(!params[0].truthiness());
+    return params[0].truthiness() ? BooleanObject.FALSE : BooleanObject.TRUE;
   }
 }

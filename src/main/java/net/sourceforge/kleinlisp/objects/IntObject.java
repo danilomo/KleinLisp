@@ -30,10 +30,32 @@ import net.sourceforge.kleinlisp.LispVisitor;
  */
 public final class IntObject implements NumericObject {
 
+  private static final int CACHE_LOW = -128;
+  private static final int CACHE_HIGH = 1024;
+  private static final IntObject[] CACHE;
+
+  static {
+    CACHE = new IntObject[CACHE_HIGH - CACHE_LOW + 1];
+    for (int i = 0; i < CACHE.length; i++) {
+      CACHE[i] = new IntObject(CACHE_LOW + i, false);
+    }
+  }
+
   public final int value;
+
+  private IntObject(int value, boolean unused) {
+    this.value = value;
+  }
 
   public IntObject(int value) {
     this.value = value;
+  }
+
+  public static IntObject valueOf(int value) {
+    if (value >= CACHE_LOW && value <= CACHE_HIGH) {
+      return CACHE[value - CACHE_LOW];
+    }
+    return new IntObject(value);
   }
 
   public int value() {
