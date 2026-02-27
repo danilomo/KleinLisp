@@ -26,6 +26,7 @@ package net.sourceforge.kleinlisp.special_forms;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,6 +36,9 @@ import net.sourceforge.kleinlisp.CompositeEnvironment;
 import net.sourceforge.kleinlisp.DefaultVisitor;
 import net.sourceforge.kleinlisp.Environment;
 import net.sourceforge.kleinlisp.Function;
+import net.sourceforge.kleinlisp.IndexedEnvironment;
+import net.sourceforge.kleinlisp.InlineEnvironment1;
+import net.sourceforge.kleinlisp.InlineEnvironment2;
 import net.sourceforge.kleinlisp.LispEnvironment;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.evaluator.ClosureVisitor.LambdaMeta;
@@ -61,6 +65,11 @@ public class LambdaForm implements SpecialForm {
     @Override
     public LispObject lookupValue(AtomObject name) {
       return map.getOrDefault(name, ListObject.NIL);
+    }
+
+    @Override
+    public LispObject lookupValueOrNull(AtomObject name) {
+      return map.get(name);
     }
 
     @Override
@@ -135,27 +144,81 @@ public class LambdaForm implements SpecialForm {
     }
 
     private Environment upvaluesObj(LispObject[] parameters) {
-      if (meta.getClosureInfo().isEmpty()) {
+      Map<AtomObject, Integer> closureInfo = meta.getClosureInfo();
+
+      if (closureInfo.isEmpty()) {
         return null;
       }
 
-      Environment closureEnv = new MapEnvironment();
+      int capturedCount = closureInfo.size();
 
-      for (AtomObject id : meta.getClosureInfo().keySet()) {
-        int parIndex = meta.getClosureInfo().get(id);
+      // Use inline environments for 1-2 captured variables
+      if (capturedCount == 1) {
+        Map.Entry<AtomObject, Integer> entry = closureInfo.entrySet().iterator().next();
+        AtomObject id = entry.getKey();
+        int parIndex = entry.getValue();
+
+        LispObject value;
         if (parIndex >= 0) {
           CellObject cell = new CellObject();
           cell.set(parameters[parIndex]);
-
-          closureEnv.set(id, cell);
+          value = cell;
         } else {
-          LispObject cell = env.lookupValue(id);
+          value = env.lookupValue(id);
+        }
 
-          closureEnv.set(id, cell);
+        return new InlineEnvironment1(id, value);
+      }
+
+      if (capturedCount == 2) {
+        Iterator<Map.Entry<AtomObject, Integer>> it = closureInfo.entrySet().iterator();
+
+        Map.Entry<AtomObject, Integer> e1 = it.next();
+        AtomObject id1 = e1.getKey();
+        int parIndex1 = e1.getValue();
+        LispObject value1;
+        if (parIndex1 >= 0) {
+          CellObject cell = new CellObject();
+          cell.set(parameters[parIndex1]);
+          value1 = cell;
+        } else {
+          value1 = env.lookupValue(id1);
+        }
+
+        Map.Entry<AtomObject, Integer> e2 = it.next();
+        AtomObject id2 = e2.getKey();
+        int parIndex2 = e2.getValue();
+        LispObject value2;
+        if (parIndex2 >= 0) {
+          CellObject cell = new CellObject();
+          cell.set(parameters[parIndex2]);
+          value2 = cell;
+        } else {
+          value2 = env.lookupValue(id2);
+        }
+
+        return new InlineEnvironment2(id1, value1, id2, value2);
+      }
+
+      // Use IndexedEnvironment for 3+ captured variables - O(1) slot access
+      Map<AtomObject, Integer> slotIndices = meta.getClosureSlotIndices();
+      LispObject[] slots = new LispObject[slotIndices.size()];
+
+      for (Map.Entry<AtomObject, Integer> entry : slotIndices.entrySet()) {
+        AtomObject id = entry.getKey();
+        int slotIndex = entry.getValue();
+        int parIndex = closureInfo.get(id);
+
+        if (parIndex >= 0) {
+          CellObject cell = new CellObject();
+          cell.set(parameters[parIndex]);
+          slots[slotIndex] = cell;
+        } else {
+          slots[slotIndex] = env.lookupValue(id);
         }
       }
 
-      return closureEnv;
+      return new IndexedEnvironment(slots, slotIndices, null);
     }
 
     @Override

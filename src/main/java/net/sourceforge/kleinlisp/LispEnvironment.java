@@ -109,6 +109,10 @@ public class LispEnvironment implements Environment {
   private int stackSize = 10000;
   private boolean trackStackTrace = true;
 
+  // Version tracking for inline caching
+  private final Map<AtomObject, Long> definitionVersions = new HashMap<>();
+  private long globalVersion = 0;
+
   public LispEnvironment() {
     this.objects = new HashMap<>();
     this.names = new HashMap<>();
@@ -205,8 +209,23 @@ public class LispEnvironment implements Environment {
     // First check the let environment stack (innermost first)
     for (int i = letEnvStack.size() - 1; i >= 0; i--) {
       Environment letEnv = letEnvStack.get(i);
-      if (letEnv.exists(atom)) {
-        return letEnv.lookupValue(atom);
+      LispObject value = letEnv.lookupValueOrNull(atom);
+      if (value != null) {
+        return value;
+      }
+    }
+    // Fall back to global environment
+    return objects.get(atom);
+  }
+
+  @Override
+  public LispObject lookupValueOrNull(AtomObject atom) {
+    // First check the let environment stack (innermost first)
+    for (int i = letEnvStack.size() - 1; i >= 0; i--) {
+      Environment letEnv = letEnvStack.get(i);
+      LispObject value = letEnv.lookupValueOrNull(atom);
+      if (value != null) {
+        return value;
       }
     }
     // Fall back to global environment
@@ -216,11 +235,21 @@ public class LispEnvironment implements Environment {
   @Override
   public void set(AtomObject atom, LispObject obj) {
     objects.put(atom, obj);
+    // Update version for inline cache invalidation
+    definitionVersions.put(atom, ++globalVersion);
   }
 
   @Override
   public boolean exists(AtomObject atom) {
     return objects.containsKey(atom);
+  }
+
+  /**
+   * Returns the version number for a specific atom's definition. Version changes when the atom is
+   * redefined. Used by inline caching for cache invalidation.
+   */
+  public long getDefinitionVersion(AtomObject atom) {
+    return definitionVersions.getOrDefault(atom, 0L);
   }
 
   public AtomObject atomOf(String atom) {

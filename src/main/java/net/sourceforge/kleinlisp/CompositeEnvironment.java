@@ -36,11 +36,20 @@ public class CompositeEnvironment implements Environment {
 
   @Override
   public LispObject lookupValue(AtomObject name) {
-    if (left.exists(name)) {
-      return left.lookupValue(name);
+    LispObject value = left.lookupValueOrNull(name);
+    if (value != null) {
+      return value;
     }
-
     return right.lookupValue(name);
+  }
+
+  @Override
+  public LispObject lookupValueOrNull(AtomObject name) {
+    LispObject value = left.lookupValueOrNull(name);
+    if (value != null) {
+      return value;
+    }
+    return right.lookupValueOrNull(name);
   }
 
   @Override

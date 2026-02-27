@@ -81,6 +81,8 @@ public class ClosureVisitor extends DefaultVisitor {
     }
 
     Map<AtomObject, Integer> closureInfo = new HashMap<>();
+    Map<AtomObject, Integer> closureSlotIndices = new HashMap<>();
+    int slotIndex = 0;
 
     for (int i = 0; i < currentFunction.parameters.size(); i++) {
       AtomObject param = currentFunction.parameters.get(i);
@@ -90,6 +92,7 @@ public class ClosureVisitor extends DefaultVisitor {
       }
 
       closureInfo.put(param, i);
+      closureSlotIndices.put(param, slotIndex++);
     }
 
     for (AtomObject param : symbols) {
@@ -98,9 +101,11 @@ public class ClosureVisitor extends DefaultVisitor {
       }
 
       closureInfo.put(param, -1);
+      closureSlotIndices.put(param, slotIndex++);
     }
 
     currentFunction.closureInfo = closureInfo;
+    currentFunction.closureSlotIndices = closureSlotIndices;
 
     for (LambdaMeta func : currentFunction.children) {
       collectClosureInfo(func);
@@ -115,6 +120,9 @@ public class ClosureVisitor extends DefaultVisitor {
     private LambdaMeta parent;
     private Map<AtomObject, Integer> closureInfo = Collections.emptyMap();
     private String repr;
+
+    // Closure slot indices for O(1) indexed access
+    private Map<AtomObject, Integer> closureSlotIndices = Collections.emptyMap();
 
     public LambdaMeta(List<AtomObject> parameters) {
       this.parameters = parameters;
@@ -140,6 +148,29 @@ public class ClosureVisitor extends DefaultVisitor {
       return parent;
     }
 
+    /**
+     * Returns the slot index map for closure variables. Maps each captured variable to its slot
+     * index in the IndexedEnvironment.
+     */
+    public Map<AtomObject, Integer> getClosureSlotIndices() {
+      return closureSlotIndices;
+    }
+
+    /**
+     * Returns the slot index for a specific closure variable, or -1 if not found.
+     */
+    public int getClosureSlotIndex(AtomObject atom) {
+      Integer index = closureSlotIndices.get(atom);
+      return index != null ? index : -1;
+    }
+
+    /**
+     * Returns the number of closure slots needed.
+     */
+    public int getClosureSlotCount() {
+      return closureSlotIndices.size();
+    }
+
     @Override
     public String toString() {
       StringBuilder sb = new StringBuilder();
@@ -147,6 +178,7 @@ public class ClosureVisitor extends DefaultVisitor {
       sb.append("parameters=").append(parameters);
       sb.append(", symbols=").append(symbols);
       sb.append(", closureInfo=").append(closureInfo);
+      sb.append(", closureSlots=").append(closureSlotIndices);
       sb.append('}');
       return sb.toString();
     }

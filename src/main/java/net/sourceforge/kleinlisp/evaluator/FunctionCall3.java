@@ -32,28 +32,34 @@ import net.sourceforge.kleinlisp.objects.FunctionObject;
 import net.sourceforge.kleinlisp.special_forms.LambdaForm.LambdaFunction;
 
 /**
- * Generic function call for 0 or 4+ argument functions. Uses ParameterArrayPool to reduce array
- * allocation overhead.
- *
- * @author Danilo Oliveira
+ * Specialized function call for three-argument functions. Uses ParameterArrayPool to avoid array
+ * allocation overhead for all function types including lambdas.
  */
-public class FunctionCall implements Supplier<LispObject> {
+public class FunctionCall3 implements Supplier<LispObject> {
+
+  private static final ThreadLocal<LispObject[]> PARAMS_HOLDER =
+      ThreadLocal.withInitial(() -> new LispObject[3]);
 
   private final LispEnvironment env;
   private final SourceRef ref;
   private final Supplier<LispObject> head;
-  private final Supplier<LispObject>[] parameters;
+  private final Supplier<LispObject> param0;
+  private final Supplier<LispObject> param1;
+  private final Supplier<LispObject> param2;
 
-  @SuppressWarnings("unchecked")
-  public FunctionCall(
+  public FunctionCall3(
       LispEnvironment env,
       SourceRef ref,
       Supplier<LispObject> head,
-      java.util.List<Supplier<LispObject>> parameters) {
+      Supplier<LispObject> param0,
+      Supplier<LispObject> param1,
+      Supplier<LispObject> param2) {
     this.env = env;
     this.ref = ref;
     this.head = head;
-    this.parameters = parameters.toArray(new Supplier[0]);
+    this.param0 = param0;
+    this.param1 = param1;
+    this.param2 = param2;
   }
 
   @Override
@@ -61,20 +67,22 @@ public class FunctionCall implements Supplier<LispObject> {
     FunctionObject functionObj = head.get().asFunction();
 
     if (functionObj == null) {
-      throw new LispArgumentError(String.format("Value [%s] isn't a valid function"));
+      throw new LispArgumentError("Value isn't a valid function");
     }
 
     Function function = functionObj.function();
-    int len = parameters.length;
+    LispObject p0 = param0.get();
+    LispObject p1 = param1.get();
+    LispObject p2 = param2.get();
 
+    LispObject[] params;
     if (function instanceof LambdaFunction) {
       // Use pool for lambda functions - stack-based allocation handles recursion
       ParameterArrayPool pool = ParameterArrayPool.get();
-      LispObject[] params = pool.acquire(len);
-
-      for (int i = 0; i < len; i++) {
-        params[i] = parameters[i].get();
-      }
+      params = pool.acquire3();
+      params[0] = p0;
+      params[1] = p1;
+      params[2] = p2;
 
       env.addFuncCall(functionObj.functionName(), ref);
       LispObject result;
@@ -82,18 +90,18 @@ public class FunctionCall implements Supplier<LispObject> {
         result = function.evaluate(params);
       } catch (RuntimeException | Error e) {
         // On exception, release pool but don't pop stack trace
-        pool.release(len);
+        pool.release3();
         throw e;
       }
       env.popFuncCall();
-      pool.release(len);
+      pool.release3();
       return result;
     } else {
-      // Built-in functions - allocate normally (rare case for 0 or 4+ args)
-      LispObject[] params = new LispObject[len];
-      for (int i = 0; i < len; i++) {
-        params[i] = parameters[i].get();
-      }
+      // Built-in functions consume values immediately, use ThreadLocal
+      params = PARAMS_HOLDER.get();
+      params[0] = p0;
+      params[1] = p1;
+      params[2] = p2;
 
       env.addFuncCall(functionObj.functionName(), ref);
       LispObject result = function.evaluate(params);

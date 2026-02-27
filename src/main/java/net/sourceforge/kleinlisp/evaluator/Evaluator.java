@@ -56,7 +56,8 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
 
   @Override
   public Supplier<LispObject> visit(AtomObject obj) {
-    return () -> environment.lookupValue(obj);
+    // Use inline caching for global lookups to avoid repeated HashMap access
+    return new CachedFunctionSupplier(environment, obj);
   }
 
   @Override
@@ -104,13 +105,40 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
     }
 
     Supplier<LispObject> headEval = head.accept(this);
-    List<Supplier<LispObject>> parameters = new ArrayList<>();
+    SourceRef ref = getSourceRef(list);
 
-    for (LispObject obj : list.cdr()) {
-      parameters.add(obj.accept(this));
+    // Use specialized FunctionCall based on arity
+    int paramCount = list.cdr().length();
+
+    switch (paramCount) {
+      case 1:
+        {
+          Supplier<LispObject> p0 = list.cdr().car().accept(this);
+          return new FunctionCall1(environment, ref, headEval, p0);
+        }
+      case 2:
+        {
+          Supplier<LispObject> p0 = list.cdr().car().accept(this);
+          Supplier<LispObject> p1 = list.cdr().cdr().car().accept(this);
+          return new FunctionCall2(environment, ref, headEval, p0, p1);
+        }
+      case 3:
+        {
+          Supplier<LispObject> p0 = list.cdr().car().accept(this);
+          Supplier<LispObject> p1 = list.cdr().cdr().car().accept(this);
+          Supplier<LispObject> p2 = list.cdr().cdr().cdr().car().accept(this);
+          return new FunctionCall3(environment, ref, headEval, p0, p1, p2);
+        }
+      default:
+        {
+          // Fall back to generic FunctionCall for 0 or 4+ parameters
+          List<Supplier<LispObject>> parameters = new ArrayList<>();
+          for (LispObject obj : list.cdr()) {
+            parameters.add(obj.accept(this));
+          }
+          return new FunctionCall(environment, ref, headEval, parameters);
+        }
     }
-
-    return new FunctionCall(environment, getSourceRef(list), headEval, parameters);
   }
 
   public Supplier<LispObject> tailCall(ListObject list) {
@@ -118,13 +146,39 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
     LispObject head = recur.cdr().car();
 
     Supplier<LispObject> headEval = head.accept(this);
-    List<Supplier<LispObject>> parameters = new ArrayList<>();
 
-    for (LispObject obj : list.cdr()) {
-      parameters.add(obj.accept(this));
+    // Use specialized TailFunctionCall based on arity
+    int paramCount = list.cdr().length();
+
+    switch (paramCount) {
+      case 1:
+        {
+          Supplier<LispObject> p0 = list.cdr().car().accept(this);
+          return new TailFunctionCall1(headEval, p0);
+        }
+      case 2:
+        {
+          Supplier<LispObject> p0 = list.cdr().car().accept(this);
+          Supplier<LispObject> p1 = list.cdr().cdr().car().accept(this);
+          return new TailFunctionCall2(headEval, p0, p1);
+        }
+      case 3:
+        {
+          Supplier<LispObject> p0 = list.cdr().car().accept(this);
+          Supplier<LispObject> p1 = list.cdr().cdr().car().accept(this);
+          Supplier<LispObject> p2 = list.cdr().cdr().cdr().car().accept(this);
+          return new TailFunctionCall3(headEval, p0, p1, p2);
+        }
+      default:
+        {
+          // Fall back to generic TailFunctionCall for 0 or 4+ parameters
+          List<Supplier<LispObject>> parameters = new ArrayList<>();
+          for (LispObject obj : list.cdr()) {
+            parameters.add(obj.accept(this));
+          }
+          return new TailFunctionCall(environment, headEval, parameters);
+        }
     }
-
-    return new TailFunctionCall(environment, headEval, parameters);
   }
 
   private SourceRef getSourceRef(ListObject list) {

@@ -34,4 +34,15 @@ public interface Environment {
   void set(AtomObject name, LispObject obj);
 
   boolean exists(AtomObject name);
+
+  /**
+   * Returns the value if it exists, or null if not found. Default implementation uses exists() +
+   * lookupValue() for backwards compatibility.
+   */
+  default LispObject lookupValueOrNull(AtomObject name) {
+    if (exists(name)) {
+      return lookupValue(name);
+    }
+    return null;
+  }
 }
