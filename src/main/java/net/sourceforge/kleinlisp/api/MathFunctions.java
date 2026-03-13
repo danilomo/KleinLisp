@@ -95,4 +95,40 @@ public class MathFunctions {
 
     return i1 < i2 ? BooleanObject.TRUE : BooleanObject.FALSE;
   }
+
+  public static LispObject abs(LispObject[] params) {
+    IntObject intVal = params[0].asInt();
+    if (intVal == null) {
+      throw new LispArgumentError("abs requires a numeric argument");
+    }
+    return IntObject.valueOf(Math.abs(intVal.value));
+  }
+
+  public static LispObject min(LispObject[] params) {
+    if (params.length == 0) {
+      throw new LispArgumentError("min requires at least one argument");
+    }
+    int result = params[0].asInt().value;
+    for (int i = 1; i < params.length; i++) {
+      int val = params[i].asInt().value;
+      if (val < result) {
+        result = val;
+      }
+    }
+    return IntObject.valueOf(result);
+  }
+
+  public static LispObject max(LispObject[] params) {
+    if (params.length == 0) {
+      throw new LispArgumentError("max requires at least one argument");
+    }
+    int result = params[0].asInt().value;
+    for (int i = 1; i < params.length; i++) {
+      int val = params[i].asInt().value;
+      if (val > result) {
+        result = val;
+      }
+    }
+    return IntObject.valueOf(result);
+  }
 }

@@ -28,9 +28,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.sourceforge.kleinlisp.api.BooleanFunctions;
+import net.sourceforge.kleinlisp.api.EqualityFunctions;
+import net.sourceforge.kleinlisp.api.HigherOrderFunctions;
 import net.sourceforge.kleinlisp.api.IOFunctions;
 import net.sourceforge.kleinlisp.api.ListFunctions;
 import net.sourceforge.kleinlisp.api.MathFunctions;
+import net.sourceforge.kleinlisp.api.StringFunctions;
+import net.sourceforge.kleinlisp.api.SymbolFunctions;
+import net.sourceforge.kleinlisp.api.TypePredicates;
+import net.sourceforge.kleinlisp.api.VectorFunctions;
 import net.sourceforge.kleinlisp.evaluator.SourceRef;
 import net.sourceforge.kleinlisp.macros.MacroDefinition;
 import net.sourceforge.kleinlisp.macros.MacroExpander;
@@ -155,11 +161,19 @@ public class LispEnvironment implements Environment {
   }
 
   private void initFunctionTable() {
+    // Math functions
     registerFunction("+", MathFunctions::add);
     registerFunction("-", MathFunctions::sub);
     registerFunction("*", MathFunctions::mul);
     registerFunction("/", MathFunctions::div);
     registerFunction("mod", MathFunctions::mod);
+    registerFunction("modulo", MathFunctions::mod);
+    registerFunction("remainder", MathFunctions::mod);
+    registerFunction("abs", MathFunctions::abs);
+    registerFunction("min", MathFunctions::min);
+    registerFunction("max", MathFunctions::max);
+
+    // Core list functions
     registerFunction("list", ListFunctions::list);
     registerFunction("length", ListFunctions::length);
     registerFunction("car", ListFunctions::car);
@@ -167,6 +181,40 @@ public class LispEnvironment implements Environment {
     registerFunction("cons", ListFunctions::cons);
     registerFunction("null?", ListFunctions::isNull);
 
+    // Additional list functions
+    registerFunction("append", ListFunctions::append);
+    registerFunction("reverse", (params) -> ListFunctions.reverse(params[0].asList()));
+    registerFunction("member", ListFunctions::member);
+    registerFunction("memq", ListFunctions::memq);
+    registerFunction("memv", ListFunctions::memv);
+    registerFunction("assoc", ListFunctions::assoc);
+    registerFunction("assq", ListFunctions::assq);
+    registerFunction("assv", ListFunctions::assv);
+    registerFunction("list-ref", ListFunctions::listRef);
+    registerFunction("list-tail", ListFunctions::listTail);
+    registerFunction("last", ListFunctions::last);
+    registerFunction("last-pair", ListFunctions::lastPair);
+    registerFunction("butlast", ListFunctions::butlast);
+    registerFunction("take", ListFunctions::take);
+    registerFunction("drop", ListFunctions::drop);
+    registerFunction("iota", ListFunctions::iota);
+
+    // Car/cdr compositions
+    registerFunction("caar", ListFunctions::caar);
+    registerFunction("cadr", ListFunctions::cadr);
+    registerFunction("cdar", ListFunctions::cdar);
+    registerFunction("cddr", ListFunctions::cddr);
+    registerFunction("caaar", ListFunctions::caaar);
+    registerFunction("caadr", ListFunctions::caadr);
+    registerFunction("cadar", ListFunctions::cadar);
+    registerFunction("caddr", ListFunctions::caddr);
+    registerFunction("cdaar", ListFunctions::cdaar);
+    registerFunction("cdadr", ListFunctions::cdadr);
+    registerFunction("cddar", ListFunctions::cddar);
+    registerFunction("cdddr", ListFunctions::cdddr);
+    registerFunction("cadddr", ListFunctions::cadddr);
+
+    // Boolean/comparison functions
     registerFunction("<", BooleanFunctions::lt);
     registerFunction(">", BooleanFunctions::gt);
     registerFunction("<=", BooleanFunctions::le);
@@ -175,6 +223,85 @@ public class LispEnvironment implements Environment {
     registerFunction("!=", BooleanFunctions::neq);
     registerFunction("not", BooleanFunctions::not);
 
+    // Equality predicates
+    registerFunction("eq?", EqualityFunctions::eq);
+    registerFunction("eqv?", EqualityFunctions::eqv);
+    registerFunction("equal?", EqualityFunctions::equal);
+
+    // Type predicates
+    registerFunction("string?", TypePredicates::isString);
+    registerFunction("number?", TypePredicates::isNumber);
+    registerFunction("integer?", TypePredicates::isInteger);
+    registerFunction("real?", TypePredicates::isDouble);
+    registerFunction("pair?", TypePredicates::isPair);
+    registerFunction("list?", TypePredicates::isList);
+    registerFunction("symbol?", TypePredicates::isSymbol);
+    registerFunction("boolean?", TypePredicates::isBoolean);
+    registerFunction("procedure?", TypePredicates::isProcedure);
+    registerFunction("vector?", TypePredicates::isVector);
+    registerFunction("zero?", TypePredicates::isZero);
+    registerFunction("positive?", TypePredicates::isPositive);
+    registerFunction("negative?", TypePredicates::isNegative);
+    registerFunction("odd?", TypePredicates::isOdd);
+    registerFunction("even?", TypePredicates::isEven);
+
+    // String functions
+    registerFunction("string-append", StringFunctions::stringAppend);
+    registerFunction("string-length", StringFunctions::stringLength);
+    registerFunction("string-ref", StringFunctions::stringRef);
+    registerFunction("substring", StringFunctions::substring);
+    registerFunction("string=?", StringFunctions::stringEqual);
+    registerFunction("string<?", StringFunctions::stringLessThan);
+    registerFunction("string>?", StringFunctions::stringGreaterThan);
+    registerFunction("string<=?", StringFunctions::stringLessOrEqual);
+    registerFunction("string>=?", StringFunctions::stringGreaterOrEqual);
+    registerFunction("number->string", StringFunctions::numberToString);
+    registerFunction("string->number", StringFunctions::stringToNumber);
+    registerFunction("string-upcase", StringFunctions::stringUpcase);
+    registerFunction("string-downcase", StringFunctions::stringDowncase);
+    registerFunction("string-split", StringFunctions::stringSplit);
+    registerFunction("string-join", StringFunctions::stringJoin);
+    registerFunction("string-trim", StringFunctions::stringTrim);
+    registerFunction("string-contains?", StringFunctions::stringContains);
+    registerFunction("string-prefix?", StringFunctions::stringPrefix);
+    registerFunction("string-suffix?", StringFunctions::stringSuffix);
+    registerFunction("string-replace", StringFunctions::stringReplace);
+
+    // Higher-order functions
+    registerFunction("map", HigherOrderFunctions::map);
+    registerFunction("filter", HigherOrderFunctions::filter);
+    registerFunction("for-each", HigherOrderFunctions::forEach);
+    registerFunction("fold-left", HigherOrderFunctions::foldLeft);
+    registerFunction("fold-right", HigherOrderFunctions::foldRight);
+    registerFunction("foldl", HigherOrderFunctions::foldLeft);
+    registerFunction("foldr", HigherOrderFunctions::foldRight);
+    registerFunction("reduce", HigherOrderFunctions::reduce);
+    registerFunction("apply", HigherOrderFunctions::apply);
+    registerFunction("compose", HigherOrderFunctions::compose);
+    registerFunction("identity", HigherOrderFunctions::identity);
+    registerFunction("negate", HigherOrderFunctions::negate);
+    registerFunction("any", HigherOrderFunctions::any);
+    registerFunction("all", HigherOrderFunctions::all);
+    registerFunction("every", HigherOrderFunctions::all);
+
+    // Vector functions
+    registerFunction("make-vector", VectorFunctions::makeVector);
+    registerFunction("vector", VectorFunctions::vector);
+    registerFunction("vector-ref", VectorFunctions::vectorRef);
+    registerFunction("vector-set!", VectorFunctions::vectorSet);
+    registerFunction("vector-length", VectorFunctions::vectorLength);
+    registerFunction("vector->list", VectorFunctions::vectorToList);
+    registerFunction("list->vector", VectorFunctions::listToVector);
+    registerFunction("vector-fill!", VectorFunctions::vectorFill);
+    registerFunction("vector-copy", VectorFunctions::vectorCopy);
+
+    // Symbol functions (require environment reference)
+    SymbolFunctions symbolFuncs = new SymbolFunctions(this);
+    registerFunction("symbol->string", symbolFuncs::symbolToString);
+    registerFunction("string->symbol", symbolFuncs::stringToSymbol);
+    registerFunction("gensym", symbolFuncs::gensym);
+
+    // I/O functions
     registerFunction("print", IOFunctions::print);
     registerFunction("println", IOFunctions::println);
     registerFunction("display", IOFunctions::println);

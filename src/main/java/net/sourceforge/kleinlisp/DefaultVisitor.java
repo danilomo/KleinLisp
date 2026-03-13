@@ -103,4 +103,9 @@ public class DefaultVisitor implements LispVisitor<LispObject> {
   public LispObject visit(IdentifierObject obj) {
     return obj;
   }
+
+  @Override
+  public LispObject visit(VectorObject obj) {
+    return obj;
+  }
 }
