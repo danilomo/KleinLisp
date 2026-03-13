@@ -99,6 +99,10 @@ public class LispEnvironment implements Environment {
       this.parameters = parameters;
     }
 
+    public LispObject[] getParameters() {
+      return parameters;
+    }
+
     public Environment getEnv() {
       return env;
     }

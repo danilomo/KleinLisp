@@ -30,6 +30,7 @@ import net.sourceforge.kleinlisp.objects.DoubleObject;
 import net.sourceforge.kleinlisp.objects.FunctionObject;
 import net.sourceforge.kleinlisp.objects.IdentifierObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
+import net.sourceforge.kleinlisp.objects.KeywordObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 import net.sourceforge.kleinlisp.objects.StringObject;
 
@@ -119,6 +120,10 @@ public interface LispObject {
   }
 
   default IdentifierObject asIdentifier() {
+    return null;
+  }
+
+  default KeywordObject asKeyword() {
     return null;
   }
 

@@ -143,6 +143,35 @@ public class ListObject implements LispObject, Iterable<LispObject> {
     this.tail = tail;
   }
 
+  /**
+   * Returns true if this is a proper list (ends with NIL).
+   */
+  public boolean isProperList() {
+    ListObject pointer = this;
+    while (pointer != NIL) {
+      if (!(pointer.tail instanceof ListObject)) {
+        return false;
+      }
+      pointer = (ListObject) pointer.tail;
+    }
+    return true;
+  }
+
+  /**
+   * For an improper list (a b . c), returns the final tail element (c).
+   * Returns null if this is a proper list.
+   */
+  public LispObject getImproperTail() {
+    ListObject pointer = this;
+    while (pointer != NIL && pointer.tail instanceof ListObject) {
+      pointer = (ListObject) pointer.tail;
+    }
+    if (pointer != NIL && !(pointer.tail instanceof ListObject)) {
+      return pointer.tail;
+    }
+    return null;
+  }
+
   public void setHead(LispObject head) {
     this.head = head;
   }
@@ -321,7 +350,12 @@ public class ListObject implements LispObject, Iterable<LispObject> {
     @Override
     public LispObject next() {
       LispObject f = cursor.head;
-      cursor = cursor.cdr();
+      // Handle improper lists - if tail is not a ListObject, stop iteration
+      if (cursor.tail instanceof ListObject) {
+        cursor = (ListObject) cursor.tail;
+      } else {
+        cursor = NIL;
+      }
       return f;
     }
   }

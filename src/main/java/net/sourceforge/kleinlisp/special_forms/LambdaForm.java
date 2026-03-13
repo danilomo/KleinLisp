@@ -163,6 +163,10 @@ public class LambdaForm implements SpecialForm {
           CellObject cell = new CellObject();
           cell.set(parameters[parIndex]);
           value = cell;
+        } else if (parIndex < -1) {
+          // Rest parameter: parIndex = -(regularParamCount + 2)
+          int regularParamCount = -(parIndex + 2);
+          value = buildRestList(parameters, regularParamCount);
         } else {
           value = env.lookupValue(id);
         }
@@ -181,6 +185,9 @@ public class LambdaForm implements SpecialForm {
           CellObject cell = new CellObject();
           cell.set(parameters[parIndex1]);
           value1 = cell;
+        } else if (parIndex1 < -1) {
+          int regularParamCount = -(parIndex1 + 2);
+          value1 = buildRestList(parameters, regularParamCount);
         } else {
           value1 = env.lookupValue(id1);
         }
@@ -193,6 +200,9 @@ public class LambdaForm implements SpecialForm {
           CellObject cell = new CellObject();
           cell.set(parameters[parIndex2]);
           value2 = cell;
+        } else if (parIndex2 < -1) {
+          int regularParamCount = -(parIndex2 + 2);
+          value2 = buildRestList(parameters, regularParamCount);
         } else {
           value2 = env.lookupValue(id2);
         }
@@ -213,12 +223,26 @@ public class LambdaForm implements SpecialForm {
           CellObject cell = new CellObject();
           cell.set(parameters[parIndex]);
           slots[slotIndex] = cell;
+        } else if (parIndex < -1) {
+          int regularParamCount = -(parIndex + 2);
+          slots[slotIndex] = buildRestList(parameters, regularParamCount);
         } else {
           slots[slotIndex] = env.lookupValue(id);
         }
       }
 
       return new IndexedEnvironment(slots, slotIndices, null);
+    }
+
+    private LispObject buildRestList(LispObject[] parameters, int startIndex) {
+      if (startIndex >= parameters.length) {
+        return ListObject.NIL;
+      }
+      ListObject result = ListObject.NIL;
+      for (int i = parameters.length - 1; i >= startIndex; i--) {
+        result = new ListObject(parameters[i], result);
+      }
+      return result;
     }
 
     @Override
@@ -247,7 +271,8 @@ public class LambdaForm implements SpecialForm {
     Set<AtomObject> fromClosure = new HashSet<>(meta.getParent().getClosureInfo().keySet());
     fromClosure.addAll(meta.getClosureInfo().keySet());
 
-    ListObject transformed = transformBodySymbols(body, meta.getParameters(), fromClosure);
+    ListObject transformed =
+        transformBodySymbols(body, meta.getParameters(), fromClosure, meta.getRestParameter());
 
     Supplier<LispObject> functionSupplier = evaluateBody(transformed);
 
@@ -268,7 +293,10 @@ public class LambdaForm implements SpecialForm {
   }
 
   private ListObject transformBodySymbols(
-      ListObject body, List<AtomObject> fromParameters, Set<AtomObject> fromClosure) {
+      ListObject body,
+      List<AtomObject> fromParameters,
+      Set<AtomObject> fromClosure,
+      AtomObject restParameter) {
     DefaultVisitor visitor =
         new DefaultVisitor() {
 
@@ -286,11 +314,17 @@ public class LambdaForm implements SpecialForm {
 
           @Override
           public LispObject visit(AtomObject obj) {
+            // Check if this is the rest parameter (must be before closure check)
+            if (restParameter != null && obj == restParameter) {
+              return getRestParameterObj(fromParameters.size());
+            }
 
+            // Check closures (important for set! to work)
             if (fromClosure.contains(obj)) {
               return getValueFromClosure(obj);
             }
 
+            // Check regular parameters
             for (int i = 0; i < fromParameters.size(); i++) {
               if (obj == fromParameters.get(i)) {
                 return getParameterObj(i);
@@ -327,6 +361,28 @@ public class LambdaForm implements SpecialForm {
             Consumer<LispObject> setter =
                 (obj) -> {
                   environment.stackTop().setParameterAt(i, obj);
+                };
+            return new ComputedLispObject(getter, setter);
+          }
+
+          private LispObject getRestParameterObj(int startIndex) {
+            Supplier<LispObject> getter =
+                () -> {
+                  LispObject[] params = environment.stackTop().getParameters();
+                  if (startIndex >= params.length) {
+                    return ListObject.NIL;
+                  }
+                  // Build a list from remaining parameters
+                  ListObject result = ListObject.NIL;
+                  for (int i = params.length - 1; i >= startIndex; i--) {
+                    result = new ListObject(params[i], result);
+                  }
+                  return result;
+                };
+            Consumer<LispObject> setter =
+                (obj) -> {
+                  // Rest parameter is read-only
+                  throw new UnsupportedOperationException("Cannot set rest parameter");
                 };
             return new ComputedLispObject(getter, setter);
           }

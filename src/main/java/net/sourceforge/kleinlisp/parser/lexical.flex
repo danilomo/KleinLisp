@@ -27,6 +27,7 @@ uppercase	= [A-Z]
 lineterminator	= \r | \n | \r\n
 
 identifier	= ({letter}|{symbol}) ({letter}|{digit}|{symbol}|{minus})*
+keyword         = "#:" ({letter}|{symbol}) ({letter}|{digit}|{symbol}|{minus})*
 
 %{
 private void error(){    
@@ -58,6 +59,7 @@ StringBuilder str = new StringBuilder();
     "."                             { return symbol( sym.DOT ); }
     "-"                             { return symbol( sym.ATOM, "-" ); }
 
+    {keyword}                       { return symbol( sym.KEYWORD, yytext().substring(2) ); }
     {identifier}                    { return symbol( sym.ATOM,  yytext() ); }
     {integer_literal}               { return symbol( sym.INT_LITERAL,  Integer.parseInt(yytext()) ); }
     {double_literal}                { return symbol( sym.DOUBLE_LITERAL,  Double.parseDouble(yytext()) ); }

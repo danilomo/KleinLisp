@@ -95,6 +95,17 @@ public class ClosureVisitor extends DefaultVisitor {
       closureSlotIndices.put(param, slotIndex++);
     }
 
+    // Handle rest parameter - use Integer.MAX_VALUE as special marker
+    if (currentFunction.restParameter != null && symbols.contains(currentFunction.restParameter)) {
+      // Store the regular parameter count in high bits, use MAX_VALUE marker in low
+      // Actually, use (parameters.size() + 1) * -1 - 1 to encode both info
+      // Or simpler: use negative value where abs(value) - 2 = regular param count
+      // E.g., -2 means 0 regular params, -3 means 1 regular param, etc.
+      int marker = -(currentFunction.parameters.size() + 2);
+      closureInfo.put(currentFunction.restParameter, marker);
+      closureSlotIndices.put(currentFunction.restParameter, slotIndex++);
+    }
+
     for (AtomObject param : symbols) {
       if (closureInfo.containsKey(param)) {
         continue;
@@ -115,6 +126,7 @@ public class ClosureVisitor extends DefaultVisitor {
   public static class LambdaMeta {
 
     private List<AtomObject> parameters;
+    private AtomObject restParameter; // For (a b . rest) syntax
     private Set<AtomObject> symbols = new HashSet<>();
     private List<LambdaMeta> children = new ArrayList<>();
     private LambdaMeta parent;
@@ -126,6 +138,19 @@ public class ClosureVisitor extends DefaultVisitor {
 
     public LambdaMeta(List<AtomObject> parameters) {
       this.parameters = parameters;
+    }
+
+    public LambdaMeta(List<AtomObject> parameters, AtomObject restParameter) {
+      this.parameters = parameters;
+      this.restParameter = restParameter;
+    }
+
+    public AtomObject getRestParameter() {
+      return restParameter;
+    }
+
+    public boolean hasRestParameter() {
+      return restParameter != null;
     }
 
     public List<LambdaMeta> getChildren() {
@@ -208,14 +233,34 @@ public class ClosureVisitor extends DefaultVisitor {
     }
 
     List<AtomObject> parameters = new ArrayList<>();
-    ListObject paramList = obj.cdr().car().asList();
-    for (LispObject param : paramList) {
-      AtomObject atom = param.asAtom();
-      parameters.add(atom);
-      definedSymbols.add(atom);
+    AtomObject restParameter = null;
+    LispObject paramSpec = obj.cdr().car();
+
+    // Handle two forms of variadic parameters:
+    // 1. (lambda args body) - single identifier, all args become a list
+    // 2. (lambda (a b . rest) body) - improper list with rest parameter
+    if (paramSpec.asAtom() != null) {
+      // Case 1: single identifier - all args become a list bound to this symbol
+      restParameter = paramSpec.asAtom();
+      definedSymbols.add(restParameter);
+    } else {
+      ListObject paramList = paramSpec.asList();
+
+      // Check if param list is improper (has rest parameter)
+      LispObject improperTail = paramList.getImproperTail();
+      if (improperTail != null && improperTail.asAtom() != null) {
+        restParameter = improperTail.asAtom();
+        definedSymbols.add(restParameter);
+      }
+
+      for (LispObject param : paramList) {
+        AtomObject atom = param.asAtom();
+        parameters.add(atom);
+        definedSymbols.add(atom);
+      }
     }
 
-    LambdaMeta newFunction = new LambdaMeta(parameters);
+    LambdaMeta newFunction = new LambdaMeta(parameters, restParameter);
     newFunction.repr = obj.toString();
     currentFunction.children.add(newFunction);
     newFunction.parent = currentFunction;
@@ -226,6 +271,10 @@ public class ClosureVisitor extends DefaultVisitor {
 
     for (AtomObject param : currentFunction.parameters) {
       currentFunction.symbols.remove(param);
+    }
+    // Also remove rest parameter from symbols (it's a local parameter)
+    if (currentFunction.getRestParameter() != null) {
+      currentFunction.symbols.remove(currentFunction.getRestParameter());
     }
 
     result.setMeta(currentFunction);

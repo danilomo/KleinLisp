@@ -60,5 +60,7 @@ public interface LispVisitor<T> {
 
   T visit(VectorObject obj);
 
+  T visit(KeywordObject obj);
+
   class Void {}
 }

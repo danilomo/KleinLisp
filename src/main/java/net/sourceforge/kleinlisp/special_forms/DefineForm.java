@@ -67,7 +67,8 @@ public class DefineForm implements SpecialForm {
 
   private void defineFunction(ListObject signature, LispObject value) {
     AtomObject id = signature.car().asAtom();
-    LispObject parameters = signature.cdr();
+    // Use tail() instead of cdr() to handle improper lists like (func . rest)
+    LispObject parameters = signature.tail();
 
     TcoOptimizer optm = new TcoOptimizer(value, id, environment);
     optm.optimize();
