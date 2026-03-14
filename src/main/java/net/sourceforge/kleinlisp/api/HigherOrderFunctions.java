@@ -401,4 +401,28 @@ public class HigherOrderFunctions {
     }
     return net.sourceforge.kleinlisp.objects.BooleanObject.TRUE;
   }
+
+  /** Finds the first element that satisfies a predicate. (find pred list) */
+  public static LispObject find(LispObject[] params) {
+    FunctionObject funcObj = params[0].asFunction();
+    if (funcObj == null) {
+      throw new LispArgumentError("find requires a procedure as first argument");
+    }
+    Function pred = funcObj.function();
+
+    if (params[1] == ListObject.NIL) {
+      return net.sourceforge.kleinlisp.objects.BooleanObject.FALSE;
+    }
+    ListObject list = params[1].asList();
+    if (list == null) {
+      throw new LispArgumentError("find requires a list as second argument");
+    }
+
+    for (LispObject elem : list) {
+      if (pred.evaluate(new LispObject[] {elem}).truthiness()) {
+        return elem;
+      }
+    }
+    return net.sourceforge.kleinlisp.objects.BooleanObject.FALSE;
+  }
 }

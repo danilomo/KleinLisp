@@ -57,6 +57,8 @@ public class SpecialForms {
     this.insertForm("cond", new CondForm(evaluator));
     this.insertForm("case", new CaseForm(evaluator));
     this.insertForm("let", new LetForm(evaluator, environment));
+    this.insertForm("let*", new LetStarForm(evaluator, environment));
+    this.insertForm("letrec", new LetrecForm(evaluator, environment));
     this.insertForm("and", new AndForm(evaluator));
     this.insertForm("or", new OrForm(evaluator));
   }

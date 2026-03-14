@@ -51,6 +51,7 @@ terminal DOT;
 
 terminal Integer INT_LITERAL;
 terminal Double  DOUBLE_LITERAL;
+terminal Boolean BOOL_LITERAL;
 
 non terminal LispObject self_evaluating_form;
 non terminal LispObject list_form;
@@ -73,6 +74,7 @@ form ::=
 self_evaluating_form ::=
     INT_LITERAL:i    {: RESULT = new IntObject(i);    :} |
     DOUBLE_LITERAL:d {: RESULT = new DoubleObject(d); :} |
+    BOOL_LITERAL:b   {: RESULT = b ? BooleanObject.TRUE : BooleanObject.FALSE; :} |
     STRING_LITERAL:s {: RESULT = new StringObject(s); :} |
     KEYWORD:k        {: RESULT = new KeywordObject(k); :} |
     ATOM:a           {:

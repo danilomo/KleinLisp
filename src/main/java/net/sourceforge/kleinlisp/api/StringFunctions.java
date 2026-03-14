@@ -111,6 +111,16 @@ public class StringFunctions {
     return s1.value().equals(s2.value()) ? BooleanObject.TRUE : BooleanObject.FALSE;
   }
 
+  /** Tests case-insensitive string equality. (string-ci=? s1 s2) */
+  public static LispObject stringCiEqual(LispObject[] params) {
+    StringObject s1 = params[0].asString();
+    StringObject s2 = params[1].asString();
+    if (s1 == null || s2 == null) {
+      throw new LispArgumentError("string-ci=? requires string arguments");
+    }
+    return s1.value().equalsIgnoreCase(s2.value()) ? BooleanObject.TRUE : BooleanObject.FALSE;
+  }
+
   /** String lexicographic comparison. (string<? s1 s2) */
   public static LispObject stringLessThan(LispObject[] params) {
     StringObject s1 = params[0].asString();

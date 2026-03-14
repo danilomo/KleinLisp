@@ -23,8 +23,8 @@
  */
 package net.sourceforge.kleinlisp.parser;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
+import java.io.BufferedReader;
+import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Consumer;
@@ -43,7 +43,7 @@ public class CUPParser implements Parser {
     parser p = null;
 
     try {
-      ByteArrayInputStream in = new ByteArrayInputStream(expression.getBytes());
+      StringReader in = new StringReader(expression);
       p = new parser(new LexicalAnalyzer(in)).withEnvironment(env).withConsumer(consumer);
 
       p.parse();
@@ -60,7 +60,7 @@ public class CUPParser implements Parser {
     parser p = null;
 
     try {
-      BufferedInputStream in = new BufferedInputStream(Files.newInputStream(path));
+      BufferedReader in = Files.newBufferedReader(path);
       p =
           new parser(new LexicalAnalyzer(in))
               .withEnvironment(env)

@@ -25,6 +25,7 @@ package net.sourceforge.kleinlisp.api;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
+import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.VoidObject;
 
@@ -48,5 +49,11 @@ public class IOFunctions {
   public static LispObject newline(LispObject[] params) {
     System.out.println();
     return VoidObject.VOID;
+  }
+
+  /** Raises an error with a message. (error message) or (error message value ...) */
+  public static LispObject error(LispObject[] params) {
+    String message = Arrays.stream(params).map(Object::toString).collect(Collectors.joining(" "));
+    throw new LispArgumentError(message);
   }
 }

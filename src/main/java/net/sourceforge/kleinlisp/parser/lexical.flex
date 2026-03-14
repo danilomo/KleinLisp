@@ -58,6 +58,8 @@ StringBuilder str = new StringBuilder();
     "]"                             { return symbol( sym.CLOSE_BRACKET ); }
     "."                             { return symbol( sym.DOT ); }
     "-"                             { return symbol( sym.ATOM, "-" ); }
+    "#t"                            { return symbol( sym.BOOL_LITERAL, true ); }
+    "#f"                            { return symbol( sym.BOOL_LITERAL, false ); }
 
     {keyword}                       { return symbol( sym.KEYWORD, yytext().substring(2) ); }
     {identifier}                    { return symbol( sym.ATOM,  yytext() ); }

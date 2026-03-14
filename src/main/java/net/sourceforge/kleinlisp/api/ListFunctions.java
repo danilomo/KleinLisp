@@ -255,6 +255,32 @@ public class ListFunctions {
     return BooleanObject.FALSE;
   }
 
+  /** Gets the value directly from an association list. (assoc-ref key alist) */
+  public static LispObject assocRef(LispObject[] params) {
+    LispObject result = assoc(params);
+    if (result == BooleanObject.FALSE) {
+      return BooleanObject.FALSE;
+    }
+    ListObject pair = result.asList();
+    if (pair != null && pair.cdr() != ListObject.NIL) {
+      // For dotted pairs like (key . value), cdr returns the value directly
+      LispObject cdrVal = pair.cdr();
+      if (cdrVal.asList() != null) {
+        // For proper lists like (key value), return car of cdr
+        return cdrVal.asList().car();
+      }
+      // For dotted pairs, return cdr directly
+      return cdrVal;
+    }
+    return BooleanObject.FALSE;
+  }
+
+  /** Gets element at 0-indexed position. (nth index list) - alias for list-ref with swapped args */
+  public static LispObject nth(LispObject[] params) {
+    // nth takes (index list) while list-ref takes (list index)
+    return listRef(new LispObject[] {params[1], params[0]});
+  }
+
   /** Gets element at index. (list-ref list k) */
   public static LispObject listRef(LispObject[] params) {
     if (params[0] == ListObject.NIL) {

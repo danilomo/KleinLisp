@@ -194,7 +194,9 @@ public class LispEnvironment implements Environment {
     registerFunction("assoc", ListFunctions::assoc);
     registerFunction("assq", ListFunctions::assq);
     registerFunction("assv", ListFunctions::assv);
+    registerFunction("assoc-ref", ListFunctions::assocRef);
     registerFunction("list-ref", ListFunctions::listRef);
+    registerFunction("nth", ListFunctions::nth);
     registerFunction("list-tail", ListFunctions::listTail);
     registerFunction("last", ListFunctions::last);
     registerFunction("last-pair", ListFunctions::lastPair);
@@ -255,6 +257,7 @@ public class LispEnvironment implements Environment {
     registerFunction("string-ref", StringFunctions::stringRef);
     registerFunction("substring", StringFunctions::substring);
     registerFunction("string=?", StringFunctions::stringEqual);
+    registerFunction("string-ci=?", StringFunctions::stringCiEqual);
     registerFunction("string<?", StringFunctions::stringLessThan);
     registerFunction("string>?", StringFunctions::stringGreaterThan);
     registerFunction("string<=?", StringFunctions::stringLessOrEqual);
@@ -267,6 +270,7 @@ public class LispEnvironment implements Environment {
     registerFunction("string-join", StringFunctions::stringJoin);
     registerFunction("string-trim", StringFunctions::stringTrim);
     registerFunction("string-contains?", StringFunctions::stringContains);
+    registerFunction("string-contains", StringFunctions::stringContains);
     registerFunction("string-prefix?", StringFunctions::stringPrefix);
     registerFunction("string-suffix?", StringFunctions::stringSuffix);
     registerFunction("string-replace", StringFunctions::stringReplace);
@@ -287,6 +291,7 @@ public class LispEnvironment implements Environment {
     registerFunction("any", HigherOrderFunctions::any);
     registerFunction("all", HigherOrderFunctions::all);
     registerFunction("every", HigherOrderFunctions::all);
+    registerFunction("find", HigherOrderFunctions::find);
 
     // Vector functions
     registerFunction("make-vector", VectorFunctions::makeVector);
@@ -310,6 +315,7 @@ public class LispEnvironment implements Environment {
     registerFunction("println", IOFunctions::println);
     registerFunction("display", IOFunctions::println);
     registerFunction("newline", IOFunctions::newline);
+    registerFunction("error", IOFunctions::error);
   }
 
   private void initMacroTable() {
