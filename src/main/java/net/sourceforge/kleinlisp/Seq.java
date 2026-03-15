@@ -24,9 +24,8 @@
 package net.sourceforge.kleinlisp;
 
 /**
- * A sequence abstraction for KleinLisp, inspired by Clojure's seq.
- * Provides a uniform way to traverse various collection types including
- * lists, vectors, sets, and any Java Iterable.
+ * A sequence abstraction for KleinLisp, inspired by Clojure's seq. Provides a uniform way to
+ * traverse various collection types including lists, vectors, sets, and any Java Iterable.
  *
  * @author Danilo Oliveira
  */

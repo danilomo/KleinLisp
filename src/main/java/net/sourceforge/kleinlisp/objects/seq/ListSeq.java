@@ -28,9 +28,8 @@ import net.sourceforge.kleinlisp.Seq;
 import net.sourceforge.kleinlisp.objects.ListObject;
 
 /**
- * A Seq implementation that wraps a ListObject (cons cell).
- * This is the most straightforward implementation as lists are already
- * inherently sequential.
+ * A Seq implementation that wraps a ListObject (cons cell). This is the most straightforward
+ * implementation as lists are already inherently sequential.
  *
  * @author Danilo Oliveira
  */
@@ -63,9 +62,7 @@ public final class ListSeq implements Seq {
     return list == ListObject.NIL;
   }
 
-  /**
-   * Returns the underlying ListObject.
-   */
+  /** Returns the underlying ListObject. */
   public ListObject getList() {
     return list;
   }

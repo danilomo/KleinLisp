@@ -31,9 +31,8 @@ import net.sourceforge.kleinlisp.objects.BooleanObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 
 /**
- * Sequence functions for KleinLisp.
- * Provides polymorphic sequence operations that work with lists, vectors, sets,
- * and any other seqable type.
+ * Sequence functions for KleinLisp. Provides polymorphic sequence operations that work with lists,
+ * vectors, sets, and any other seqable type.
  *
  * <p>Inspired by Clojure's sequence abstraction.
  *
@@ -42,8 +41,8 @@ import net.sourceforge.kleinlisp.objects.ListObject;
 public class SeqFunctions {
 
   /**
-   * Coerces an object to a Seq.
-   * (seq coll) returns nil if coll is empty, otherwise returns a seq of coll.
+   * Coerces an object to a Seq. (seq coll) returns nil if coll is empty, otherwise returns a seq of
+   * coll.
    */
   public static LispObject seq(LispObject[] params) {
     LispObject obj = params[0];
@@ -68,8 +67,8 @@ public class SeqFunctions {
   }
 
   /**
-   * Returns the first element of a seqable.
-   * (first coll) returns the first element, or nil if coll is empty.
+   * Returns the first element of a seqable. (first coll) returns the first element, or nil if coll
+   * is empty.
    */
   public static LispObject first(LispObject[] params) {
     LispObject obj = params[0];
@@ -89,9 +88,8 @@ public class SeqFunctions {
   }
 
   /**
-   * Returns the rest of a seqable as a list.
-   * (rest coll) returns a list of all elements except the first.
-   * Returns () if coll is empty or has only one element.
+   * Returns the rest of a seqable as a list. (rest coll) returns a list of all elements except the
+   * first. Returns () if coll is empty or has only one element.
    */
   public static LispObject rest(LispObject[] params) {
     LispObject obj = params[0];
@@ -115,9 +113,9 @@ public class SeqFunctions {
   }
 
   /**
-   * Returns the next elements of a seqable (rest, but nil if no more elements).
-   * (next coll) returns nil if coll has 0 or 1 element, otherwise returns rest.
-   * This is the Clojure convention - next can be used for termination checks.
+   * Returns the next elements of a seqable (rest, but nil if no more elements). (next coll) returns
+   * nil if coll has 0 or 1 element, otherwise returns rest. This is the Clojure convention - next
+   * can be used for termination checks.
    */
   public static LispObject next(LispObject[] params) {
     LispObject obj = params[0];
@@ -140,10 +138,7 @@ public class SeqFunctions {
     return seqToList(r);
   }
 
-  /**
-   * Tests if an object is seqable.
-   * (seqable? obj) returns #t if obj can be converted to a seq.
-   */
+  /** Tests if an object is seqable. (seqable? obj) returns #t if obj can be converted to a seq. */
   public static LispObject seqable(LispObject[] params) {
     LispObject obj = params[0];
 
@@ -155,10 +150,7 @@ public class SeqFunctions {
     return obj.asSeq() != null ? BooleanObject.TRUE : BooleanObject.FALSE;
   }
 
-  /**
-   * Converts a Seq to a ListObject.
-   * Helper method for returning sequences as lists.
-   */
+  /** Converts a Seq to a ListObject. Helper method for returning sequences as lists. */
   public static ListObject seqToList(Seq s) {
     if (s == null || s.isEmpty()) {
       return ListObject.NIL;
@@ -174,9 +166,8 @@ public class SeqFunctions {
   }
 
   /**
-   * Gets a Seq from a LispObject, handling nil and non-seqable objects.
-   * Returns null if the object is not seqable or is empty.
-   * This is a utility method for use by other functions.
+   * Gets a Seq from a LispObject, handling nil and non-seqable objects. Returns null if the object
+   * is not seqable or is empty. This is a utility method for use by other functions.
    */
   public static Seq getSeq(LispObject obj) {
     if (obj == ListObject.NIL) {
@@ -186,10 +177,9 @@ public class SeqFunctions {
   }
 
   /**
-   * Checks if an object is seqable (can be converted to a sequence).
-   * Returns true even for empty collections.
-   * This is useful for HOFs to distinguish between empty collections
-   * and non-seqable objects.
+   * Checks if an object is seqable (can be converted to a sequence). Returns true even for empty
+   * collections. This is useful for HOFs to distinguish between empty collections and non-seqable
+   * objects.
    */
   public static boolean isSeqable(LispObject obj) {
     if (obj == ListObject.NIL) {

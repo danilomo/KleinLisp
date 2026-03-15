@@ -27,9 +27,7 @@ import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.LispVisitor;
 
-/**
- * Mutable vector (array) type for KleinLisp. Provides O(1) indexed access.
- */
+/** Mutable vector (array) type for KleinLisp. Provides O(1) indexed access. */
 public final class VectorObject implements LispObject {
 
   private final LispObject[] elements;

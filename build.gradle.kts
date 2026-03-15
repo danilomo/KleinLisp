@@ -1,5 +1,11 @@
 plugins {
     java
+    application
+    id("com.diffplug.spotless") version "6.25.0"
+}
+
+application {
+    mainClass.set("net.sourceforge.kleinlisp.Main")
 }
 
 group = "net.sourceforge.kleinlisp"
@@ -8,6 +14,37 @@ version = "0.0.1"
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+val parserDir = "src/main/java/net/sourceforge/kleinlisp/parser"
+val binDir = "bin"
+
+val generateLexer by tasks.registering(JavaExec::class) {
+    description = "Generate lexer from JFlex specification"
+    group = "build"
+
+    inputs.file("$parserDir/lexical.flex")
+    outputs.file("$parserDir/LexicalAnalyzer.java")
+
+    classpath = files("$binDir/JFlex.jar")
+    mainClass.set("JFlex.Main")
+    args = listOf("-d", parserDir, "$parserDir/lexical.flex")
+}
+
+val generateParser by tasks.registering(JavaExec::class) {
+    description = "Generate parser from CUP specification"
+    group = "build"
+
+    inputs.file("$parserDir/parser.cup")
+    outputs.files("$parserDir/parser.java", "$parserDir/sym.java")
+
+    classpath = files("$binDir/java-cup-11a.jar")
+    mainClass.set("java_cup.Main")
+    args = listOf("-destdir", parserDir, "-expect", "1", "$parserDir/parser.cup")
+}
+
+tasks.compileJava {
+    dependsOn(generateLexer, generateParser)
 }
 
 sourceSets {
@@ -39,4 +76,26 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.jar {
+    manifest {
+        attributes(
+            "Main-Class" to "net.sourceforge.kleinlisp.Main"
+        )
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+}
+
+spotless {
+    java {
+        targetExclude(
+            "src/main/java/net/sourceforge/kleinlisp/parser/LexicalAnalyzer.java",
+            "src/main/java/net/sourceforge/kleinlisp/parser/parser.java",
+            "src/main/java/net/sourceforge/kleinlisp/parser/sym.java",
+            "src/main/java/net/sourceforge/kleinlisp/java_cup/**"
+        )
+        googleJavaFormat().reflowLongStrings()
+    }
 }

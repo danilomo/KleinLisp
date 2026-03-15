@@ -30,14 +30,14 @@ import net.sourceforge.kleinlisp.Seq;
 import net.sourceforge.kleinlisp.objects.StringObject;
 
 /**
- * A lazy Seq implementation that reads lines from a BufferedReader.
- * Lines are read on demand - calling first() reads the next line,
- * and rest() returns a new ReaderSeq that will continue reading.
+ * A lazy Seq implementation that reads lines from a BufferedReader. Lines are read on demand -
+ * calling first() reads the next line, and rest() returns a new ReaderSeq that will continue
+ * reading.
  *
  * <p>This is similar to Clojure's line-seq function.
  *
- * <p>Note: The reader should be closed after the sequence is consumed.
- * Consider using with-open or similar resource management patterns.
+ * <p>Note: The reader should be closed after the sequence is consumed. Consider using with-open or
+ * similar resource management patterns.
  *
  * @author Danilo Oliveira
  */
@@ -113,17 +113,12 @@ public final class ReaderSeq implements Seq {
     }
   }
 
-  /**
-   * Returns the underlying BufferedReader.
-   * Can be used to close the reader when done.
-   */
+  /** Returns the underlying BufferedReader. Can be used to close the reader when done. */
   public BufferedReader getReader() {
     return reader;
   }
 
-  /**
-   * Closes the underlying reader.
-   */
+  /** Closes the underlying reader. */
   public void close() {
     try {
       reader.close();
@@ -132,9 +127,7 @@ public final class ReaderSeq implements Seq {
     }
   }
 
-  /**
-   * An empty sequence that still holds a reference to the reader for closing.
-   */
+  /** An empty sequence that still holds a reference to the reader for closing. */
   private static final class EmptyReaderSeq implements Seq {
     private final BufferedReader reader;
 

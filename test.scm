@@ -6,4 +6,4 @@
   (display b)
   (bar a b))
 
-(foo 1 'a)
+(foo 1 2)

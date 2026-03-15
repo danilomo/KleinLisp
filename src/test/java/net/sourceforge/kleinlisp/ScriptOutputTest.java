@@ -42,9 +42,7 @@ public class ScriptOutputTest extends BaseTestClass {
 
   private static final String TEST_RESOURCES_PATH = "src/test/resources/script_tests";
 
-  /**
-   * Provides test script names by finding all .scm files that have corresponding .out files.
-   */
+  /** Provides test script names by finding all .scm files that have corresponding .out files. */
   static Stream<String> provideTestScripts() throws IOException {
     Path resourcesDir = Paths.get(TEST_RESOURCES_PATH);
 

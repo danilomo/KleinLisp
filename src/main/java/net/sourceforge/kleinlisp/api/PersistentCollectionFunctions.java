@@ -46,8 +46,8 @@ public class PersistentCollectionFunctions {
   /**
    * Generic get operation. (get coll key) or (get coll key default)
    *
-   * <p>- For p-map: returns value for key, or default/nil - For p-vec: returns element at index,
-   * or default/nil - For p-set: returns the element if present, or default/nil
+   * <p>- For p-map: returns value for key, or default/nil - For p-vec: returns element at index, or
+   * default/nil - For p-set: returns the element if present, or default/nil
    */
   public static LispObject get(LispObject[] params) {
     LispObject coll = params[0];
@@ -87,8 +87,8 @@ public class PersistentCollectionFunctions {
    * ...) - For p-map: associates key with value - For p-vec: sets element at index (index must be
    * valid or equal to length for append)
    *
-   * <p>For association lists (Scheme-style): (assoc key alist) - Searches for key in alist,
-   * returns the pair or #f
+   * <p>For association lists (Scheme-style): (assoc key alist) - Searches for key in alist, returns
+   * the pair or #f
    */
   public static LispObject assoc(LispObject[] params) {
     LispObject first = params[0];

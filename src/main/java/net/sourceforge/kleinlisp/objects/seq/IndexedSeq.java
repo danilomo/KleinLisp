@@ -28,9 +28,8 @@ import net.sourceforge.kleinlisp.Seq;
 import net.sourceforge.kleinlisp.objects.PVectorObject;
 
 /**
- * A Seq implementation that wraps a PVectorObject with a starting index.
- * This provides efficient sequential access to persistent vectors by
- * simply incrementing an index rather than copying data.
+ * A Seq implementation that wraps a PVectorObject with a starting index. This provides efficient
+ * sequential access to persistent vectors by simply incrementing an index rather than copying data.
  *
  * @author Danilo Oliveira
  */
@@ -69,16 +68,12 @@ public final class IndexedSeq implements Seq {
     return index >= vector.length();
   }
 
-  /**
-   * Returns the underlying PVectorObject.
-   */
+  /** Returns the underlying PVectorObject. */
   public PVectorObject getVector() {
     return vector;
   }
 
-  /**
-   * Returns the current index in the vector.
-   */
+  /** Returns the current index in the vector. */
   public int getIndex() {
     return index;
   }

@@ -34,11 +34,9 @@ import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 
 /**
- * Implements 'letrec' for recursive bindings.
- * All bindings are visible to all value expressions, allowing mutual recursion.
- * (letrec ((even? (lambda (n) (if (= n 0) #t (odd? (- n 1)))))
- *          (odd? (lambda (n) (if (= n 0) #f (even? (- n 1))))))
- *   body...)
+ * Implements 'letrec' for recursive bindings. All bindings are visible to all value expressions,
+ * allowing mutual recursion. (letrec ((even? (lambda (n) (if (= n 0) #t (odd? (- n 1))))) (odd?
+ * (lambda (n) (if (= n 0) #f (even? (- n 1)))))) body...)
  *
  * @author danilo
  */

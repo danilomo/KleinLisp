@@ -34,8 +34,8 @@ import net.sourceforge.kleinlisp.objects.ListObject;
 /**
  * Short-circuit OR form.
  *
- * <p>(or expr1 expr2 ...) evaluates expressions left to right. Returns the first true value; if
- * all expressions evaluate to false, returns #f. If no expressions are provided, returns #f.
+ * <p>(or expr1 expr2 ...) evaluates expressions left to right. Returns the first true value; if all
+ * expressions evaluate to false, returns #f. If no expressions are provided, returns #f.
  */
 public class OrForm implements SpecialForm {
 

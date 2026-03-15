@@ -28,9 +28,8 @@ import net.sourceforge.kleinlisp.LispVisitor;
 import net.sourceforge.kleinlisp.Seq;
 
 /**
- * A LispObject wrapper for lazy sequences.
- * This allows lazy sequences (like file line readers) to be first-class Lisp values
- * that can be passed around and used with seq operations.
+ * A LispObject wrapper for lazy sequences. This allows lazy sequences (like file line readers) to
+ * be first-class Lisp values that can be passed around and used with seq operations.
  *
  * @author Danilo Oliveira
  */
@@ -80,9 +79,7 @@ public final class LazySeqObject implements LispObject {
     return "#<" + description + ">";
   }
 
-  /**
-   * Returns the underlying Seq.
-   */
+  /** Returns the underlying Seq. */
   public Seq getSeq() {
     return seq;
   }

@@ -28,13 +28,13 @@ import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.Seq;
 
 /**
- * A Seq implementation that wraps a Java Iterator.
- * This is used for sets and other iterables that don't have indexed access.
- * The iterator is consumed lazily - elements are only fetched when needed.
+ * A Seq implementation that wraps a Java Iterator. This is used for sets and other iterables that
+ * don't have indexed access. The iterator is consumed lazily - elements are only fetched when
+ * needed.
  *
- * <p>Note: Because iterators are stateful and can only be consumed once,
- * calling rest() on an IteratorSeq will cache the first element and then
- * return a new IteratorSeq wrapping the same iterator.
+ * <p>Note: Because iterators are stateful and can only be consumed once, calling rest() on an
+ * IteratorSeq will cache the first element and then return a new IteratorSeq wrapping the same
+ * iterator.
  *
  * @author Danilo Oliveira
  */
@@ -108,9 +108,7 @@ public final class IteratorSeq implements Seq {
     }
   }
 
-  /**
-   * An empty sequence singleton for use when the iterator is exhausted.
-   */
+  /** An empty sequence singleton for use when the iterator is exhausted. */
   private static final class EmptySeq implements Seq {
     @Override
     public LispObject first() {

@@ -147,7 +147,9 @@ public class PersistentMapFunctions {
     return IntObject.valueOf(map.size());
   }
 
-  /** Merges two or more persistent maps. Later maps override earlier ones. (p-map-merge m1 m2 ...) */
+  /**
+   * Merges two or more persistent maps. Later maps override earlier ones. (p-map-merge m1 m2 ...)
+   */
   public static LispObject pMapMerge(LispObject[] params) {
     if (params.length == 0) {
       return PMapObject.EMPTY;
@@ -175,8 +177,8 @@ public class PersistentMapFunctions {
   }
 
   /**
-   * Converts a list of key-value pairs to a persistent map. (list->p-map l) The list should be
-   * (k1 v1 k2 v2 ...) or ((k1 v1) (k2 v2) ...)
+   * Converts a list of key-value pairs to a persistent map. (list->p-map l) The list should be (k1
+   * v1 k2 v2 ...) or ((k1 v1) (k2 v2) ...)
    */
   public static LispObject listToPMap(LispObject[] params) {
     if (params[0] == ListObject.NIL) {

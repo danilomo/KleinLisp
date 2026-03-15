@@ -65,13 +65,14 @@ public class IOFunctions {
   }
 
   /**
-   * Returns a lazy sequence of lines from a file.
-   * (line-seq filename) - opens the file and returns a lazy seq of strings (one per line).
+   * Returns a lazy sequence of lines from a file. (line-seq filename) - opens the file and returns
+   * a lazy seq of strings (one per line).
    *
-   * <p>The sequence is lazy - lines are read only when requested.
-   * The file is automatically closed when the sequence is exhausted.
+   * <p>The sequence is lazy - lines are read only when requested. The file is automatically closed
+   * when the sequence is exhausted.
    *
    * <p>Example:
+   *
    * <pre>
    * (define lines (line-seq "myfile.txt"))
    * (first lines)  ; => first line of file
@@ -107,10 +108,11 @@ public class IOFunctions {
   }
 
   /**
-   * Reads the entire contents of a file as a string.
-   * (slurp filename) - returns the entire file content as a single string.
+   * Reads the entire contents of a file as a string. (slurp filename) - returns the entire file
+   * content as a single string.
    *
    * <p>Example:
+   *
    * <pre>
    * (slurp "myfile.txt")  ; => "file contents..."
    * </pre>

@@ -28,7 +28,6 @@ import java.util.List;
 import net.sourceforge.kleinlisp.LispEnvironment.FunctionRef;
 
 /**
- *
  * @author danilo
  */
 public class LispRuntimeException extends LispException {

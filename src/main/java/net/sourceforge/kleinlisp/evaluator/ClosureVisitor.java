@@ -181,17 +181,13 @@ public class ClosureVisitor extends DefaultVisitor {
       return closureSlotIndices;
     }
 
-    /**
-     * Returns the slot index for a specific closure variable, or -1 if not found.
-     */
+    /** Returns the slot index for a specific closure variable, or -1 if not found. */
     public int getClosureSlotIndex(AtomObject atom) {
       Integer index = closureSlotIndices.get(atom);
       return index != null ? index : -1;
     }
 
-    /**
-     * Returns the number of closure slots needed.
-     */
+    /** Returns the number of closure slots needed. */
     public int getClosureSlotCount() {
       return closureSlotIndices.size();
     }

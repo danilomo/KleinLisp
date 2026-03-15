@@ -34,8 +34,8 @@ import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 
 /**
- * Implements 'let*' where each binding can refer to previous bindings.
- * (let* ((x 1) (y (+ x 1))) body...)
+ * Implements 'let*' where each binding can refer to previous bindings. (let* ((x 1) (y (+ x 1)))
+ * body...)
  *
  * @author danilo
  */

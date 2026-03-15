@@ -26,7 +26,6 @@ package net.sourceforge.kleinlisp.evaluator;
 import net.sourceforge.kleinlisp.LispException;
 
 /**
- *
  * @author danilo
  */
 public class StackOverflowError extends LispException {

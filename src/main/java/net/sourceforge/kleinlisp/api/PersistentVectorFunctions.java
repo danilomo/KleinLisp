@@ -32,8 +32,8 @@ import net.sourceforge.kleinlisp.objects.PVectorObject;
 import org.pcollections.TreePVector;
 
 /**
- * Persistent vector functions for KleinLisp. These functions provide Clojure-like persistent
- * vector operations with structural sharing.
+ * Persistent vector functions for KleinLisp. These functions provide Clojure-like persistent vector
+ * operations with structural sharing.
  */
 public class PersistentVectorFunctions {
 
@@ -59,8 +59,8 @@ public class PersistentVectorFunctions {
   }
 
   /**
-   * Returns a new vector with the element at index replaced. (p-vec-assoc v i val) Does not
-   * modify the original vector.
+   * Returns a new vector with the element at index replaced. (p-vec-assoc v i val) Does not modify
+   * the original vector.
    */
   public static LispObject pVecAssoc(LispObject[] params) {
     if (!(params[0] instanceof PVectorObject)) {

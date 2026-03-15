@@ -136,9 +136,7 @@ public class ParameterArrayPool {
     }
   }
 
-  /**
-   * Acquire an array of the given size. Returns pooled array if available, otherwise allocates.
-   */
+  /** Acquire an array of the given size. Returns pooled array if available, otherwise allocates. */
   public LispObject[] acquire(int size) {
     if (size == 0) return new LispObject[0];
     if (size == 1) return acquire1();

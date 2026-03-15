@@ -38,7 +38,10 @@ import org.pcollections.PSet;
  */
 public class PersistentSetFunctions {
 
-  /** Creates a persistent set from elements. (p-set) creates empty set (p-set e1 e2 ...) creates set with elements */
+  /**
+   * Creates a persistent set from elements. (p-set) creates empty set (p-set e1 e2 ...) creates set
+   * with elements
+   */
   public static LispObject pSet(LispObject[] params) {
     if (params.length == 0) {
       return PSetObject.EMPTY;
@@ -121,7 +124,9 @@ public class PersistentSetFunctions {
     return result;
   }
 
-  /** Returns the difference of two sets (elements in first but not second). (p-set-difference s1 s2) */
+  /**
+   * Returns the difference of two sets (elements in first but not second). (p-set-difference s1 s2)
+   */
   public static LispObject pSetDifference(LispObject[] params) {
     if (!(params[0] instanceof PSetObject)) {
       throw new LispArgumentError("p-set-difference requires a persistent set as first argument");

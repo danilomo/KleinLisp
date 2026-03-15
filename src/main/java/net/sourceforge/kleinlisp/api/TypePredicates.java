@@ -104,7 +104,10 @@ public class TypePredicates {
     return params[0].asFunction() != null ? BooleanObject.TRUE : BooleanObject.FALSE;
   }
 
-  /** Tests if the value is nil (empty list). (null? x) - already exists but included for completeness */
+  /**
+   * Tests if the value is nil (empty list). (null? x) - already exists but included for
+   * completeness
+   */
   public static LispObject isNull(LispObject[] params) {
     LispObject obj = params[0];
     return (obj == null || obj == ListObject.NIL) ? BooleanObject.TRUE : BooleanObject.FALSE;

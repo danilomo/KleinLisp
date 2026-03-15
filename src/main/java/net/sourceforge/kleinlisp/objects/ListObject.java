@@ -145,9 +145,7 @@ public class ListObject implements LispObject, Iterable<LispObject> {
     this.tail = tail;
   }
 
-  /**
-   * Returns true if this is a proper list (ends with NIL).
-   */
+  /** Returns true if this is a proper list (ends with NIL). */
   public boolean isProperList() {
     ListObject pointer = this;
     while (pointer != NIL) {
@@ -160,8 +158,8 @@ public class ListObject implements LispObject, Iterable<LispObject> {
   }
 
   /**
-   * For an improper list (a b . c), returns the final tail element (c).
-   * Returns null if this is a proper list.
+   * For an improper list (a b . c), returns the final tail element (c). Returns null if this is a
+   * proper list.
    */
   public LispObject getImproperTail() {
     ListObject pointer = this;

@@ -499,7 +499,10 @@ public class ListFunctions {
     return list;
   }
 
-  /** Creates a list of integers from start to end-1. (iota count) or (iota count start) or (iota count start step) */
+  /**
+   * Creates a list of integers from start to end-1. (iota count) or (iota count start) or (iota
+   * count start step)
+   */
   public static LispObject iota(LispObject[] params) {
     IntObject countObj = params[0].asInt();
     if (countObj == null || countObj.value < 0) {

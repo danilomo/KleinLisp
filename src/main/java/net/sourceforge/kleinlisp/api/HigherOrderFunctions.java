@@ -37,9 +37,9 @@ import net.sourceforge.kleinlisp.objects.VoidObject;
 public class HigherOrderFunctions {
 
   /**
-   * Applies a procedure to each element of a seqable, returning a list of results.
-   * (map proc coll) - works with lists, vectors, sets, etc.
-   * Also supports multi-collection mapping: (map proc coll1 coll2 ...)
+   * Applies a procedure to each element of a seqable, returning a list of results. (map proc coll)
+   * - works with lists, vectors, sets, etc. Also supports multi-collection mapping: (map proc coll1
+   * coll2 ...)
    */
   public static LispObject map(LispObject[] params) {
     FunctionObject funcObj = params[0].asFunction();
@@ -104,8 +104,7 @@ public class HigherOrderFunctions {
   }
 
   /**
-   * Filters a seqable by a predicate.
-   * (filter pred coll) - works with lists, vectors, sets, etc.
+   * Filters a seqable by a predicate. (filter pred coll) - works with lists, vectors, sets, etc.
    * Returns a list of elements for which pred returns true.
    */
   public static LispObject filter(LispObject[] params) {
@@ -135,9 +134,8 @@ public class HigherOrderFunctions {
   }
 
   /**
-   * Applies a procedure to each element of a seqable for side effects.
-   * (for-each proc coll) - works with lists, vectors, sets, etc.
-   * Returns void.
+   * Applies a procedure to each element of a seqable for side effects. (for-each proc coll) - works
+   * with lists, vectors, sets, etc. Returns void.
    */
   public static LispObject forEach(LispObject[] params) {
     FunctionObject funcObj = params[0].asFunction();
@@ -200,8 +198,7 @@ public class HigherOrderFunctions {
   }
 
   /**
-   * Left fold over a seqable.
-   * (fold-left proc init coll) - works with lists, vectors, sets, etc.
+   * Left fold over a seqable. (fold-left proc init coll) - works with lists, vectors, sets, etc.
    * Applies (proc acc elem) from left to right, starting with init.
    */
   public static LispObject foldLeft(LispObject[] params) {
@@ -229,8 +226,7 @@ public class HigherOrderFunctions {
   }
 
   /**
-   * Right fold over a seqable.
-   * (fold-right proc init coll) - works with lists, vectors, sets, etc.
+   * Right fold over a seqable. (fold-right proc init coll) - works with lists, vectors, sets, etc.
    * Applies (proc elem acc) from right to left.
    */
   public static LispObject foldRight(LispObject[] params) {
@@ -269,7 +265,9 @@ public class HigherOrderFunctions {
     return foldLeft(params);
   }
 
-  /** Applies a procedure with a list of arguments. (apply proc args) or (apply proc arg1 ... args) */
+  /**
+   * Applies a procedure with a list of arguments. (apply proc args) or (apply proc arg1 ... args)
+   */
   public static LispObject apply(LispObject[] params) {
     FunctionObject funcObj = params[0].asFunction();
     if (funcObj == null) {
@@ -367,8 +365,8 @@ public class HigherOrderFunctions {
   }
 
   /**
-   * Tests if any element satisfies a predicate.
-   * (any pred coll) - works with lists, vectors, sets, etc.
+   * Tests if any element satisfies a predicate. (any pred coll) - works with lists, vectors, sets,
+   * etc.
    */
   public static LispObject any(LispObject[] params) {
     FunctionObject funcObj = params[0].asFunction();
@@ -395,8 +393,8 @@ public class HigherOrderFunctions {
   }
 
   /**
-   * Tests if all elements satisfy a predicate.
-   * (all pred coll) or (every pred coll) - works with lists, vectors, sets, etc.
+   * Tests if all elements satisfy a predicate. (all pred coll) or (every pred coll) - works with
+   * lists, vectors, sets, etc.
    */
   public static LispObject all(LispObject[] params) {
     FunctionObject funcObj = params[0].asFunction();
@@ -424,8 +422,8 @@ public class HigherOrderFunctions {
   }
 
   /**
-   * Finds the first element that satisfies a predicate.
-   * (find pred coll) - works with lists, vectors, sets, etc.
+   * Finds the first element that satisfies a predicate. (find pred coll) - works with lists,
+   * vectors, sets, etc.
    */
   public static LispObject find(LispObject[] params) {
     FunctionObject funcObj = params[0].asFunction();
