@@ -23,52 +23,33 @@
  */
 package net.sourceforge.kleinlisp;
 
-import net.sourceforge.kleinlisp.objects.*;
-
 /**
- * @param <T>
- * @author daolivei
+ * A sequence abstraction for KleinLisp, inspired by Clojure's seq.
+ * Provides a uniform way to traverse various collection types including
+ * lists, vectors, sets, and any Java Iterable.
+ *
+ * @author Danilo Oliveira
  */
-public interface LispVisitor<T> {
-  Void NONE = new Void();
+public interface Seq {
 
-  T visit(AtomObject obj);
+  /**
+   * Returns the first element of the sequence.
+   *
+   * @return the first element, or null if the sequence is empty
+   */
+  LispObject first();
 
-  T visit(BooleanObject obj);
+  /**
+   * Returns the rest of the sequence (everything except the first element).
+   *
+   * @return a Seq containing all elements except the first, or an empty Seq
+   */
+  Seq rest();
 
-  T visit(DoubleObject obj);
-
-  T visit(IntObject obj);
-
-  T visit(JavaObject obj);
-
-  T visit(ListObject obj);
-
-  T visit(StringObject obj);
-
-  T visit(FunctionObject obj);
-
-  T visit(ErrorObject obj);
-
-  T visit(VoidObject obj);
-
-  T visit(ComputedLispObject obj);
-
-  T visit(CellObject obj);
-
-  T visit(IdentifierObject obj);
-
-  T visit(VectorObject obj);
-
-  T visit(KeywordObject obj);
-
-  T visit(PVectorObject obj);
-
-  T visit(PMapObject obj);
-
-  T visit(PSetObject obj);
-
-  T visit(LazySeqObject obj);
-
-  class Void {}
+  /**
+   * Returns true if the sequence has no elements.
+   *
+   * @return true if empty, false otherwise
+   */
+  boolean isEmpty();
 }

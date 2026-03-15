@@ -21,54 +21,52 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.sourceforge.kleinlisp;
+package net.sourceforge.kleinlisp.objects.seq;
 
-import net.sourceforge.kleinlisp.objects.*;
+import net.sourceforge.kleinlisp.LispObject;
+import net.sourceforge.kleinlisp.Seq;
+import net.sourceforge.kleinlisp.objects.ListObject;
 
 /**
- * @param <T>
- * @author daolivei
+ * A Seq implementation that wraps a ListObject (cons cell).
+ * This is the most straightforward implementation as lists are already
+ * inherently sequential.
+ *
+ * @author Danilo Oliveira
  */
-public interface LispVisitor<T> {
-  Void NONE = new Void();
+public final class ListSeq implements Seq {
 
-  T visit(AtomObject obj);
+  private final ListObject list;
 
-  T visit(BooleanObject obj);
+  public ListSeq(ListObject list) {
+    this.list = list;
+  }
 
-  T visit(DoubleObject obj);
+  @Override
+  public LispObject first() {
+    if (list == ListObject.NIL) {
+      return null;
+    }
+    return list.car();
+  }
 
-  T visit(IntObject obj);
+  @Override
+  public Seq rest() {
+    if (list == ListObject.NIL) {
+      return this;
+    }
+    return new ListSeq(list.cdr());
+  }
 
-  T visit(JavaObject obj);
+  @Override
+  public boolean isEmpty() {
+    return list == ListObject.NIL;
+  }
 
-  T visit(ListObject obj);
-
-  T visit(StringObject obj);
-
-  T visit(FunctionObject obj);
-
-  T visit(ErrorObject obj);
-
-  T visit(VoidObject obj);
-
-  T visit(ComputedLispObject obj);
-
-  T visit(CellObject obj);
-
-  T visit(IdentifierObject obj);
-
-  T visit(VectorObject obj);
-
-  T visit(KeywordObject obj);
-
-  T visit(PVectorObject obj);
-
-  T visit(PMapObject obj);
-
-  T visit(PSetObject obj);
-
-  T visit(LazySeqObject obj);
-
-  class Void {}
+  /**
+   * Returns the underlying ListObject.
+   */
+  public ListObject getList() {
+    return list;
+  }
 }

@@ -128,4 +128,9 @@ public class DefaultVisitor implements LispVisitor<LispObject> {
   public LispObject visit(PSetObject obj) {
     return obj;
   }
+
+  @Override
+  public LispObject visit(LazySeqObject obj) {
+    return obj;
+  }
 }

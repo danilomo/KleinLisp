@@ -28,6 +28,8 @@ import net.sourceforge.kleinlisp.Function;
 import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.LispVisitor;
+import net.sourceforge.kleinlisp.Seq;
+import net.sourceforge.kleinlisp.objects.seq.IteratorSeq;
 import org.pcollections.HashTreePSet;
 import org.pcollections.PSet;
 
@@ -206,6 +208,14 @@ public final class PSetObject implements LispObject, Function, Iterable<LispObje
   @Override
   public int hashCode() {
     return set.hashCode();
+  }
+
+  @Override
+  public Seq asSeq() {
+    if (set.isEmpty()) {
+      return null;
+    }
+    return new IteratorSeq(iterator());
   }
 
   /**

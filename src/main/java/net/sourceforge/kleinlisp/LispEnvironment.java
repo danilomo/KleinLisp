@@ -37,6 +37,7 @@ import net.sourceforge.kleinlisp.api.PersistentCollectionFunctions;
 import net.sourceforge.kleinlisp.api.PersistentMapFunctions;
 import net.sourceforge.kleinlisp.api.PersistentSetFunctions;
 import net.sourceforge.kleinlisp.api.PersistentVectorFunctions;
+import net.sourceforge.kleinlisp.api.SeqFunctions;
 import net.sourceforge.kleinlisp.api.StringFunctions;
 import net.sourceforge.kleinlisp.api.SymbolFunctions;
 import net.sourceforge.kleinlisp.api.TypePredicates;
@@ -297,6 +298,13 @@ public class LispEnvironment implements Environment {
     registerFunction("every", HigherOrderFunctions::all);
     registerFunction("find", HigherOrderFunctions::find);
 
+    // Sequence functions (polymorphic like Clojure)
+    registerFunction("seq", SeqFunctions::seq);
+    registerFunction("first", SeqFunctions::first);
+    registerFunction("rest", SeqFunctions::rest);
+    registerFunction("next", SeqFunctions::next);
+    registerFunction("seqable?", SeqFunctions::seqable);
+
     // Vector functions
     registerFunction("make-vector", VectorFunctions::makeVector);
     registerFunction("vector", VectorFunctions::vector);
@@ -320,6 +328,8 @@ public class LispEnvironment implements Environment {
     registerFunction("display", IOFunctions::println);
     registerFunction("newline", IOFunctions::newline);
     registerFunction("error", IOFunctions::error);
+    registerFunction("line-seq", IOFunctions::lineSeq);
+    registerFunction("slurp", IOFunctions::slurp);
 
     // Persistent vector functions
     registerFunction("p-vec", PersistentVectorFunctions::pVec);

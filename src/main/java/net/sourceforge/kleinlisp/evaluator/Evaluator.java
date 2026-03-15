@@ -265,4 +265,9 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
   public Supplier<LispObject> visit(PSetObject obj) {
     return () -> obj;
   }
+
+  @Override
+  public Supplier<LispObject> visit(LazySeqObject obj) {
+    return () -> obj;
+  }
 }

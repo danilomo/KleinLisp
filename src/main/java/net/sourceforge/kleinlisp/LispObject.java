@@ -184,4 +184,14 @@ public interface LispObject {
   default boolean error() {
     return false;
   }
+
+  /**
+   * Returns a Seq view of this object if it is seqable (list, vector, set, etc.).
+   * Returns null if the object is not seqable.
+   *
+   * @return a Seq representing the sequential view of this object, or null
+   */
+  default Seq asSeq() {
+    return null;
+  }
 }

@@ -28,6 +28,8 @@ import net.sourceforge.kleinlisp.Function;
 import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.LispVisitor;
+import net.sourceforge.kleinlisp.Seq;
+import net.sourceforge.kleinlisp.objects.seq.IndexedSeq;
 import org.pcollections.PVector;
 import org.pcollections.TreePVector;
 
@@ -196,6 +198,14 @@ public final class PVectorObject implements LispObject, Function, Iterable<LispO
   @Override
   public int hashCode() {
     return vector.hashCode();
+  }
+
+  @Override
+  public Seq asSeq() {
+    if (vector.isEmpty()) {
+      return null;
+    }
+    return new IndexedSeq(this);
   }
 
   /**

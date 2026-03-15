@@ -31,10 +31,12 @@ import java.util.Map;
 import java.util.Optional;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.LispVisitor;
+import net.sourceforge.kleinlisp.Seq;
 import net.sourceforge.kleinlisp.functional.Tuple2;
 import net.sourceforge.kleinlisp.functional.Tuple3;
 import net.sourceforge.kleinlisp.functional.Tuple4;
 import net.sourceforge.kleinlisp.functional.Tuple5;
+import net.sourceforge.kleinlisp.objects.seq.ListSeq;
 
 /**
  * @author daolivei
@@ -211,6 +213,14 @@ public class ListObject implements LispObject, Iterable<LispObject> {
   @Override
   public ListObject asList() {
     return this;
+  }
+
+  @Override
+  public Seq asSeq() {
+    if (this == NIL) {
+      return null;
+    }
+    return new ListSeq(this);
   }
 
   @Override

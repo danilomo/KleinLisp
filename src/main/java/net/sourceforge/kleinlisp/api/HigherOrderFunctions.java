@@ -28,6 +28,7 @@ import java.util.List;
 import net.sourceforge.kleinlisp.Function;
 import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispObject;
+import net.sourceforge.kleinlisp.Seq;
 import net.sourceforge.kleinlisp.objects.FunctionObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 import net.sourceforge.kleinlisp.objects.VoidObject;
@@ -36,8 +37,9 @@ import net.sourceforge.kleinlisp.objects.VoidObject;
 public class HigherOrderFunctions {
 
   /**
-   * Applies a procedure to each element of a list, returning a list of results. (map proc list)
-   * Also supports multi-list mapping: (map proc list1 list2 ...)
+   * Applies a procedure to each element of a seqable, returning a list of results.
+   * (map proc coll) - works with lists, vectors, sets, etc.
+   * Also supports multi-collection mapping: (map proc coll1 coll2 ...)
    */
   public static LispObject map(LispObject[] params) {
     FunctionObject funcObj = params[0].asFunction();
@@ -46,53 +48,54 @@ public class HigherOrderFunctions {
     }
     Function func = funcObj.function();
 
-    // Single list case (most common)
+    // Single collection case (most common)
     if (params.length == 2) {
-      if (params[1] == ListObject.NIL) {
-        return ListObject.NIL;
+      if (!SeqFunctions.isSeqable(params[1])) {
+        throw new LispArgumentError("map requires a seqable as second argument");
       }
-      ListObject list = params[1].asList();
-      if (list == null) {
-        throw new LispArgumentError("map requires a list as second argument");
+      Seq seq = SeqFunctions.getSeq(params[1]);
+      if (seq == null) {
+        return ListObject.NIL; // Empty collection
       }
 
       List<LispObject> results = new ArrayList<>();
-      for (LispObject elem : list) {
-        results.add(func.evaluate(new LispObject[] {elem}));
+      while (!seq.isEmpty()) {
+        results.add(func.evaluate(new LispObject[] {seq.first()}));
+        seq = seq.rest();
       }
       return ListObject.fromList(results.toArray(new LispObject[0]));
     }
 
-    // Multi-list case
-    List<ListObject> lists = new ArrayList<>();
+    // Multi-collection case
+    List<Seq> seqs = new ArrayList<>();
     for (int i = 1; i < params.length; i++) {
-      if (params[i] == ListObject.NIL) {
-        return ListObject.NIL;
+      if (!SeqFunctions.isSeqable(params[i])) {
+        throw new LispArgumentError("map requires seqables as arguments");
       }
-      ListObject list = params[i].asList();
-      if (list == null) {
-        throw new LispArgumentError("map requires lists as arguments");
+      Seq seq = SeqFunctions.getSeq(params[i]);
+      if (seq == null) {
+        return ListObject.NIL; // Empty collection
       }
-      lists.add(list);
+      seqs.add(seq);
     }
 
     List<LispObject> results = new ArrayList<>();
     while (true) {
-      // Check if any list is exhausted
+      // Check if any seq is exhausted
       boolean anyEmpty = false;
-      for (ListObject list : lists) {
-        if (list == ListObject.NIL) {
+      for (Seq seq : seqs) {
+        if (seq.isEmpty()) {
           anyEmpty = true;
           break;
         }
       }
       if (anyEmpty) break;
 
-      // Gather elements from each list
-      LispObject[] args = new LispObject[lists.size()];
-      for (int i = 0; i < lists.size(); i++) {
-        args[i] = lists.get(i).car();
-        lists.set(i, lists.get(i).cdr());
+      // Gather elements from each seq
+      LispObject[] args = new LispObject[seqs.size()];
+      for (int i = 0; i < seqs.size(); i++) {
+        args[i] = seqs.get(i).first();
+        seqs.set(i, seqs.get(i).rest());
       }
 
       results.add(func.evaluate(args));
@@ -101,8 +104,9 @@ public class HigherOrderFunctions {
   }
 
   /**
-   * Filters a list by a predicate. (filter pred list) Returns a list of elements for which pred
-   * returns true.
+   * Filters a seqable by a predicate.
+   * (filter pred coll) - works with lists, vectors, sets, etc.
+   * Returns a list of elements for which pred returns true.
    */
   public static LispObject filter(LispObject[] params) {
     FunctionObject funcObj = params[0].asFunction();
@@ -111,26 +115,29 @@ public class HigherOrderFunctions {
     }
     Function pred = funcObj.function();
 
-    if (params[1] == ListObject.NIL) {
-      return ListObject.NIL;
+    if (!SeqFunctions.isSeqable(params[1])) {
+      throw new LispArgumentError("filter requires a seqable as second argument");
     }
-    ListObject list = params[1].asList();
-    if (list == null) {
-      throw new LispArgumentError("filter requires a list as second argument");
+    Seq seq = SeqFunctions.getSeq(params[1]);
+    if (seq == null) {
+      return ListObject.NIL; // Empty collection
     }
 
     List<LispObject> results = new ArrayList<>();
-    for (LispObject elem : list) {
+    while (!seq.isEmpty()) {
+      LispObject elem = seq.first();
       if (pred.evaluate(new LispObject[] {elem}).truthiness()) {
         results.add(elem);
       }
+      seq = seq.rest();
     }
     return ListObject.fromList(results.toArray(new LispObject[0]));
   }
 
   /**
-   * Applies a procedure to each element of a list for side effects. (for-each proc list) Returns
-   * void.
+   * Applies a procedure to each element of a seqable for side effects.
+   * (for-each proc coll) - works with lists, vectors, sets, etc.
+   * Returns void.
    */
   public static LispObject forEach(LispObject[] params) {
     FunctionObject funcObj = params[0].asFunction();
@@ -139,51 +146,52 @@ public class HigherOrderFunctions {
     }
     Function func = funcObj.function();
 
-    // Single list case (most common)
+    // Single collection case (most common)
     if (params.length == 2) {
-      if (params[1] == ListObject.NIL) {
-        return VoidObject.VOID;
+      if (!SeqFunctions.isSeqable(params[1])) {
+        throw new LispArgumentError("for-each requires a seqable as second argument");
       }
-      ListObject list = params[1].asList();
-      if (list == null) {
-        throw new LispArgumentError("for-each requires a list as second argument");
+      Seq seq = SeqFunctions.getSeq(params[1]);
+      if (seq == null) {
+        return VoidObject.VOID; // Empty collection
       }
 
-      for (LispObject elem : list) {
-        func.evaluate(new LispObject[] {elem});
+      while (!seq.isEmpty()) {
+        func.evaluate(new LispObject[] {seq.first()});
+        seq = seq.rest();
       }
       return VoidObject.VOID;
     }
 
-    // Multi-list case
-    List<ListObject> lists = new ArrayList<>();
+    // Multi-collection case
+    List<Seq> seqs = new ArrayList<>();
     for (int i = 1; i < params.length; i++) {
-      if (params[i] == ListObject.NIL) {
-        return VoidObject.VOID;
+      if (!SeqFunctions.isSeqable(params[i])) {
+        throw new LispArgumentError("for-each requires seqables as arguments");
       }
-      ListObject list = params[i].asList();
-      if (list == null) {
-        throw new LispArgumentError("for-each requires lists as arguments");
+      Seq seq = SeqFunctions.getSeq(params[i]);
+      if (seq == null) {
+        return VoidObject.VOID; // Empty collection
       }
-      lists.add(list);
+      seqs.add(seq);
     }
 
     while (true) {
-      // Check if any list is exhausted
+      // Check if any seq is exhausted
       boolean anyEmpty = false;
-      for (ListObject list : lists) {
-        if (list == ListObject.NIL) {
+      for (Seq seq : seqs) {
+        if (seq.isEmpty()) {
           anyEmpty = true;
           break;
         }
       }
       if (anyEmpty) break;
 
-      // Gather elements from each list
-      LispObject[] args = new LispObject[lists.size()];
-      for (int i = 0; i < lists.size(); i++) {
-        args[i] = lists.get(i).car();
-        lists.set(i, lists.get(i).cdr());
+      // Gather elements from each seq
+      LispObject[] args = new LispObject[seqs.size()];
+      for (int i = 0; i < seqs.size(); i++) {
+        args[i] = seqs.get(i).first();
+        seqs.set(i, seqs.get(i).rest());
       }
 
       func.evaluate(args);
@@ -192,8 +200,9 @@ public class HigherOrderFunctions {
   }
 
   /**
-   * Left fold over a list. (fold-left proc init list) Applies (proc acc elem) from left to right,
-   * starting with init.
+   * Left fold over a seqable.
+   * (fold-left proc init coll) - works with lists, vectors, sets, etc.
+   * Applies (proc acc elem) from left to right, starting with init.
    */
   public static LispObject foldLeft(LispObject[] params) {
     FunctionObject funcObj = params[0].asFunction();
@@ -204,23 +213,25 @@ public class HigherOrderFunctions {
 
     LispObject acc = params[1];
 
-    if (params[2] == ListObject.NIL) {
-      return acc;
+    if (!SeqFunctions.isSeqable(params[2])) {
+      throw new LispArgumentError("fold-left requires a seqable as third argument");
     }
-    ListObject list = params[2].asList();
-    if (list == null) {
-      throw new LispArgumentError("fold-left requires a list as third argument");
+    Seq seq = SeqFunctions.getSeq(params[2]);
+    if (seq == null) {
+      return acc; // Empty collection
     }
 
-    for (LispObject elem : list) {
-      acc = func.evaluate(new LispObject[] {acc, elem});
+    while (!seq.isEmpty()) {
+      acc = func.evaluate(new LispObject[] {acc, seq.first()});
+      seq = seq.rest();
     }
     return acc;
   }
 
   /**
-   * Right fold over a list. (fold-right proc init list) Applies (proc elem acc) from right to
-   * left.
+   * Right fold over a seqable.
+   * (fold-right proc init coll) - works with lists, vectors, sets, etc.
+   * Applies (proc elem acc) from right to left.
    */
   public static LispObject foldRight(LispObject[] params) {
     FunctionObject funcObj = params[0].asFunction();
@@ -231,18 +242,19 @@ public class HigherOrderFunctions {
 
     LispObject init = params[1];
 
-    if (params[2] == ListObject.NIL) {
-      return init;
+    if (!SeqFunctions.isSeqable(params[2])) {
+      throw new LispArgumentError("fold-right requires a seqable as third argument");
     }
-    ListObject list = params[2].asList();
-    if (list == null) {
-      throw new LispArgumentError("fold-right requires a list as third argument");
+    Seq seq = SeqFunctions.getSeq(params[2]);
+    if (seq == null) {
+      return init; // Empty collection
     }
 
     // Convert to array for right-to-left traversal
     List<LispObject> elements = new ArrayList<>();
-    for (LispObject elem : list) {
-      elements.add(elem);
+    while (!seq.isEmpty()) {
+      elements.add(seq.first());
+      seq = seq.rest();
     }
 
     LispObject acc = init;
@@ -354,7 +366,10 @@ public class HigherOrderFunctions {
         });
   }
 
-  /** Tests if any element satisfies a predicate. (any pred list) */
+  /**
+   * Tests if any element satisfies a predicate.
+   * (any pred coll) - works with lists, vectors, sets, etc.
+   */
   public static LispObject any(LispObject[] params) {
     FunctionObject funcObj = params[0].asFunction();
     if (funcObj == null) {
@@ -362,23 +377,27 @@ public class HigherOrderFunctions {
     }
     Function pred = funcObj.function();
 
-    if (params[1] == ListObject.NIL) {
-      return net.sourceforge.kleinlisp.objects.BooleanObject.FALSE;
+    if (!SeqFunctions.isSeqable(params[1])) {
+      throw new LispArgumentError("any requires a seqable as second argument");
     }
-    ListObject list = params[1].asList();
-    if (list == null) {
-      throw new LispArgumentError("any requires a list as second argument");
+    Seq seq = SeqFunctions.getSeq(params[1]);
+    if (seq == null) {
+      return net.sourceforge.kleinlisp.objects.BooleanObject.FALSE; // Empty collection
     }
 
-    for (LispObject elem : list) {
-      if (pred.evaluate(new LispObject[] {elem}).truthiness()) {
+    while (!seq.isEmpty()) {
+      if (pred.evaluate(new LispObject[] {seq.first()}).truthiness()) {
         return net.sourceforge.kleinlisp.objects.BooleanObject.TRUE;
       }
+      seq = seq.rest();
     }
     return net.sourceforge.kleinlisp.objects.BooleanObject.FALSE;
   }
 
-  /** Tests if all elements satisfy a predicate. (all pred list) or (every pred list) */
+  /**
+   * Tests if all elements satisfy a predicate.
+   * (all pred coll) or (every pred coll) - works with lists, vectors, sets, etc.
+   */
   public static LispObject all(LispObject[] params) {
     FunctionObject funcObj = params[0].asFunction();
     if (funcObj == null) {
@@ -386,23 +405,28 @@ public class HigherOrderFunctions {
     }
     Function pred = funcObj.function();
 
-    if (params[1] == ListObject.NIL) {
-      return net.sourceforge.kleinlisp.objects.BooleanObject.TRUE;
+    if (!SeqFunctions.isSeqable(params[1])) {
+      throw new LispArgumentError("all requires a seqable as second argument");
     }
-    ListObject list = params[1].asList();
-    if (list == null) {
-      throw new LispArgumentError("all requires a list as second argument");
+    Seq seq = SeqFunctions.getSeq(params[1]);
+    if (seq == null) {
+      return net.sourceforge.kleinlisp.objects.BooleanObject
+          .TRUE; // Empty collection, vacuously true
     }
 
-    for (LispObject elem : list) {
-      if (!pred.evaluate(new LispObject[] {elem}).truthiness()) {
+    while (!seq.isEmpty()) {
+      if (!pred.evaluate(new LispObject[] {seq.first()}).truthiness()) {
         return net.sourceforge.kleinlisp.objects.BooleanObject.FALSE;
       }
+      seq = seq.rest();
     }
     return net.sourceforge.kleinlisp.objects.BooleanObject.TRUE;
   }
 
-  /** Finds the first element that satisfies a predicate. (find pred list) */
+  /**
+   * Finds the first element that satisfies a predicate.
+   * (find pred coll) - works with lists, vectors, sets, etc.
+   */
   public static LispObject find(LispObject[] params) {
     FunctionObject funcObj = params[0].asFunction();
     if (funcObj == null) {
@@ -410,18 +434,20 @@ public class HigherOrderFunctions {
     }
     Function pred = funcObj.function();
 
-    if (params[1] == ListObject.NIL) {
-      return net.sourceforge.kleinlisp.objects.BooleanObject.FALSE;
+    if (!SeqFunctions.isSeqable(params[1])) {
+      throw new LispArgumentError("find requires a seqable as second argument");
     }
-    ListObject list = params[1].asList();
-    if (list == null) {
-      throw new LispArgumentError("find requires a list as second argument");
+    Seq seq = SeqFunctions.getSeq(params[1]);
+    if (seq == null) {
+      return net.sourceforge.kleinlisp.objects.BooleanObject.FALSE; // Empty collection
     }
 
-    for (LispObject elem : list) {
+    while (!seq.isEmpty()) {
+      LispObject elem = seq.first();
       if (pred.evaluate(new LispObject[] {elem}).truthiness()) {
         return elem;
       }
+      seq = seq.rest();
     }
     return net.sourceforge.kleinlisp.objects.BooleanObject.FALSE;
   }
