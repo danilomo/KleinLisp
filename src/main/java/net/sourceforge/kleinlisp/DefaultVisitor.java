@@ -113,4 +113,19 @@ public class DefaultVisitor implements LispVisitor<LispObject> {
   public LispObject visit(KeywordObject obj) {
     return obj;
   }
+
+  @Override
+  public LispObject visit(PVectorObject obj) {
+    return obj;
+  }
+
+  @Override
+  public LispObject visit(PMapObject obj) {
+    return obj;
+  }
+
+  @Override
+  public LispObject visit(PSetObject obj) {
+    return obj;
+  }
 }

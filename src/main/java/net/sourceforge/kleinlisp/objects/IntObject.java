@@ -106,4 +106,17 @@ public final class IntObject implements NumericObject {
   public boolean error() {
     return false;
   }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (!(obj instanceof IntObject)) return false;
+    IntObject that = (IntObject) obj;
+    return value == that.value;
+  }
+
+  @Override
+  public int hashCode() {
+    return Integer.hashCode(value);
+  }
 }

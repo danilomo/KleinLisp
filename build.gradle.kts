@@ -31,6 +31,7 @@ repositories {
 }
 
 dependencies {
+    implementation("org.pcollections:pcollections:4.0.2")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.1")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.1")
     testImplementation("org.hamcrest:hamcrest-core:1.3")

@@ -70,4 +70,17 @@ public final class StringObject implements LispObject {
   public boolean error() {
     return false;
   }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (!(obj instanceof StringObject)) return false;
+    StringObject that = (StringObject) obj;
+    return value.equals(that.value);
+  }
+
+  @Override
+  public int hashCode() {
+    return value.hashCode();
+  }
 }

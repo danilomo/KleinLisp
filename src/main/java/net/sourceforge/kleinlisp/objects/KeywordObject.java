@@ -23,16 +23,21 @@
  */
 package net.sourceforge.kleinlisp.objects;
 
+import net.sourceforge.kleinlisp.Function;
+import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.LispVisitor;
 
 /**
- * Represents a keyword in Scheme syntax (#:keyword).
- * Keywords are self-evaluating symbols used primarily for named arguments.
+ * Represents a keyword in Scheme syntax (#:keyword). Keywords are self-evaluating symbols used
+ * primarily for named arguments.
+ *
+ * <p>Keywords are callable as functions for map lookup: (#:key my-map) returns (p-map-get my-map
+ * #:key) (#:key my-map default) returns (p-map-get my-map #:key default)
  *
  * @author Danilo Oliveira
  */
-public final class KeywordObject implements LispObject {
+public final class KeywordObject implements LispObject, Function {
 
   private final String name;
 
@@ -80,5 +85,41 @@ public final class KeywordObject implements LispObject {
   @Override
   public int hashCode() {
     return name.hashCode();
+  }
+
+  /**
+   * Makes keywords callable for map lookup. (#:key my-map) returns value for :key in map (#:key
+   * my-map default) returns value or default
+   */
+  @Override
+  public LispObject evaluate(LispObject[] parameters) {
+    if (parameters.length == 0) {
+      throw new LispArgumentError("Keyword lookup requires a map argument");
+    }
+    LispObject coll = parameters[0];
+    LispObject defaultVal = parameters.length > 1 ? parameters[1] : ListObject.NIL;
+
+    if (coll instanceof PMapObject) {
+      return ((PMapObject) coll).getOrDefault(this, defaultVal);
+    }
+
+    // Also work with regular association lists
+    ListObject list = coll.asList();
+    if (list != null && list != ListObject.NIL) {
+      // Try as alist: ((key val) (key val) ...)
+      for (LispObject entry : list) {
+        ListObject pair = entry.asList();
+        if (pair != null && pair.car().equals(this)) {
+          return pair.cdr().car();
+        }
+      }
+    }
+
+    return defaultVal;
+  }
+
+  @Override
+  public FunctionObject asFunction() {
+    return new FunctionObject(this);
   }
 }

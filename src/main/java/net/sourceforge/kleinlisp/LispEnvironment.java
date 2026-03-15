@@ -33,6 +33,10 @@ import net.sourceforge.kleinlisp.api.HigherOrderFunctions;
 import net.sourceforge.kleinlisp.api.IOFunctions;
 import net.sourceforge.kleinlisp.api.ListFunctions;
 import net.sourceforge.kleinlisp.api.MathFunctions;
+import net.sourceforge.kleinlisp.api.PersistentCollectionFunctions;
+import net.sourceforge.kleinlisp.api.PersistentMapFunctions;
+import net.sourceforge.kleinlisp.api.PersistentSetFunctions;
+import net.sourceforge.kleinlisp.api.PersistentVectorFunctions;
 import net.sourceforge.kleinlisp.api.StringFunctions;
 import net.sourceforge.kleinlisp.api.SymbolFunctions;
 import net.sourceforge.kleinlisp.api.TypePredicates;
@@ -316,6 +320,64 @@ public class LispEnvironment implements Environment {
     registerFunction("display", IOFunctions::println);
     registerFunction("newline", IOFunctions::newline);
     registerFunction("error", IOFunctions::error);
+
+    // Persistent vector functions
+    registerFunction("p-vec", PersistentVectorFunctions::pVec);
+    registerFunction("p-vec-ref", PersistentVectorFunctions::pVecRef);
+    registerFunction("p-vec-assoc", PersistentVectorFunctions::pVecAssoc);
+    registerFunction("p-vec-conj", PersistentVectorFunctions::pVecConj);
+    registerFunction("p-vec-pop", PersistentVectorFunctions::pVecPop);
+    registerFunction("p-vec-peek", PersistentVectorFunctions::pVecPeek);
+    registerFunction("p-vec-length", PersistentVectorFunctions::pVecLength);
+    registerFunction("p-vec-subvec", PersistentVectorFunctions::pVecSubvec);
+    registerFunction("p-vec->list", PersistentVectorFunctions::pVecToList);
+    registerFunction("list->p-vec", PersistentVectorFunctions::listToPVec);
+    registerFunction("p-vec-concat", PersistentVectorFunctions::pVecConcat);
+    registerFunction("p-vec?", PersistentVectorFunctions::isPVec);
+    registerFunction("p-vec-empty?", PersistentVectorFunctions::isPVecEmpty);
+
+    // Persistent map functions
+    registerFunction("p-map", PersistentMapFunctions::pMap);
+    registerFunction("p-map-get", PersistentMapFunctions::pMapGet);
+    registerFunction("p-map-assoc", PersistentMapFunctions::pMapAssoc);
+    registerFunction("p-map-dissoc", PersistentMapFunctions::pMapDissoc);
+    registerFunction("p-map-contains?", PersistentMapFunctions::pMapContains);
+    registerFunction("p-map-keys", PersistentMapFunctions::pMapKeys);
+    registerFunction("p-map-vals", PersistentMapFunctions::pMapVals);
+    registerFunction("p-map-entries", PersistentMapFunctions::pMapEntries);
+    registerFunction("p-map-size", PersistentMapFunctions::pMapSize);
+    registerFunction("p-map-merge", PersistentMapFunctions::pMapMerge);
+    registerFunction("p-map->list", PersistentMapFunctions::pMapToList);
+    registerFunction("list->p-map", PersistentMapFunctions::listToPMap);
+    registerFunction("p-map?", PersistentMapFunctions::isPMap);
+    registerFunction("p-map-empty?", PersistentMapFunctions::isPMapEmpty);
+
+    // Generic persistent collection functions (polymorphic like Clojure)
+    registerFunction("get", PersistentCollectionFunctions::get);
+    registerFunction("assoc", PersistentCollectionFunctions::assoc);
+    registerFunction("conj", PersistentCollectionFunctions::conj);
+    registerFunction("dissoc", PersistentCollectionFunctions::dissoc);
+    registerFunction("contains?", PersistentCollectionFunctions::contains);
+    registerFunction("count", PersistentCollectionFunctions::count);
+    registerFunction("empty?", PersistentCollectionFunctions::isEmpty);
+    registerFunction("into", PersistentCollectionFunctions::into);
+    registerFunction("persistent?", PersistentCollectionFunctions::isPersistent);
+
+    // Persistent set functions
+    registerFunction("p-set", PersistentSetFunctions::pSet);
+    registerFunction("p-set-contains?", PersistentSetFunctions::pSetContains);
+    registerFunction("p-set-conj", PersistentSetFunctions::pSetConj);
+    registerFunction("p-set-disj", PersistentSetFunctions::pSetDisj);
+    registerFunction("p-set-union", PersistentSetFunctions::pSetUnion);
+    registerFunction("p-set-intersection", PersistentSetFunctions::pSetIntersection);
+    registerFunction("p-set-difference", PersistentSetFunctions::pSetDifference);
+    registerFunction("p-set-subset?", PersistentSetFunctions::pSetSubset);
+    registerFunction("p-set-superset?", PersistentSetFunctions::pSetSuperset);
+    registerFunction("p-set-size", PersistentSetFunctions::pSetSize);
+    registerFunction("p-set->list", PersistentSetFunctions::pSetToList);
+    registerFunction("list->p-set", PersistentSetFunctions::listToPSet);
+    registerFunction("p-set?", PersistentSetFunctions::isPSet);
+    registerFunction("p-set-empty?", PersistentSetFunctions::isPSetEmpty);
   }
 
   private void initMacroTable() {

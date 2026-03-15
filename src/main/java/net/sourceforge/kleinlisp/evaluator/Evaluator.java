@@ -250,4 +250,19 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
   public Supplier<LispObject> visit(KeywordObject obj) {
     return () -> obj;
   }
+
+  @Override
+  public Supplier<LispObject> visit(PVectorObject obj) {
+    return () -> obj;
+  }
+
+  @Override
+  public Supplier<LispObject> visit(PMapObject obj) {
+    return () -> obj;
+  }
+
+  @Override
+  public Supplier<LispObject> visit(PSetObject obj) {
+    return () -> obj;
+  }
 }

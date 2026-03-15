@@ -62,5 +62,11 @@ public interface LispVisitor<T> {
 
   T visit(KeywordObject obj);
 
+  T visit(PVectorObject obj);
+
+  T visit(PMapObject obj);
+
+  T visit(PSetObject obj);
+
   class Void {}
 }

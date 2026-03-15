@@ -215,7 +215,7 @@ public class ListObject implements LispObject, Iterable<LispObject> {
 
   @Override
   public boolean truthiness() {
-    return true;
+    return this != NIL;
   }
 
   @Override
