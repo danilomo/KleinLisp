@@ -16,6 +16,7 @@ import java.util.Stack;
  * @version last updated: 7/3/96
  * @see java_cup.runtime.lr_parser
  */
+@SuppressWarnings({"deprecation", "removal", "unchecked", "rawtypes"})
 public class virtual_parse_stack {
   /*-----------------------------------------------------------*/
   /*--- Constructor(s) ----------------------------------------*/

@@ -103,6 +103,7 @@ import java.util.Stack;
  * @see java_cup.runtime.Symbol
  * @see java_cup.runtime.virtual_parse_stack
  */
+@SuppressWarnings({"deprecation", "removal", "unchecked", "rawtypes"})
 public abstract class lr_parser {
   /*-----------------------------------------------------------*/
   /*--- Constructor(s) ----------------------------------------*/

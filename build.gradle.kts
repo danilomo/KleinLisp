@@ -21,7 +21,7 @@ val binDir = "bin"
 
 val generateLexer by tasks.registering(JavaExec::class) {
     description = "Generate lexer from JFlex specification"
-    group = "build"
+    group = "generation"
 
     inputs.file("$parserDir/lexical.flex")
     outputs.file("$parserDir/LexicalAnalyzer.java")
@@ -33,7 +33,7 @@ val generateLexer by tasks.registering(JavaExec::class) {
 
 val generateParser by tasks.registering(JavaExec::class) {
     description = "Generate parser from CUP specification"
-    group = "build"
+    group = "generation"
 
     inputs.file("$parserDir/parser.cup")
     outputs.files("$parserDir/parser.java", "$parserDir/sym.java")
@@ -41,10 +41,6 @@ val generateParser by tasks.registering(JavaExec::class) {
     classpath = files("$binDir/java-cup-11a.jar")
     mainClass.set("java_cup.Main")
     args = listOf("-destdir", parserDir, "-expect", "1", "$parserDir/parser.cup")
-}
-
-tasks.compileJava {
-    dependsOn(generateLexer, generateParser)
 }
 
 sourceSets {
