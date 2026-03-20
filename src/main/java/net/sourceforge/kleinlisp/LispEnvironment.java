@@ -509,4 +509,27 @@ public class LispEnvironment implements Environment {
   public void popLetEnv() {
     letEnvStack.remove(letEnvStack.size() - 1);
   }
+
+  /**
+   * Returns true if we're currently inside a let environment. Used by CachedFunctionSupplier to
+   * skip let environment checks when not needed (optimization).
+   */
+  public boolean hasLetEnv() {
+    return !letEnvStack.isEmpty();
+  }
+
+  /**
+   * Look up a value in the let environment stack only (not global). Returns null if not found in
+   * any let environment. Used by CachedFunctionSupplier to bypass caching for let-bound variables.
+   */
+  public LispObject lookupInLetEnvStack(AtomObject atom) {
+    for (int i = letEnvStack.size() - 1; i >= 0; i--) {
+      Environment letEnv = letEnvStack.get(i);
+      LispObject value = letEnv.lookupValueOrNull(atom);
+      if (value != null) {
+        return value;
+      }
+    }
+    return null;
+  }
 }

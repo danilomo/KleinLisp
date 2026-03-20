@@ -53,6 +53,17 @@ public class CachedFunctionSupplier implements Supplier<LispObject> {
 
   @Override
   public LispObject get() {
+    // Fast path: if no let environments active, use cached global lookup directly
+    // This avoids the O(n) let stack iteration for the common case
+    if (environment.hasLetEnv()) {
+      // Check let environment stack - these are dynamic and should NOT be cached
+      LispObject letValue = environment.lookupInLetEnvStack(atom);
+      if (letValue != null) {
+        return letValue;
+      }
+    }
+
+    // For global variables, use inline caching
     long currentVersion = environment.getDefinitionVersion(atom);
 
     if (cachedValue != null && currentVersion == cacheVersion) {
