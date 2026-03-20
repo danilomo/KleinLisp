@@ -520,7 +520,7 @@ public class LispEnvironment implements Environment {
 
   /**
    * Look up a value in the let environment stack only (not global). Returns null if not found in
-   * any let environment. Used by CachedFunctionSupplier to bypass caching for let-bound variables.
+   * any let environment. Used by let-bound ComputedLispObjects to get fresh values.
    */
   public LispObject lookupInLetEnvStack(AtomObject atom) {
     for (int i = letEnvStack.size() - 1; i >= 0; i--) {
@@ -531,5 +531,21 @@ public class LispEnvironment implements Environment {
       }
     }
     return null;
+  }
+
+  /**
+   * Set a value in the let environment stack. Finds the environment containing the binding and
+   * updates it. Used by set! on let-bound variables.
+   */
+  public void setInLetEnvStack(AtomObject atom, LispObject value) {
+    for (int i = letEnvStack.size() - 1; i >= 0; i--) {
+      Environment letEnv = letEnvStack.get(i);
+      if (letEnv.lookupValueOrNull(atom) != null) {
+        letEnv.set(atom, value);
+        return;
+      }
+    }
+    // If not found in let stack, fall back to global (shouldn't normally happen)
+    set(atom, value);
   }
 }
