@@ -31,6 +31,7 @@ import net.sourceforge.kleinlisp.api.BooleanFunctions;
 import net.sourceforge.kleinlisp.api.EqualityFunctions;
 import net.sourceforge.kleinlisp.api.HigherOrderFunctions;
 import net.sourceforge.kleinlisp.api.IOFunctions;
+import net.sourceforge.kleinlisp.api.JsonFunctions;
 import net.sourceforge.kleinlisp.api.ListFunctions;
 import net.sourceforge.kleinlisp.api.MathFunctions;
 import net.sourceforge.kleinlisp.api.PersistentCollectionFunctions;
@@ -330,6 +331,9 @@ public class LispEnvironment implements Environment {
     registerFunction("error", IOFunctions::error);
     registerFunction("line-seq", IOFunctions::lineSeq);
     registerFunction("slurp", IOFunctions::slurp);
+
+    // JSON functions
+    registerFunction("json-parse", JsonFunctions::jsonParse);
 
     // Persistent vector functions
     registerFunction("p-vec", PersistentVectorFunctions::pVec);
