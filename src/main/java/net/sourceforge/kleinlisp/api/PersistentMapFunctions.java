@@ -26,6 +26,7 @@ package net.sourceforge.kleinlisp.api;
 import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.BooleanObject;
+import net.sourceforge.kleinlisp.objects.CellObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 import net.sourceforge.kleinlisp.objects.PMapObject;
@@ -58,10 +59,11 @@ public class PersistentMapFunctions {
 
   /** Returns the value associated with the key, or NIL if not found. (p-map-get m key) */
   public static LispObject pMapGet(LispObject[] params) {
-    if (!(params[0] instanceof PMapObject)) {
-      throw new LispArgumentError("p-map-get requires a persistent map as first argument");
+    PMapObject map = asPMap(params[0]);
+    if (map == null) {
+      throw new LispArgumentError(
+          "p-map-get requires a persistent map as first argument, got: " + describeType(params[0]));
     }
-    PMapObject map = (PMapObject) params[0];
     if (params.length > 2) {
       // Optional default value
       return map.getOrDefault(params[1], params[2]);
@@ -74,15 +76,17 @@ public class PersistentMapFunctions {
    * (p-map-assoc m k1 v1 k2 v2 ...) Does not modify the original map.
    */
   public static LispObject pMapAssoc(LispObject[] params) {
-    if (!(params[0] instanceof PMapObject)) {
-      throw new LispArgumentError("p-map-assoc requires a persistent map as first argument");
+    PMapObject map = asPMap(params[0]);
+    if (map == null) {
+      throw new LispArgumentError(
+          "p-map-assoc requires a persistent map as first argument, got: "
+              + describeType(params[0]));
     }
     if ((params.length - 1) % 2 != 0) {
       throw new LispArgumentError("p-map-assoc requires key-value pairs");
     }
-    PMapObject map = (PMapObject) params[0];
     for (int i = 1; i < params.length; i += 2) {
-      map = map.assoc(params[i], params[i + 1]);
+      map = map.assoc(unwrap(params[i]), unwrap(params[i + 1]));
     }
     return map;
   }
@@ -92,58 +96,66 @@ public class PersistentMapFunctions {
    * not modify the original map.
    */
   public static LispObject pMapDissoc(LispObject[] params) {
-    if (!(params[0] instanceof PMapObject)) {
-      throw new LispArgumentError("p-map-dissoc requires a persistent map as first argument");
+    PMapObject map = asPMap(params[0]);
+    if (map == null) {
+      throw new LispArgumentError(
+          "p-map-dissoc requires a persistent map as first argument, got: "
+              + describeType(params[0]));
     }
-    PMapObject map = (PMapObject) params[0];
     for (int i = 1; i < params.length; i++) {
-      map = map.dissoc(params[i]);
+      map = map.dissoc(unwrap(params[i]));
     }
     return map;
   }
 
   /** Returns true if the map contains the key. (p-map-contains? m key) */
   public static LispObject pMapContains(LispObject[] params) {
-    if (!(params[0] instanceof PMapObject)) {
-      throw new LispArgumentError("p-map-contains? requires a persistent map as first argument");
+    PMapObject map = asPMap(params[0]);
+    if (map == null) {
+      throw new LispArgumentError(
+          "p-map-contains? requires a persistent map as first argument, got: "
+              + describeType(params[0]));
     }
-    PMapObject map = (PMapObject) params[0];
-    return map.containsKey(params[1]) ? BooleanObject.TRUE : BooleanObject.FALSE;
+    return map.containsKey(unwrap(params[1])) ? BooleanObject.TRUE : BooleanObject.FALSE;
   }
 
   /** Returns a list of all keys. (p-map-keys m) */
   public static LispObject pMapKeys(LispObject[] params) {
-    if (!(params[0] instanceof PMapObject)) {
-      throw new LispArgumentError("p-map-keys requires a persistent map");
+    PMapObject map = asPMap(params[0]);
+    if (map == null) {
+      throw new LispArgumentError(
+          "p-map-keys requires a persistent map, got: " + describeType(params[0]));
     }
-    PMapObject map = (PMapObject) params[0];
     return map.keys();
   }
 
   /** Returns a list of all values. (p-map-vals m) */
   public static LispObject pMapVals(LispObject[] params) {
-    if (!(params[0] instanceof PMapObject)) {
-      throw new LispArgumentError("p-map-vals requires a persistent map");
+    PMapObject map = asPMap(params[0]);
+    if (map == null) {
+      throw new LispArgumentError(
+          "p-map-vals requires a persistent map, got: " + describeType(params[0]));
     }
-    PMapObject map = (PMapObject) params[0];
     return map.vals();
   }
 
   /** Returns a list of [key value] pairs. (p-map-entries m) */
   public static LispObject pMapEntries(LispObject[] params) {
-    if (!(params[0] instanceof PMapObject)) {
-      throw new LispArgumentError("p-map-entries requires a persistent map");
+    PMapObject map = asPMap(params[0]);
+    if (map == null) {
+      throw new LispArgumentError(
+          "p-map-entries requires a persistent map, got: " + describeType(params[0]));
     }
-    PMapObject map = (PMapObject) params[0];
     return map.entries();
   }
 
   /** Returns the number of entries in the map. (p-map-size m) */
   public static LispObject pMapSize(LispObject[] params) {
-    if (!(params[0] instanceof PMapObject)) {
-      throw new LispArgumentError("p-map-size requires a persistent map");
+    PMapObject map = asPMap(params[0]);
+    if (map == null) {
+      throw new LispArgumentError(
+          "p-map-size requires a persistent map, got: " + describeType(params[0]));
     }
-    PMapObject map = (PMapObject) params[0];
     return IntObject.valueOf(map.size());
   }
 
@@ -154,25 +166,32 @@ public class PersistentMapFunctions {
     if (params.length == 0) {
       return PMapObject.EMPTY;
     }
-    if (!(params[0] instanceof PMapObject)) {
-      throw new LispArgumentError("p-map-merge requires persistent maps");
+    PMapObject result = asPMap(params[0]);
+    if (result == null) {
+      throw new LispArgumentError(
+          "p-map-merge requires persistent maps, got: " + describeType(params[0]));
     }
-    PMapObject result = (PMapObject) params[0];
     for (int i = 1; i < params.length; i++) {
-      if (!(params[i] instanceof PMapObject)) {
-        throw new LispArgumentError("p-map-merge requires persistent maps");
+      PMapObject other = asPMap(params[i]);
+      if (other == null) {
+        throw new LispArgumentError(
+            "p-map-merge requires persistent maps, argument "
+                + (i + 1)
+                + " is: "
+                + describeType(params[i]));
       }
-      result = result.merge((PMapObject) params[i]);
+      result = result.merge(other);
     }
     return result;
   }
 
   /** Converts a persistent map to a flat list of alternating keys and values. (p-map->list m) */
   public static LispObject pMapToList(LispObject[] params) {
-    if (!(params[0] instanceof PMapObject)) {
-      throw new LispArgumentError("p-map->list requires a persistent map");
+    PMapObject map = asPMap(params[0]);
+    if (map == null) {
+      throw new LispArgumentError(
+          "p-map->list requires a persistent map, got: " + describeType(params[0]));
     }
-    PMapObject map = (PMapObject) params[0];
     return map.toList();
   }
 
@@ -221,15 +240,82 @@ public class PersistentMapFunctions {
 
   /** Tests if the value is a persistent map. (p-map? x) */
   public static LispObject isPMap(LispObject[] params) {
-    return (params[0] instanceof PMapObject) ? BooleanObject.TRUE : BooleanObject.FALSE;
+    return (asPMap(params[0]) != null) ? BooleanObject.TRUE : BooleanObject.FALSE;
   }
 
   /** Tests if the persistent map is empty. (p-map-empty? m) */
   public static LispObject isPMapEmpty(LispObject[] params) {
-    if (!(params[0] instanceof PMapObject)) {
-      throw new LispArgumentError("p-map-empty? requires a persistent map");
+    PMapObject map = asPMap(params[0]);
+    if (map == null) {
+      throw new LispArgumentError(
+          "p-map-empty? requires a persistent map, got: " + describeType(params[0]));
     }
-    PMapObject map = (PMapObject) params[0];
     return map.isEmpty() ? BooleanObject.TRUE : BooleanObject.FALSE;
+  }
+
+  /**
+   * Unwraps a LispObject if it's a CellObject. CellObjects are used to wrap values in closures and
+   * need to be unwrapped before type checks.
+   */
+  private static LispObject unwrap(LispObject obj) {
+    if (obj instanceof CellObject) {
+      return ((CellObject) obj).get();
+    }
+    return obj;
+  }
+
+  /**
+   * Unwraps and casts to PMapObject, or returns null if not a PMapObject. Handles CellObject
+   * wrapping.
+   */
+  private static PMapObject asPMap(LispObject obj) {
+    LispObject unwrapped = unwrap(obj);
+    if (unwrapped instanceof PMapObject) {
+      return (PMapObject) unwrapped;
+    }
+    return null;
+  }
+
+  /** Returns a human-readable description of a LispObject's type for error messages. */
+  private static String describeType(LispObject obj) {
+    // Unwrap CellObjects for better error messages
+    obj = unwrap(obj);
+    if (obj == null) {
+      return "null";
+    }
+    if (obj == ListObject.NIL) {
+      return "'() (empty list)";
+    }
+    if (obj instanceof PMapObject) {
+      return "persistent map";
+    }
+    if (obj instanceof net.sourceforge.kleinlisp.objects.PSetObject) {
+      return "persistent set";
+    }
+    if (obj instanceof net.sourceforge.kleinlisp.objects.PVectorObject) {
+      return "persistent vector";
+    }
+    if (obj.asList() != null) {
+      return "list";
+    }
+    if (obj.asInt() != null) {
+      return "integer (" + obj.asInt().value + ")";
+    }
+    if (obj.asDouble() != null) {
+      return "number (" + obj.asDouble().value + ")";
+    }
+    if (obj.asString() != null) {
+      return "string (\"" + obj.asString().value() + "\")";
+    }
+    if (obj.asAtom() != null) {
+      return "symbol (" + obj.asAtom() + ")";
+    }
+    if (obj instanceof net.sourceforge.kleinlisp.objects.BooleanObject) {
+      return obj.truthiness() ? "#t (true)" : "#f (false)";
+    }
+    if (obj.asFunction() != null) {
+      return "function";
+    }
+    return obj.getClass().getSimpleName();
   }
 }

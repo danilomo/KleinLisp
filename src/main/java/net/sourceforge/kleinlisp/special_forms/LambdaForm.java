@@ -150,13 +150,33 @@ public class LambdaForm implements SpecialForm {
         return null;
       }
 
-      int capturedCount = closureInfo.size();
+      // Filter out let-bound closure variables - they'll be captured when inner lambdas are created
+      Set<AtomObject> letBoundClosureVars = meta.getLetBoundClosureVars();
 
-      // Use inline environments for 1-2 captured variables
-      if (capturedCount == 1) {
-        Map.Entry<AtomObject, Integer> entry = closureInfo.entrySet().iterator().next();
+      // Count non-let-bound variables
+      int capturedCount = 0;
+      for (AtomObject id : closureInfo.keySet()) {
+        if (!letBoundClosureVars.contains(id)) {
+          capturedCount++;
+        }
+      }
+
+      if (capturedCount == 0) {
+        return null;
+      }
+
+      // Build environment with only non-let-bound variables
+      // Use MapEnvironment for simplicity (can optimize later if needed)
+      MapEnvironment captured = new MapEnvironment();
+
+      for (Map.Entry<AtomObject, Integer> entry : closureInfo.entrySet()) {
         AtomObject id = entry.getKey();
         int parIndex = entry.getValue();
+
+        // Skip let-bound closure variables
+        if (letBoundClosureVars.contains(id)) {
+          continue;
+        }
 
         LispObject value;
         if (parIndex >= 0) {
@@ -168,70 +188,38 @@ public class LambdaForm implements SpecialForm {
           int regularParamCount = -(parIndex + 2);
           value = buildRestList(parameters, regularParamCount);
         } else {
-          value = env.lookupValue(id);
+          value = lookupClosureValue(id);
         }
 
-        return new InlineEnvironment1(id, value);
+        captured.set(id, value);
       }
 
-      if (capturedCount == 2) {
-        Iterator<Map.Entry<AtomObject, Integer>> it = closureInfo.entrySet().iterator();
+      return captured;
+    }
 
-        Map.Entry<AtomObject, Integer> e1 = it.next();
-        AtomObject id1 = e1.getKey();
-        int parIndex1 = e1.getValue();
-        LispObject value1;
-        if (parIndex1 >= 0) {
-          CellObject cell = new CellObject();
-          cell.set(parameters[parIndex1]);
-          value1 = cell;
-        } else if (parIndex1 < -1) {
-          int regularParamCount = -(parIndex1 + 2);
-          value1 = buildRestList(parameters, regularParamCount);
-        } else {
-          value1 = env.lookupValue(id1);
-        }
-
-        Map.Entry<AtomObject, Integer> e2 = it.next();
-        AtomObject id2 = e2.getKey();
-        int parIndex2 = e2.getValue();
-        LispObject value2;
-        if (parIndex2 >= 0) {
-          CellObject cell = new CellObject();
-          cell.set(parameters[parIndex2]);
-          value2 = cell;
-        } else if (parIndex2 < -1) {
-          int regularParamCount = -(parIndex2 + 2);
-          value2 = buildRestList(parameters, regularParamCount);
-        } else {
-          value2 = env.lookupValue(id2);
-        }
-
-        return new InlineEnvironment2(id1, value1, id2, value2);
+    /**
+     * Look up a closure variable value from all available scopes. First checks the let environment
+     * stack (for let-bound variables), then falls back to the parent closure environment. Values
+     * from let bindings are wrapped in CellObject to ensure proper capture since the let
+     * environment will be popped after the let form finishes.
+     */
+    private LispObject lookupClosureValue(AtomObject id) {
+      // First check the let environment stack (for let-bound variables)
+      LispObject letValue = environment.lookupInLetEnvStack(id);
+      if (letValue != null) {
+        // Wrap in CellObject to capture the value (let env will be popped later)
+        CellObject cell = new CellObject();
+        cell.set(letValue);
+        return cell;
       }
 
-      // Use IndexedEnvironment for 3+ captured variables - O(1) slot access
-      Map<AtomObject, Integer> slotIndices = meta.getClosureSlotIndices();
-      LispObject[] slots = new LispObject[slotIndices.size()];
-
-      for (Map.Entry<AtomObject, Integer> entry : slotIndices.entrySet()) {
-        AtomObject id = entry.getKey();
-        int slotIndex = entry.getValue();
-        int parIndex = closureInfo.get(id);
-
-        if (parIndex >= 0) {
-          CellObject cell = new CellObject();
-          cell.set(parameters[parIndex]);
-          slots[slotIndex] = cell;
-        } else if (parIndex < -1) {
-          int regularParamCount = -(parIndex + 2);
-          slots[slotIndex] = buildRestList(parameters, regularParamCount);
-        } else {
-          slots[slotIndex] = env.lookupValue(id);
-        }
+      // Fall back to parent closure environment
+      if (env != null) {
+        return env.lookupValue(id);
       }
 
-      return new IndexedEnvironment(slots, slotIndices, null);
+      // Fall back to global environment
+      return environment.lookupValue(id);
     }
 
     private LispObject buildRestList(LispObject[] parameters, int startIndex) {
@@ -283,6 +271,18 @@ public class LambdaForm implements SpecialForm {
         env = environment.stackTop().getEnv();
       }
 
+      // Capture let-bound variables at lambda creation time.
+      // These variables are stored in the let environment stack which will be popped
+      // after the let form finishes, so we need to capture their values now.
+      Environment letCapturedEnv = captureLetBoundVariables(fromClosure);
+      if (letCapturedEnv != null) {
+        if (env == null) {
+          env = letCapturedEnv;
+        } else {
+          env = new CompositeEnvironment(letCapturedEnv, env);
+        }
+      }
+
       LambdaFunction function = new LambdaFunction(functionSupplier, meta, env);
       FunctionObject functionObj = new FunctionObject(function);
 
@@ -290,6 +290,36 @@ public class LambdaForm implements SpecialForm {
 
       return functionObj;
     };
+  }
+
+  /**
+   * Captures let-bound variables that are referenced in closures. This is called at lambda creation
+   * time to ensure that let-bound values are captured before the let environment is popped.
+   *
+   * @param closureVars The set of variables that may be captured from closure
+   * @return An environment containing the captured let-bound variables, or null if none
+   */
+  private Environment captureLetBoundVariables(Set<AtomObject> closureVars) {
+    if (!environment.hasLetEnv()) {
+      return null;
+    }
+
+    MapEnvironment captured = null;
+
+    for (AtomObject var : closureVars) {
+      LispObject value = environment.lookupInLetEnvStack(var);
+      if (value != null) {
+        if (captured == null) {
+          captured = new MapEnvironment();
+        }
+        // Wrap in CellObject to ensure proper closure semantics
+        CellObject cell = new CellObject();
+        cell.set(value);
+        captured.set(var, cell);
+      }
+    }
+
+    return captured;
   }
 
   private ListObject transformBodySymbols(
@@ -350,7 +380,59 @@ public class LambdaForm implements SpecialForm {
               return obj;
             }
 
+            // Handle let forms specially - don't transform binding names
+            if (head.specialForm() == SpecialFormEnum.LET) {
+              return visitLetForm(obj);
+            }
+
             return super.visit(obj);
+          }
+
+          /**
+           * Visit a let form, transforming binding values and body but not binding names.
+           */
+          private LispObject visitLetForm(ListObject obj) {
+            // let form: (let ((var1 val1) (var2 val2) ...) body...)
+            ListObject list = obj.cdr();
+            LispObject bindingsObj = list.car();
+            ListObject body = list.cdr();
+
+            // Transform binding values (but not names)
+            List<LispObject> newBindings = new ArrayList<>();
+            if (bindingsObj.asList() != null) {
+              for (LispObject binding : bindingsObj.asList()) {
+                ListObject tuple = binding.asList();
+                if (tuple != null && tuple.length() >= 2) {
+                  LispObject name = tuple.car();  // Keep name as-is
+                  LispObject valueExpr = tuple.cdr().car();
+                  LispObject newValueExpr = valueExpr.accept(this);
+
+                  // Rebuild binding tuple with original name
+                  newBindings.add(new ListObject(name, new ListObject(newValueExpr, ListObject.NIL)));
+                }
+              }
+            }
+
+            // Transform body
+            List<LispObject> newBody = new ArrayList<>();
+            for (LispObject expr : body) {
+              newBody.add(expr.accept(this));
+            }
+
+            // Rebuild bindings list
+            ListObject newBindingsList = ListObject.NIL;
+            for (int i = newBindings.size() - 1; i >= 0; i--) {
+              newBindingsList = new ListObject(newBindings.get(i), newBindingsList);
+            }
+
+            // Rebuild body list
+            ListObject newBodyList = ListObject.NIL;
+            for (int i = newBody.size() - 1; i >= 0; i--) {
+              newBodyList = new ListObject(newBody.get(i), newBodyList);
+            }
+
+            // Rebuild let form
+            return new ListObject(obj.car(), new ListObject(newBindingsList, newBodyList));
           }
 
           private LispObject getParameterObj(int i) {
@@ -390,11 +472,32 @@ public class LambdaForm implements SpecialForm {
           private LispObject getValueFromClosure(AtomObject id) {
             Supplier<LispObject> getter =
                 () -> {
-                  return environment.stackTop().getEnv().lookupValue(id);
+                  // First check the let environment stack (for let-bound variables)
+                  LispObject letValue = environment.lookupInLetEnvStack(id);
+                  if (letValue != null) {
+                    return letValue;
+                  }
+                  // Fall back to closure environment
+                  Environment env = environment.stackTop().getEnv();
+                  if (env != null) {
+                    return env.lookupValue(id);
+                  }
+                  // Fall back to global
+                  return environment.lookupValue(id);
                 };
             Consumer<LispObject> setter =
                 (obj) -> {
-                  environment.stackTop().getEnv().lookupValue(id).set(obj);
+                  // First check the let environment stack
+                  LispObject letValue = environment.lookupInLetEnvStack(id);
+                  if (letValue != null) {
+                    environment.setInLetEnvStack(id, obj);
+                    return;
+                  }
+                  // Fall back to closure environment
+                  Environment env = environment.stackTop().getEnv();
+                  if (env != null) {
+                    env.lookupValue(id).set(obj);
+                  }
                 };
             return new ComputedLispObject(getter, setter);
           }

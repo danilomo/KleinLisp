@@ -337,4 +337,37 @@ public class PersistentMapTest extends BaseTestClass {
     String result = lisp.evaluate("(p-map #:a 1)").toString();
     assertTrue(result.startsWith("{") && result.endsWith("}"));
   }
+
+  // ========== Seq Support ==========
+
+  @Test
+  public void testPMapAsSeqReturnsEntries() {
+    // asSeq should return entries as [key value] pairs
+    lisp.evaluate("(define m (p-map \"a\" 1 \"b\" 2))");
+    lisp.evaluate("(define entries (map (lambda (e) e) m))");
+    assertEquals(2, lisp.evaluate("(length entries)").asInt().value);
+  }
+
+  @Test
+  public void testEmptyPMapAsSeqReturnsEmpty() {
+    lisp.evaluate("(define m (p-map))");
+    lisp.evaluate("(define entries (map (lambda (e) e) m))");
+    assertTrue(lisp.evaluate("(null? entries)").truthiness());
+  }
+
+  @Test
+  public void testPMapWorksWithFilter() {
+    // Filter entries where value > 1
+    lisp.evaluate("(define m (p-map \"a\" 1 \"b\" 2 \"c\" 3))");
+    lisp.evaluate("(define filtered (filter (lambda (e) (> (cadr e) 1)) m))");
+    assertEquals(2, lisp.evaluate("(length filtered)").asInt().value);
+  }
+
+  @Test
+  public void testPMapWorksWithFoldLeft() {
+    // Sum all values in the map
+    lisp.evaluate("(define m (p-map \"a\" 1 \"b\" 2 \"c\" 3))");
+    int sum = lisp.evaluate("(fold-left (lambda (acc e) (+ acc (cadr e))) 0 m)").asInt().value;
+    assertEquals(6, sum);
+  }
 }

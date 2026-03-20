@@ -26,6 +26,7 @@ package net.sourceforge.kleinlisp.objects;
 import java.util.Optional;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.LispVisitor;
+import net.sourceforge.kleinlisp.Seq;
 
 /**
  * @author danilo
@@ -72,6 +73,26 @@ public class CellObject implements LispObject {
   @Override
   public FunctionObject asFunction() {
     return object.asFunction();
+  }
+
+  @Override
+  public StringObject asString() {
+    return object.asString();
+  }
+
+  @Override
+  public IdentifierObject asIdentifier() {
+    return object.asIdentifier();
+  }
+
+  @Override
+  public KeywordObject asKeyword() {
+    return object.asKeyword();
+  }
+
+  @Override
+  public Seq asSeq() {
+    return object.asSeq();
   }
 
   @Override

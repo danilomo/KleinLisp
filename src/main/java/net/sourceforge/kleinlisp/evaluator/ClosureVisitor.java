@@ -106,6 +106,8 @@ public class ClosureVisitor extends DefaultVisitor {
       closureSlotIndices.put(currentFunction.restParameter, slotIndex++);
     }
 
+    Set<AtomObject> letBoundClosureVars = new HashSet<>();
+
     for (AtomObject param : symbols) {
       if (closureInfo.containsKey(param)) {
         continue;
@@ -113,10 +115,16 @@ public class ClosureVisitor extends DefaultVisitor {
 
       closureInfo.put(param, -1);
       closureSlotIndices.put(param, slotIndex++);
+
+      // Track if this is a let-bound variable in this function
+      if (currentFunction.letBoundVars.contains(param)) {
+        letBoundClosureVars.add(param);
+      }
     }
 
     currentFunction.closureInfo = closureInfo;
     currentFunction.closureSlotIndices = closureSlotIndices;
+    currentFunction.letBoundClosureVars = letBoundClosureVars;
 
     for (LambdaMeta func : currentFunction.children) {
       collectClosureInfo(func);
@@ -135,6 +143,13 @@ public class ClosureVisitor extends DefaultVisitor {
 
     // Closure slot indices for O(1) indexed access
     private Map<AtomObject, Integer> closureSlotIndices = Collections.emptyMap();
+
+    // Variables bound by let forms within this function (not closure variables for this function)
+    Set<AtomObject> letBoundVars = new HashSet<>();
+
+    // Variables in closureInfo that are let-bound (need special handling - captured at inner
+    // lambda creation time, not at outer function entry time)
+    private Set<AtomObject> letBoundClosureVars = Collections.emptySet();
 
     public LambdaMeta(List<AtomObject> parameters) {
       this.parameters = parameters;
@@ -192,6 +207,16 @@ public class ClosureVisitor extends DefaultVisitor {
       return closureSlotIndices.size();
     }
 
+    /** Returns the set of closure variables that are let-bound in this function. */
+    public Set<AtomObject> getLetBoundClosureVars() {
+      return letBoundClosureVars;
+    }
+
+    /** Returns true if the given atom is a let-bound closure variable. */
+    public boolean isLetBoundClosureVar(AtomObject atom) {
+      return letBoundClosureVars.contains(atom);
+    }
+
     @Override
     public String toString() {
       StringBuilder sb = new StringBuilder();
@@ -222,6 +247,11 @@ public class ClosureVisitor extends DefaultVisitor {
 
     if (head == null) {
       return super.visit(obj);
+    }
+
+    // Handle let forms - add bindings to definedSymbols
+    if (head.specialForm() == SpecialFormEnum.LET) {
+      return visitLetForm(obj);
     }
 
     if (head.specialForm() != SpecialFormEnum.LAMBDA) {
@@ -286,6 +316,11 @@ public class ClosureVisitor extends DefaultVisitor {
       return obj;
     }
 
+    // Don't add let-bound variables of this function to symbols - they're local, not closures
+    if (currentFunction.letBoundVars.contains(obj)) {
+      return obj;
+    }
+
     if (obj.specialForm() == SpecialFormEnum.NONE) {
       currentFunction.symbols.add(obj);
     }
@@ -302,5 +337,72 @@ public class ClosureVisitor extends DefaultVisitor {
     }
 
     return result;
+  }
+
+  /**
+   * Handle let forms by adding bound variables to definedSymbols. This ensures that let-bound
+   * variables are tracked as closure variables when captured by nested lambdas. The method properly
+   * rebuilds the AST so that nested lambdas get their LambdaMeta set.
+   *
+   * <p>Important: Let-bound variables should only be considered closure variables for nested
+   * lambdas, not for the containing function. We track this using letBoundInCurrentFunction.
+   */
+  private LispObject visitLetForm(ListObject obj) {
+    // let form: (let ((var1 val1) (var2 val2) ...) body...)
+    ListObject list = obj.cdr();
+    LispObject bindingsObj = list.car();
+    ListObject body = list.cdr();
+
+    // First, visit the binding value expressions (they shouldn't see the bound variables yet)
+    // and collect the bound variable names
+    List<AtomObject> boundVars = new ArrayList<>();
+    List<LispObject> newBindings = new ArrayList<>();
+
+    if (bindingsObj.asList() != null) {
+      for (LispObject binding : bindingsObj.asList()) {
+        ListObject tuple = binding.asList();
+        if (tuple != null && tuple.length() >= 2) {
+          AtomObject name = tuple.car().asAtom();
+          LispObject valueExpr = tuple.cdr().car();
+
+          // Visit the value expression before adding the variable to scope
+          LispObject newValueExpr = valueExpr.accept(this);
+
+          if (name != null) {
+            boundVars.add(name);
+          }
+
+          // Rebuild the binding tuple
+          newBindings.add(new ListObject(tuple.car(), new ListObject(newValueExpr, ListObject.NIL)));
+        }
+      }
+    }
+
+    // Add bound variables to definedSymbols (so nested lambdas can capture them)
+    // Also track them in the current function's let-bound set
+    for (AtomObject var : boundVars) {
+      definedSymbols.add(var);
+      currentFunction.letBoundVars.add(var);
+    }
+
+    // Visit the body with the bound variables in scope and rebuild it
+    List<LispObject> newBody = new ArrayList<>();
+    for (LispObject expr : body) {
+      newBody.add(expr.accept(this));
+    }
+
+    // Rebuild the let form: (let bindings-list body...)
+    ListObject newBindingsList = ListObject.NIL;
+    for (int i = newBindings.size() - 1; i >= 0; i--) {
+      newBindingsList = new ListObject(newBindings.get(i), newBindingsList);
+    }
+
+    ListObject newBodyList = ListObject.NIL;
+    for (int i = newBody.size() - 1; i >= 0; i--) {
+      newBodyList = new ListObject(newBody.get(i), newBodyList);
+    }
+
+    // Result: (let new-bindings-list new-body...)
+    return new ListObject(obj.car(), new ListObject(newBindingsList, newBodyList));
   }
 }

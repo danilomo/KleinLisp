@@ -26,6 +26,7 @@ package net.sourceforge.kleinlisp.api;
 import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.BooleanObject;
+import net.sourceforge.kleinlisp.objects.CellObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 import net.sourceforge.kleinlisp.objects.PSetObject;
@@ -51,11 +52,11 @@ public class PersistentSetFunctions {
 
   /** Returns true if the set contains the element. (p-set-contains? s elem) */
   public static LispObject pSetContains(LispObject[] params) {
-    if (!(params[0] instanceof PSetObject)) {
+    PSetObject set = asPSet(params[0]);
+    if (set == null) {
       throw new LispArgumentError("p-set-contains? requires a persistent set as first argument");
     }
-    PSetObject set = (PSetObject) params[0];
-    return set.contains(params[1]) ? BooleanObject.TRUE : BooleanObject.FALSE;
+    return set.contains(unwrap(params[1])) ? BooleanObject.TRUE : BooleanObject.FALSE;
   }
 
   /**
@@ -63,12 +64,12 @@ public class PersistentSetFunctions {
    * not modify the original set.
    */
   public static LispObject pSetConj(LispObject[] params) {
-    if (!(params[0] instanceof PSetObject)) {
+    PSetObject set = asPSet(params[0]);
+    if (set == null) {
       throw new LispArgumentError("p-set-conj requires a persistent set as first argument");
     }
-    PSetObject set = (PSetObject) params[0];
     for (int i = 1; i < params.length; i++) {
-      set = set.conj(params[i]);
+      set = set.conj(unwrap(params[i]));
     }
     return set;
   }
@@ -78,12 +79,12 @@ public class PersistentSetFunctions {
    * Does not modify the original set.
    */
   public static LispObject pSetDisj(LispObject[] params) {
-    if (!(params[0] instanceof PSetObject)) {
+    PSetObject set = asPSet(params[0]);
+    if (set == null) {
       throw new LispArgumentError("p-set-disj requires a persistent set as first argument");
     }
-    PSetObject set = (PSetObject) params[0];
     for (int i = 1; i < params.length; i++) {
-      set = set.disj(params[i]);
+      set = set.disj(unwrap(params[i]));
     }
     return set;
   }
@@ -93,15 +94,16 @@ public class PersistentSetFunctions {
     if (params.length == 0) {
       return PSetObject.EMPTY;
     }
-    if (!(params[0] instanceof PSetObject)) {
+    PSetObject result = asPSet(params[0]);
+    if (result == null) {
       throw new LispArgumentError("p-set-union requires persistent sets");
     }
-    PSetObject result = (PSetObject) params[0];
     for (int i = 1; i < params.length; i++) {
-      if (!(params[i] instanceof PSetObject)) {
+      PSetObject other = asPSet(params[i]);
+      if (other == null) {
         throw new LispArgumentError("p-set-union requires persistent sets");
       }
-      result = result.union((PSetObject) params[i]);
+      result = result.union(other);
     }
     return result;
   }
@@ -111,15 +113,16 @@ public class PersistentSetFunctions {
     if (params.length == 0) {
       return PSetObject.EMPTY;
     }
-    if (!(params[0] instanceof PSetObject)) {
+    PSetObject result = asPSet(params[0]);
+    if (result == null) {
       throw new LispArgumentError("p-set-intersection requires persistent sets");
     }
-    PSetObject result = (PSetObject) params[0];
     for (int i = 1; i < params.length; i++) {
-      if (!(params[i] instanceof PSetObject)) {
+      PSetObject other = asPSet(params[i]);
+      if (other == null) {
         throw new LispArgumentError("p-set-intersection requires persistent sets");
       }
-      result = result.intersection((PSetObject) params[i]);
+      result = result.intersection(other);
     }
     return result;
   }
@@ -128,58 +131,58 @@ public class PersistentSetFunctions {
    * Returns the difference of two sets (elements in first but not second). (p-set-difference s1 s2)
    */
   public static LispObject pSetDifference(LispObject[] params) {
-    if (!(params[0] instanceof PSetObject)) {
+    PSetObject set1 = asPSet(params[0]);
+    if (set1 == null) {
       throw new LispArgumentError("p-set-difference requires a persistent set as first argument");
     }
-    if (!(params[1] instanceof PSetObject)) {
+    PSetObject set2 = asPSet(params[1]);
+    if (set2 == null) {
       throw new LispArgumentError("p-set-difference requires a persistent set as second argument");
     }
-    PSetObject set1 = (PSetObject) params[0];
-    PSetObject set2 = (PSetObject) params[1];
     return set1.difference(set2);
   }
 
   /** Returns true if s1 is a subset of s2. (p-set-subset? s1 s2) */
   public static LispObject pSetSubset(LispObject[] params) {
-    if (!(params[0] instanceof PSetObject)) {
+    PSetObject set1 = asPSet(params[0]);
+    if (set1 == null) {
       throw new LispArgumentError("p-set-subset? requires a persistent set as first argument");
     }
-    if (!(params[1] instanceof PSetObject)) {
+    PSetObject set2 = asPSet(params[1]);
+    if (set2 == null) {
       throw new LispArgumentError("p-set-subset? requires a persistent set as second argument");
     }
-    PSetObject set1 = (PSetObject) params[0];
-    PSetObject set2 = (PSetObject) params[1];
     return set1.isSubset(set2) ? BooleanObject.TRUE : BooleanObject.FALSE;
   }
 
   /** Returns true if s1 is a superset of s2. (p-set-superset? s1 s2) */
   public static LispObject pSetSuperset(LispObject[] params) {
-    if (!(params[0] instanceof PSetObject)) {
+    PSetObject set1 = asPSet(params[0]);
+    if (set1 == null) {
       throw new LispArgumentError("p-set-superset? requires a persistent set as first argument");
     }
-    if (!(params[1] instanceof PSetObject)) {
+    PSetObject set2 = asPSet(params[1]);
+    if (set2 == null) {
       throw new LispArgumentError("p-set-superset? requires a persistent set as second argument");
     }
-    PSetObject set1 = (PSetObject) params[0];
-    PSetObject set2 = (PSetObject) params[1];
     return set1.isSuperset(set2) ? BooleanObject.TRUE : BooleanObject.FALSE;
   }
 
   /** Returns the number of elements in the set. (p-set-size s) */
   public static LispObject pSetSize(LispObject[] params) {
-    if (!(params[0] instanceof PSetObject)) {
+    PSetObject set = asPSet(params[0]);
+    if (set == null) {
       throw new LispArgumentError("p-set-size requires a persistent set");
     }
-    PSetObject set = (PSetObject) params[0];
     return IntObject.valueOf(set.size());
   }
 
   /** Converts a persistent set to a list. (p-set->list s) */
   public static LispObject pSetToList(LispObject[] params) {
-    if (!(params[0] instanceof PSetObject)) {
+    PSetObject set = asPSet(params[0]);
+    if (set == null) {
       throw new LispArgumentError("p-set->list requires a persistent set");
     }
-    PSetObject set = (PSetObject) params[0];
     return set.toList();
   }
 
@@ -201,15 +204,32 @@ public class PersistentSetFunctions {
 
   /** Tests if the value is a persistent set. (p-set? x) */
   public static LispObject isPSet(LispObject[] params) {
-    return (params[0] instanceof PSetObject) ? BooleanObject.TRUE : BooleanObject.FALSE;
+    return (asPSet(params[0]) != null) ? BooleanObject.TRUE : BooleanObject.FALSE;
   }
 
   /** Tests if the persistent set is empty. (p-set-empty? s) */
   public static LispObject isPSetEmpty(LispObject[] params) {
-    if (!(params[0] instanceof PSetObject)) {
+    PSetObject set = asPSet(params[0]);
+    if (set == null) {
       throw new LispArgumentError("p-set-empty? requires a persistent set");
     }
-    PSetObject set = (PSetObject) params[0];
     return set.isEmpty() ? BooleanObject.TRUE : BooleanObject.FALSE;
+  }
+
+  /** Unwraps a LispObject if it's a CellObject. */
+  private static LispObject unwrap(LispObject obj) {
+    if (obj instanceof CellObject) {
+      return ((CellObject) obj).get();
+    }
+    return obj;
+  }
+
+  /** Unwraps and casts to PSetObject, or returns null if not a PSetObject. */
+  private static PSetObject asPSet(LispObject obj) {
+    LispObject unwrapped = unwrap(obj);
+    if (unwrapped instanceof PSetObject) {
+      return (PSetObject) unwrapped;
+    }
+    return null;
   }
 }

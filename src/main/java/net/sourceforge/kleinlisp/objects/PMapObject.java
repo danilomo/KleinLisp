@@ -28,6 +28,7 @@ import net.sourceforge.kleinlisp.Function;
 import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.LispVisitor;
+import net.sourceforge.kleinlisp.Seq;
 import org.pcollections.HashTreePMap;
 import org.pcollections.PMap;
 
@@ -153,6 +154,19 @@ public final class PMapObject implements LispObject, Function {
       elements[i++] = entry.getValue();
     }
     return (ListObject) ListObject.fromList(elements);
+  }
+
+  /**
+   * Returns a sequence over the map's entries as [key value] pairs. This enables p-maps to work
+   * with seq-based operations like map, filter, and dynamic-list.
+   */
+  @Override
+  public Seq asSeq() {
+    ListObject entriesList = entries();
+    if (entriesList == ListObject.NIL) {
+      return null;
+    }
+    return entriesList.asSeq();
   }
 
   @Override

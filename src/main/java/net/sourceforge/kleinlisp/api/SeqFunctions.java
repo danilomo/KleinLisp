@@ -193,6 +193,9 @@ public class SeqFunctions {
     if (obj instanceof net.sourceforge.kleinlisp.objects.PSetObject) {
       return true;
     }
+    if (obj instanceof net.sourceforge.kleinlisp.objects.PMapObject) {
+      return true;
+    }
     if (obj instanceof net.sourceforge.kleinlisp.objects.LazySeqObject) {
       return true;
     }
