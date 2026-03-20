@@ -66,6 +66,7 @@ StringBuilder str = new StringBuilder();
     {integer_literal}               { return symbol( sym.INT_LITERAL,  Integer.parseInt(yytext()) ); }
     {double_literal}                { return symbol( sym.DOUBLE_LITERAL,  Double.parseDouble(yytext()) ); }
     " "|\t|\n|	{lineterminator}    {/* whitespace */}
+    ";"[^\r\n]*                     {/* single-line comment */}
 }
 
 <STRING> {

@@ -373,7 +373,8 @@ public class ClosureVisitor extends DefaultVisitor {
           }
 
           // Rebuild the binding tuple
-          newBindings.add(new ListObject(tuple.car(), new ListObject(newValueExpr, ListObject.NIL)));
+          newBindings.add(
+              new ListObject(tuple.car(), new ListObject(newValueExpr, ListObject.NIL)));
         }
       }
     }

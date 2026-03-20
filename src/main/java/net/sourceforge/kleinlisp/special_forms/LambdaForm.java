@@ -26,7 +26,6 @@ package net.sourceforge.kleinlisp.special_forms;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,9 +35,6 @@ import net.sourceforge.kleinlisp.CompositeEnvironment;
 import net.sourceforge.kleinlisp.DefaultVisitor;
 import net.sourceforge.kleinlisp.Environment;
 import net.sourceforge.kleinlisp.Function;
-import net.sourceforge.kleinlisp.IndexedEnvironment;
-import net.sourceforge.kleinlisp.InlineEnvironment1;
-import net.sourceforge.kleinlisp.InlineEnvironment2;
 import net.sourceforge.kleinlisp.LispEnvironment;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.evaluator.ClosureVisitor.LambdaMeta;
@@ -388,9 +384,7 @@ public class LambdaForm implements SpecialForm {
             return super.visit(obj);
           }
 
-          /**
-           * Visit a let form, transforming binding values and body but not binding names.
-           */
+          /** Visit a let form, transforming binding values and body but not binding names. */
           private LispObject visitLetForm(ListObject obj) {
             // let form: (let ((var1 val1) (var2 val2) ...) body...)
             ListObject list = obj.cdr();
@@ -403,12 +397,13 @@ public class LambdaForm implements SpecialForm {
               for (LispObject binding : bindingsObj.asList()) {
                 ListObject tuple = binding.asList();
                 if (tuple != null && tuple.length() >= 2) {
-                  LispObject name = tuple.car();  // Keep name as-is
+                  LispObject name = tuple.car(); // Keep name as-is
                   LispObject valueExpr = tuple.cdr().car();
                   LispObject newValueExpr = valueExpr.accept(this);
 
                   // Rebuild binding tuple with original name
-                  newBindings.add(new ListObject(name, new ListObject(newValueExpr, ListObject.NIL)));
+                  newBindings.add(
+                      new ListObject(name, new ListObject(newValueExpr, ListObject.NIL)));
                 }
               }
             }
