@@ -70,5 +70,7 @@ public interface LispVisitor<T> {
 
   T visit(LazySeqObject obj);
 
+  T visit(CharObject obj);
+
   class Void {}
 }

@@ -2,6 +2,7 @@ package net.sourceforge.kleinlisp.parser;
 
 import java_cup.runtime.*;
 import net.sourceforge.kleinlisp.*;
+import net.sourceforge.kleinlisp.objects.CharObject;
 
 %%
 %unicode
@@ -63,6 +64,27 @@ StringBuilder str = new StringBuilder();
     "-"                             { return symbol( sym.ATOM, "-" ); }
     "#t"                            { return symbol( sym.BOOL_LITERAL, true ); }
     "#f"                            { return symbol( sym.BOOL_LITERAL, false ); }
+
+    // Character literals - named characters (must come before single char pattern)
+    "#\\space"                      { return symbol( sym.CHAR_LITERAL, new CharObject(' ') ); }
+    "#\\newline"                    { return symbol( sym.CHAR_LITERAL, new CharObject('\n') ); }
+    "#\\tab"                        { return symbol( sym.CHAR_LITERAL, new CharObject('\t') ); }
+    "#\\return"                     { return symbol( sym.CHAR_LITERAL, new CharObject('\r') ); }
+    "#\\null"                       { return symbol( sym.CHAR_LITERAL, new CharObject('\0') ); }
+    "#\\alarm"                      { return symbol( sym.CHAR_LITERAL, new CharObject('\007') ); }
+    "#\\backspace"                  { return symbol( sym.CHAR_LITERAL, new CharObject('\b') ); }
+    "#\\escape"                     { return symbol( sym.CHAR_LITERAL, new CharObject('\033') ); }
+    "#\\delete"                     { return symbol( sym.CHAR_LITERAL, new CharObject('\177') ); }
+
+    // Hex character literal #\xNN
+    "#\\x"[0-9a-fA-F]+              {
+        String hex = yytext().substring(3);
+        int codepoint = Integer.parseInt(hex, 16);
+        return symbol( sym.CHAR_LITERAL, new CharObject((char) codepoint) );
+    }
+
+    // Single character literal #\c (must come after named characters)
+    "#\\"[^\s]                      { return symbol( sym.CHAR_LITERAL, new CharObject(yytext().charAt(2)) ); }
 
     {keyword}                       { return symbol( sym.KEYWORD, yytext().substring(2) ); }
     {identifier}                    { return symbol( sym.ATOM,  yytext() ); }

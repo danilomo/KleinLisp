@@ -26,6 +26,7 @@ package net.sourceforge.kleinlisp.api;
 import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.BooleanObject;
+import net.sourceforge.kleinlisp.objects.CharObject;
 import net.sourceforge.kleinlisp.objects.DoubleObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
@@ -56,7 +57,7 @@ public class StringFunctions {
     return IntObject.valueOf(str.value().length());
   }
 
-  /** Returns the character at the given index as a single-character string. (string-ref s i) */
+  /** Returns the character at the given index. (string-ref s i) */
   public static LispObject stringRef(LispObject[] params) {
     StringObject str = params[0].asString();
     IntObject idx = params[1].asInt();
@@ -72,7 +73,7 @@ public class StringFunctions {
       throw new LispArgumentError(
           "string-ref index out of bounds: " + i + " for string of length " + value.length());
     }
-    return new StringObject(String.valueOf(value.charAt(i)));
+    return new CharObject(value.charAt(i));
   }
 
   /** Extracts a substring. (substring s start end) */

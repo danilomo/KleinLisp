@@ -48,9 +48,10 @@ public class StringFunctionsTest extends BaseTestClass {
 
   @Test
   public void testStringRef() {
-    assertEquals("h", lisp.evaluate("(string-ref \"hello\" 0)").asString().value());
-    assertEquals("e", lisp.evaluate("(string-ref \"hello\" 1)").asString().value());
-    assertEquals("o", lisp.evaluate("(string-ref \"hello\" 4)").asString().value());
+    // string-ref returns a character object, not a string
+    assertEquals("#\\h", lisp.evaluate("(string-ref \"hello\" 0)").toString());
+    assertEquals("#\\e", lisp.evaluate("(string-ref \"hello\" 1)").toString());
+    assertEquals("#\\o", lisp.evaluate("(string-ref \"hello\" 4)").toString());
   }
 
   @Test

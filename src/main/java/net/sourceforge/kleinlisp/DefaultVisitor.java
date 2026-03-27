@@ -133,4 +133,9 @@ public class DefaultVisitor implements LispVisitor<LispObject> {
   public LispObject visit(LazySeqObject obj) {
     return obj;
   }
+
+  @Override
+  public LispObject visit(CharObject obj) {
+    return obj;
+  }
 }

@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.sourceforge.kleinlisp.api.BooleanFunctions;
+import net.sourceforge.kleinlisp.api.CharFunctions;
 import net.sourceforge.kleinlisp.api.EqualityFunctions;
 import net.sourceforge.kleinlisp.api.HigherOrderFunctions;
 import net.sourceforge.kleinlisp.api.IOFunctions;
@@ -334,6 +335,29 @@ public class LispEnvironment implements Environment {
 
     // JSON functions
     registerFunction("json-parse", JsonFunctions::jsonParse);
+
+    // Character functions
+    registerFunction("char?", CharFunctions::isChar);
+    registerFunction("char=?", CharFunctions::charEqual);
+    registerFunction("char<?", CharFunctions::charLessThan);
+    registerFunction("char>?", CharFunctions::charGreaterThan);
+    registerFunction("char<=?", CharFunctions::charLessOrEqual);
+    registerFunction("char>=?", CharFunctions::charGreaterOrEqual);
+    registerFunction("char-ci=?", CharFunctions::charCiEqual);
+    registerFunction("char-ci<?", CharFunctions::charCiLessThan);
+    registerFunction("char-ci>?", CharFunctions::charCiGreaterThan);
+    registerFunction("char-ci<=?", CharFunctions::charCiLessOrEqual);
+    registerFunction("char-ci>=?", CharFunctions::charCiGreaterOrEqual);
+    registerFunction("char-alphabetic?", CharFunctions::charAlphabetic);
+    registerFunction("char-numeric?", CharFunctions::charNumeric);
+    registerFunction("char-whitespace?", CharFunctions::charWhitespace);
+    registerFunction("char-upper-case?", CharFunctions::charUpperCase);
+    registerFunction("char-lower-case?", CharFunctions::charLowerCase);
+    registerFunction("char->integer", CharFunctions::charToInteger);
+    registerFunction("integer->char", CharFunctions::integerToChar);
+    registerFunction("char-upcase", CharFunctions::charUpcase);
+    registerFunction("char-downcase", CharFunctions::charDowncase);
+    registerFunction("digit-value", CharFunctions::digitValue);
 
     // Persistent vector functions
     registerFunction("p-vec", PersistentVectorFunctions::pVec);

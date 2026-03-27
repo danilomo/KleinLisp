@@ -4,6 +4,7 @@ import net.sourceforge.kleinlisp.*;
 import net.sourceforge.kleinlisp.evaluator.*;
 import net.sourceforge.kleinlisp.objects.*;
 import net.sourceforge.kleinlisp.objects.KeywordObject;
+import net.sourceforge.kleinlisp.objects.CharObject;
 import java.util.function.Consumer;
 
 parser code {:
@@ -52,6 +53,7 @@ terminal DOT;
 terminal Integer INT_LITERAL;
 terminal Double  DOUBLE_LITERAL;
 terminal Boolean BOOL_LITERAL;
+terminal CharObject CHAR_LITERAL;
 
 non terminal LispObject self_evaluating_form;
 non terminal LispObject list_form;
@@ -82,6 +84,7 @@ self_evaluating_form ::=
     DOUBLE_LITERAL:d {: RESULT = new DoubleObject(d); :} |
     BOOL_LITERAL:b   {: RESULT = b ? BooleanObject.TRUE : BooleanObject.FALSE; :} |
     STRING_LITERAL:s {: RESULT = new StringObject(s); :} |
+    CHAR_LITERAL:c   {: RESULT = c; :} |
     KEYWORD:k        {: RESULT = new KeywordObject(k); :} |
     ATOM:a           {:
                         AtomObject atom = parser.environment().atomOf(a);
