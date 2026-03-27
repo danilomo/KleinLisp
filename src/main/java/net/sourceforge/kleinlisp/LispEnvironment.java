@@ -178,11 +178,60 @@ public class LispEnvironment implements Environment {
     registerFunction("*", MathFunctions::mul);
     registerFunction("/", MathFunctions::div);
     registerFunction("mod", MathFunctions::mod);
-    registerFunction("modulo", MathFunctions::mod);
-    registerFunction("remainder", MathFunctions::mod);
     registerFunction("abs", MathFunctions::abs);
     registerFunction("min", MathFunctions::min);
     registerFunction("max", MathFunctions::max);
+
+    // Rounding operations
+    registerFunction("floor", MathFunctions::floor);
+    registerFunction("ceiling", MathFunctions::ceiling);
+    registerFunction("truncate", MathFunctions::truncate);
+    registerFunction("round", MathFunctions::round);
+
+    // Integer division
+    registerFunction("quotient", MathFunctions::quotient);
+    registerFunction("remainder", MathFunctions::remainder);
+    registerFunction("modulo", MathFunctions::modulo);
+
+    // GCD and LCM
+    registerFunction("gcd", MathFunctions::gcdFn);
+    registerFunction("lcm", MathFunctions::lcmFn);
+
+    // Exactness predicates and conversions
+    registerFunction("exact?", MathFunctions::isExact);
+    registerFunction("inexact?", MathFunctions::isInexact);
+    registerFunction("exact", MathFunctions::exact);
+    registerFunction("inexact", MathFunctions::inexact);
+
+    // Transcendental functions
+    registerFunction("sqrt", MathFunctions::sqrt);
+    registerFunction("expt", MathFunctions::expt);
+    registerFunction("exp", MathFunctions::exp);
+    registerFunction("log", MathFunctions::log);
+    registerFunction("sin", MathFunctions::sin);
+    registerFunction("cos", MathFunctions::cos);
+    registerFunction("tan", MathFunctions::tan);
+    registerFunction("asin", MathFunctions::asin);
+    registerFunction("acos", MathFunctions::acos);
+    registerFunction("atan", MathFunctions::atan);
+
+    // Additional numeric functions
+    registerFunction("square", MathFunctions::square);
+    registerFunction("exact-integer-sqrt", MathFunctions::exactIntegerSqrt);
+
+    // Rational functions (simplified)
+    registerFunction("numerator", MathFunctions::numerator);
+    registerFunction("denominator", MathFunctions::denominator);
+    registerFunction("rationalize", MathFunctions::rationalize);
+
+    // Numeric predicates
+    registerFunction("integer?", MathFunctions::isInteger);
+    registerFunction("rational?", MathFunctions::isRational);
+    registerFunction("real?", MathFunctions::isReal);
+    registerFunction("complex?", MathFunctions::isComplex);
+    registerFunction("finite?", MathFunctions::isFinite);
+    registerFunction("infinite?", MathFunctions::isInfinite);
+    registerFunction("nan?", MathFunctions::isNan);
 
     // Core list functions
     registerFunction("list", ListFunctions::list);
@@ -244,8 +293,7 @@ public class LispEnvironment implements Environment {
     // Type predicates
     registerFunction("string?", TypePredicates::isString);
     registerFunction("number?", TypePredicates::isNumber);
-    registerFunction("integer?", TypePredicates::isInteger);
-    registerFunction("real?", TypePredicates::isDouble);
+    // Note: integer? and real? are registered in numeric tower section above
     registerFunction("pair?", TypePredicates::isPair);
     registerFunction("list?", TypePredicates::isList);
     registerFunction("symbol?", TypePredicates::isSymbol);

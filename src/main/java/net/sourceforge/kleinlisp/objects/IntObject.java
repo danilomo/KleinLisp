@@ -119,4 +119,8 @@ public final class IntObject implements NumericObject {
   public int hashCode() {
     return Integer.hashCode(value);
   }
+
+  public boolean isExact() {
+    return true;
+  }
 }

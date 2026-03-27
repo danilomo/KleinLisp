@@ -84,4 +84,8 @@ public final class DoubleObject implements NumericObject {
   public boolean error() {
     return false;
   }
+
+  public boolean isExact() {
+    return false;
+  }
 }
