@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
+import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispEnvironment;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.LispVisitor;
@@ -104,6 +105,9 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
       return fastPath;
     }
 
+    // Validate that head can be a function - catch errors at compile time
+    validateFunctionPosition(head, list);
+
     Supplier<LispObject> headEval = head.accept(this);
     SourceRef ref = getSourceRef(list);
 
@@ -178,6 +182,27 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
           }
           return new TailFunctionCall(environment, headEval, parameters);
         }
+    }
+  }
+
+  /**
+   * Validates that a value in function position can potentially be a function. Throws an error at
+   * compile time if a literal value (integer, string, etc.) is in function position, which would
+   * always fail at runtime. Note: Keywords ARE callable (they act as lookup functions on maps).
+   */
+  private void validateFunctionPosition(LispObject head, ListObject list) {
+    // Values that can never be functions - detect error at compile time
+    if (head.asInt() != null
+        || head.asDouble() != null
+        || head.asString() != null
+        || head instanceof BooleanObject
+        || head instanceof VectorObject) {
+      SourceRef ref = getSourceRef(list);
+      String location = (ref != null) ? " at " + ref : "";
+      throw new LispArgumentError(
+          String.format(
+              "Invalid function call: [%s] (type: %s) cannot be used as a function%s",
+              head, head.getClass().getSimpleName(), location));
     }
   }
 

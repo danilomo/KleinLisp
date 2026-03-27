@@ -55,10 +55,20 @@ public class FunctionCall1 implements Supplier<LispObject> {
 
   @Override
   public LispObject get() {
-    FunctionObject functionObj = head.get().asFunction();
+    LispObject headValue = head.get();
+    FunctionObject functionObj = headValue.asFunction();
 
     if (functionObj == null) {
-      throw new LispArgumentError("Value isn't a valid function");
+      System.err.println(
+          "[FunctionCall1] ERROR: trying to call non-function: "
+              + headValue
+              + " (type: "
+              + headValue.getClass().getSimpleName()
+              + ")");
+      if (ref != null) {
+        System.err.println("[FunctionCall1] source ref: " + ref);
+      }
+      throw new LispArgumentError(String.format("Value [%s] isn't a valid function", headValue));
     }
 
     Function function = functionObj.function();
