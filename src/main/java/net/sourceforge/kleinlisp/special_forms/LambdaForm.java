@@ -362,6 +362,10 @@ public class LambdaForm implements SpecialForm {
 
           @Override
           public LispObject visit(ListObject obj) {
+            return visitListObject(obj, false);
+          }
+
+          private LispObject visitListObject(ListObject obj, boolean insideQuote) {
             if (obj == ListObject.NIL) {
               return obj;
             }
@@ -369,10 +373,17 @@ public class LambdaForm implements SpecialForm {
             AtomObject head = obj.car().asAtom();
 
             if (head == null) {
-              return super.visit(obj);
+              return visitListElements(obj, insideQuote);
             }
 
-            if (head.specialForm() == SpecialFormEnum.LAMBDA) {
+            // Check for quote or quasiquote - transformation should continue inside
+            String headValue = head.value();
+            if (headValue.equals("quote") || headValue.equals("quasiquote")) {
+              return visitListElements(obj, true);
+            }
+
+            // Only stop at lambda when NOT inside quote/quasiquote
+            if (head.specialForm() == SpecialFormEnum.LAMBDA && !insideQuote) {
               return obj;
             }
 
@@ -381,7 +392,35 @@ public class LambdaForm implements SpecialForm {
               return visitLetForm(obj);
             }
 
-            return super.visit(obj);
+            return visitListElements(obj, insideQuote);
+          }
+
+          private LispObject visitListElements(ListObject obj, boolean insideQuote) {
+            if (obj == ListObject.NIL) {
+              return obj;
+            }
+
+            LispObject head = obj.head();
+            LispObject transformedHead;
+            if (head instanceof ListObject) {
+              transformedHead = visitListObject((ListObject) head, insideQuote);
+            } else {
+              transformedHead = head.accept(this);
+            }
+
+            LispObject tail = obj.tail();
+            LispObject transformedTail;
+            if (tail instanceof ListObject) {
+              transformedTail = visitListObject((ListObject) tail, insideQuote);
+            } else {
+              transformedTail = tail;
+            }
+
+            if (tail != ListObject.NIL) {
+              return new ListObject(transformedHead, transformedTail);
+            } else {
+              return new ListObject(transformedHead, ListObject.NIL);
+            }
           }
 
           /** Visit a let form, transforming binding values and body but not binding names. */

@@ -52,6 +52,9 @@ StringBuilder str = new StringBuilder();
 <YYINITIAL> {
     "\""                            {str.setLength(0); yybegin(STRING);}
     "'"                             { return symbol( sym.QUOTE ); }
+    "`"                             { return symbol( sym.QUASIQUOTE ); }
+    ",@"                            { return symbol( sym.UNQUOTE_SPLICING ); }
+    ","                             { return symbol( sym.UNQUOTE ); }
     "("                             { return symbol( sym.OPEN_PAR ); }
     ")"                             { return symbol( sym.CLOSE_PAR ); }
     "["                             { return symbol( sym.OPEN_BRACKET ); }

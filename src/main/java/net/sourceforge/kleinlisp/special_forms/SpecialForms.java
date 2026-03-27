@@ -54,6 +54,7 @@ public class SpecialForms {
     this.insertForm("begin", new BeginForm(evaluator));
     this.insertForm("define-syntax", new DefineSyntaxForm(environment));
     this.insertForm("quote", new QuoteForm());
+    this.insertForm("quasiquote", new QuasiquoteForm(evaluator, environment));
     this.insertForm("cond", new CondForm(evaluator));
     this.insertForm("case", new CaseForm(evaluator));
     this.insertForm("let", new LetForm(evaluator, environment));

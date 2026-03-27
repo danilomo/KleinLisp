@@ -46,7 +46,7 @@ parser code {:
 terminal String ATOM;
 terminal String STRING_LITERAL;
 terminal String KEYWORD;
-terminal QUOTE, OPEN_PAR, CLOSE_PAR, OPEN_BRACKET, CLOSE_BRACKET;
+terminal QUOTE, QUASIQUOTE, UNQUOTE, UNQUOTE_SPLICING, OPEN_PAR, CLOSE_PAR, OPEN_BRACKET, CLOSE_BRACKET;
 terminal DOT;
 
 terminal Integer INT_LITERAL;
@@ -57,6 +57,9 @@ non terminal LispObject self_evaluating_form;
 non terminal LispObject list_form;
 non terminal LispObject form_list;
 non terminal LispObject quoted_form;
+non terminal LispObject quasiquoted_form;
+non terminal LispObject unquoted_form;
+non terminal LispObject unquote_spliced_form;
 non terminal LispObject form;
 non terminal forms;
 
@@ -66,10 +69,13 @@ forms ::= forms:fs form:f {: parser.accept(f); :} |
           form:f {: parser.accept(f); :} |
           error:e {: parser.syntaxError(e, eleft, eright); :};
 
-form ::= 
+form ::=
     self_evaluating_form:f {: RESULT = f; :} |
     list_form:f {: RESULT = f; :} |
-    quoted_form:f {: RESULT = f; :};
+    quoted_form:f {: RESULT = f; :} |
+    quasiquoted_form:f {: RESULT = f; :} |
+    unquoted_form:f {: RESULT = f; :} |
+    unquote_spliced_form:f {: RESULT = f; :};
 
 self_evaluating_form ::=
     INT_LITERAL:i    {: RESULT = new IntObject(i);    :} |
@@ -92,5 +98,14 @@ form_list ::=
     form:head form_list:tail {: RESULT = new ListObject( head, tail );         :} |
     form:head                {: RESULT = new ListObject( head, ListObject.NIL ); :};
 
-quoted_form ::= 
+quoted_form ::=
     QUOTE form:f {: RESULT = new ListObject( parser.environment().atomOf("quote"), new ListObject(f, ListObject.NIL) ); :};
+
+quasiquoted_form ::=
+    QUASIQUOTE form:f {: RESULT = new ListObject( parser.environment().atomOf("quasiquote"), new ListObject(f, ListObject.NIL) ); :};
+
+unquoted_form ::=
+    UNQUOTE form:f {: RESULT = new ListObject( parser.environment().atomOf("unquote"), new ListObject(f, ListObject.NIL) ); :};
+
+unquote_spliced_form ::=
+    UNQUOTE_SPLICING form:f {: RESULT = new ListObject( parser.environment().atomOf("unquote-splicing"), new ListObject(f, ListObject.NIL) ); :};
