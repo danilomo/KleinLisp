@@ -143,4 +143,9 @@ public class DefaultVisitor implements LispVisitor<LispObject> {
   public LispObject visit(ValuesObject obj) {
     return obj;
   }
+
+  @Override
+  public LispObject visit(PromiseObject obj) {
+    return obj;
+  }
 }

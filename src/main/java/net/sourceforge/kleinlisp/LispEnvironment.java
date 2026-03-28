@@ -30,6 +30,7 @@ import java.util.Map;
 import net.sourceforge.kleinlisp.api.BooleanFunctions;
 import net.sourceforge.kleinlisp.api.CharFunctions;
 import net.sourceforge.kleinlisp.api.EqualityFunctions;
+import net.sourceforge.kleinlisp.api.PromiseFunctions;
 import net.sourceforge.kleinlisp.api.HigherOrderFunctions;
 import net.sourceforge.kleinlisp.api.IOFunctions;
 import net.sourceforge.kleinlisp.api.JsonFunctions;
@@ -470,6 +471,11 @@ public class LispEnvironment implements Environment {
     registerFunction("values", ValuesFunctions::values);
     registerFunction("call-with-values", ValuesFunctions::callWithValues);
     registerFunction("values?", ValuesFunctions::isValues);
+
+    // Promise functions (R7RS)
+    registerFunction("force", PromiseFunctions::force);
+    registerFunction("promise?", PromiseFunctions::isPromise);
+    registerFunction("make-promise", PromiseFunctions::makePromise);
   }
 
   private void initMacroTable() {
