@@ -115,18 +115,27 @@ public class NewEnhancementsTest extends BaseTestClass {
 
   @Test
   public void testError() {
+    // error now raises a LispRaisedException with an ErrorObject (R7RS behavior)
     assertThrows(
-        LispArgumentError.class,
+        LispRaisedException.class,
         () -> {
           lisp.evaluate("(error \"Something went wrong\")");
         });
 
-    try {
-      lisp.evaluate("(error \"Error:\" 42)");
-      fail("Should have thrown LispArgumentError");
-    } catch (LispArgumentError e) {
-      assertTrue(e.getMessage().contains("Error:"));
-      assertTrue(e.getMessage().contains("42"));
-    }
+    // Test that guard can catch the error and extract the message
+    String message =
+        lisp.evaluate(
+                "(guard (e ((error-object? e) (error-object-message e))) "
+                    + "(error \"Error:\" 42))")
+            .toString();
+    assertEquals("\"Error:\"", message);
+
+    // Test that irritants are captured
+    String irritants =
+        lisp.evaluate(
+                "(guard (e ((error-object? e) (error-object-irritants e))) "
+                    + "(error \"Error:\" 42))")
+            .toString();
+    assertEquals("(42)", irritants);
   }
 }

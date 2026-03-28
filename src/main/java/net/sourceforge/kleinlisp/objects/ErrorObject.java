@@ -23,32 +23,50 @@
  */
 package net.sourceforge.kleinlisp.objects;
 
+import java.util.Arrays;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.LispVisitor;
 
 /**
+ * R7RS Error object created by the error procedure.
+ *
  * @author daolivei
  */
 public final class ErrorObject implements LispObject {
 
-  private final Exception error;
+  private final String message;
+  private final LispObject[] irritants;
 
   public ErrorObject(String message) {
-    this.error = new Exception(message);
+    this.message = message;
+    this.irritants = new LispObject[0];
   }
 
-  public ErrorObject(Exception error) {
-    this.error = error;
+  public ErrorObject(String message, LispObject[] irritants) {
+    this.message = message;
+    this.irritants = irritants;
+  }
+
+  public String getMessage() {
+    return message;
+  }
+
+  public LispObject[] getIrritants() {
+    return irritants;
+  }
+
+  public ListObject getIrritantsList() {
+    return (ListObject) ListObject.fromList(Arrays.asList(irritants));
   }
 
   @Override
   public Object asObject() {
-    return error;
+    return this;
   }
 
   @Override
   public boolean truthiness() {
-    throw new RuntimeException("Cannot evaluate error as boolean");
+    return true;
   }
 
   @Override
@@ -58,7 +76,17 @@ public final class ErrorObject implements LispObject {
 
   @Override
   public String toString() {
-    return "LispError: " + error.getMessage();
+    StringBuilder sb = new StringBuilder("#<error: ");
+    sb.append(message);
+    if (irritants.length > 0) {
+      sb.append(" ");
+      for (int i = 0; i < irritants.length; i++) {
+        if (i > 0) sb.append(" ");
+        sb.append(irritants[i]);
+      }
+    }
+    sb.append(">");
+    return sb.toString();
   }
 
   @Override

@@ -30,6 +30,8 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispObject;
+import net.sourceforge.kleinlisp.LispRaisedException;
+import net.sourceforge.kleinlisp.objects.ErrorObject;
 import net.sourceforge.kleinlisp.objects.LazySeqObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 import net.sourceforge.kleinlisp.objects.StringObject;
@@ -58,10 +60,29 @@ public class IOFunctions {
     return VoidObject.VOID;
   }
 
-  /** Raises an error with a message. (error message) or (error message value ...) */
+  /**
+   * Creates and raises an R7RS error object.
+   *
+   * <p>(error message) or (error message irritant ...)
+   *
+   * <p>Creates an error object with the given message and optional irritant values, then raises it
+   * as an exception that can be caught by guard.
+   */
   public static LispObject error(LispObject[] params) {
-    String message = Arrays.stream(params).map(Object::toString).collect(Collectors.joining(" "));
-    throw new LispArgumentError(message);
+    if (params.length < 1) {
+      throw new LispArgumentError("error requires at least a message argument");
+    }
+
+    String message;
+    if (params[0].asString() != null) {
+      message = params[0].asString().value();
+    } else {
+      message = params[0].toString();
+    }
+
+    LispObject[] irritants = Arrays.copyOfRange(params, 1, params.length);
+    ErrorObject errorObj = new ErrorObject(message, irritants);
+    throw new LispRaisedException(errorObj, false);
   }
 
   /**
