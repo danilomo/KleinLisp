@@ -23,10 +23,14 @@
  */
 package net.sourceforge.kleinlisp.api;
 
+import net.sourceforge.kleinlisp.Function;
 import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispObject;
+import net.sourceforge.kleinlisp.objects.CharObject;
+import net.sourceforge.kleinlisp.objects.FunctionObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
+import net.sourceforge.kleinlisp.objects.StringObject;
 import net.sourceforge.kleinlisp.objects.VectorObject;
 import net.sourceforge.kleinlisp.objects.VoidObject;
 
@@ -128,12 +132,211 @@ public class VectorFunctions {
     return VoidObject.VOID;
   }
 
-  /** Copies a vector. (vector-copy v) */
+  /** Copies a vector. (vector-copy v) or with start/end */
   public static LispObject vectorCopy(LispObject[] params) {
+    if (params.length < 1 || params.length > 3) {
+      throw new LispArgumentError("vector-copy: expected 1-3 arguments");
+    }
     if (!(params[0] instanceof VectorObject)) {
       throw new LispArgumentError("vector-copy requires a vector");
     }
     VectorObject vec = (VectorObject) params[0];
-    return new VectorObject(vec.toArray());
+
+    int start = 0;
+    int end = vec.length();
+
+    if (params.length > 1) {
+      IntObject startObj = params[1].asInt();
+      if (startObj == null) {
+        throw new LispArgumentError("vector-copy: expected integer start index");
+      }
+      start = startObj.value;
+    }
+    if (params.length > 2) {
+      IntObject endObj = params[2].asInt();
+      if (endObj == null) {
+        throw new LispArgumentError("vector-copy: expected integer end index");
+      }
+      end = endObj.value;
+    }
+
+    if (start < 0 || end > vec.length() || start > end) {
+      throw new LispArgumentError("vector-copy: index out of bounds");
+    }
+
+    LispObject[] elements = new LispObject[end - start];
+    for (int i = start; i < end; i++) {
+      elements[i - start] = vec.ref(i);
+    }
+    return new VectorObject(elements);
+  }
+
+  /** Appends multiple vectors. (vector-append vector ...) */
+  public static LispObject vectorAppend(LispObject[] params) {
+    int totalLen = 0;
+    for (LispObject arg : params) {
+      if (!(arg instanceof VectorObject)) {
+        throw new LispArgumentError("vector-append: expected vector arguments");
+      }
+      totalLen += ((VectorObject) arg).length();
+    }
+
+    LispObject[] result = new LispObject[totalLen];
+    int pos = 0;
+    for (LispObject arg : params) {
+      VectorObject v = (VectorObject) arg;
+      for (int i = 0; i < v.length(); i++) {
+        result[pos++] = v.ref(i);
+      }
+    }
+    return new VectorObject(result);
+  }
+
+  /** Maps a procedure over vector elements. (vector-map proc vector ...) */
+  public static LispObject vectorMap(LispObject[] params) {
+    if (params.length < 2) {
+      throw new LispArgumentError("vector-map: expected at least 2 arguments");
+    }
+    FunctionObject funcObj = params[0].asFunction();
+    if (funcObj == null) {
+      throw new LispArgumentError("vector-map: expected procedure as first argument");
+    }
+    Function proc = funcObj.function();
+
+    VectorObject[] vectors = new VectorObject[params.length - 1];
+    int minLen = Integer.MAX_VALUE;
+    for (int i = 0; i < vectors.length; i++) {
+      if (!(params[i + 1] instanceof VectorObject)) {
+        throw new LispArgumentError("vector-map: expected vector arguments");
+      }
+      vectors[i] = (VectorObject) params[i + 1];
+      minLen = Math.min(minLen, vectors[i].length());
+    }
+
+    LispObject[] result = new LispObject[minLen];
+    for (int i = 0; i < minLen; i++) {
+      LispObject[] elements = new LispObject[vectors.length];
+      for (int j = 0; j < vectors.length; j++) {
+        elements[j] = vectors[j].ref(i);
+      }
+      result[i] = proc.evaluate(elements);
+    }
+    return new VectorObject(result);
+  }
+
+  /**
+   * Applies a procedure to each vector element for side effects. (vector-for-each proc vector ...)
+   */
+  public static LispObject vectorForEach(LispObject[] params) {
+    if (params.length < 2) {
+      throw new LispArgumentError("vector-for-each: expected at least 2 arguments");
+    }
+    FunctionObject funcObj = params[0].asFunction();
+    if (funcObj == null) {
+      throw new LispArgumentError("vector-for-each: expected procedure as first argument");
+    }
+    Function proc = funcObj.function();
+
+    VectorObject[] vectors = new VectorObject[params.length - 1];
+    int minLen = Integer.MAX_VALUE;
+    for (int i = 0; i < vectors.length; i++) {
+      if (!(params[i + 1] instanceof VectorObject)) {
+        throw new LispArgumentError("vector-for-each: expected vector arguments");
+      }
+      vectors[i] = (VectorObject) params[i + 1];
+      minLen = Math.min(minLen, vectors[i].length());
+    }
+
+    for (int i = 0; i < minLen; i++) {
+      LispObject[] elements = new LispObject[vectors.length];
+      for (int j = 0; j < vectors.length; j++) {
+        elements[j] = vectors[j].ref(i);
+      }
+      proc.evaluate(elements);
+    }
+    return VoidObject.VOID;
+  }
+
+  /** Converts a vector of characters to a string. (vector->string vector) or with start/end */
+  public static LispObject vectorToString(LispObject[] params) {
+    if (params.length < 1 || params.length > 3) {
+      throw new LispArgumentError("vector->string: expected 1-3 arguments");
+    }
+    if (!(params[0] instanceof VectorObject)) {
+      throw new LispArgumentError("vector->string: expected vector");
+    }
+    VectorObject vec = (VectorObject) params[0];
+
+    int start = 0;
+    int end = vec.length();
+
+    if (params.length > 1) {
+      IntObject startObj = params[1].asInt();
+      if (startObj == null) {
+        throw new LispArgumentError("vector->string: expected integer start index");
+      }
+      start = startObj.value;
+    }
+    if (params.length > 2) {
+      IntObject endObj = params[2].asInt();
+      if (endObj == null) {
+        throw new LispArgumentError("vector->string: expected integer end index");
+      }
+      end = endObj.value;
+    }
+
+    if (start < 0 || end > vec.length() || start > end) {
+      throw new LispArgumentError("vector->string: index out of bounds");
+    }
+
+    StringBuilder sb = new StringBuilder();
+    for (int i = start; i < end; i++) {
+      LispObject obj = vec.ref(i);
+      if (!(obj instanceof CharObject)) {
+        throw new LispArgumentError("vector->string: vector must contain characters");
+      }
+      sb.append(((CharObject) obj).getValue());
+    }
+    return new StringObject(sb.toString());
+  }
+
+  /** Converts a string to a vector of characters. (string->vector string) or with start/end */
+  public static LispObject stringToVector(LispObject[] params) {
+    if (params.length < 1 || params.length > 3) {
+      throw new LispArgumentError("string->vector: expected 1-3 arguments");
+    }
+    StringObject strObj = params[0].asString();
+    if (strObj == null) {
+      throw new LispArgumentError("string->vector: expected string");
+    }
+    String s = strObj.value();
+
+    int start = 0;
+    int end = s.length();
+
+    if (params.length > 1) {
+      IntObject startObj = params[1].asInt();
+      if (startObj == null) {
+        throw new LispArgumentError("string->vector: expected integer start index");
+      }
+      start = startObj.value;
+    }
+    if (params.length > 2) {
+      IntObject endObj = params[2].asInt();
+      if (endObj == null) {
+        throw new LispArgumentError("string->vector: expected integer end index");
+      }
+      end = endObj.value;
+    }
+
+    if (start < 0 || end > s.length() || start > end) {
+      throw new LispArgumentError("string->vector: index out of bounds");
+    }
+
+    LispObject[] chars = new LispObject[end - start];
+    for (int i = start; i < end; i++) {
+      chars[i - start] = new CharObject(s.charAt(i));
+    }
+    return new VectorObject(chars);
   }
 }

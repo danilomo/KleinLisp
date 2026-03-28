@@ -47,6 +47,7 @@ import net.sourceforge.kleinlisp.api.PromiseFunctions;
 import net.sourceforge.kleinlisp.api.SeqFunctions;
 import net.sourceforge.kleinlisp.api.StringFunctions;
 import net.sourceforge.kleinlisp.api.SymbolFunctions;
+import net.sourceforge.kleinlisp.api.SystemFunctions;
 import net.sourceforge.kleinlisp.api.TypePredicates;
 import net.sourceforge.kleinlisp.api.ValuesFunctions;
 import net.sourceforge.kleinlisp.api.VectorFunctions;
@@ -266,6 +267,7 @@ public class LispEnvironment implements Environment {
     registerFunction("take", ListFunctions::take);
     registerFunction("drop", ListFunctions::drop);
     registerFunction("iota", ListFunctions::iota);
+    registerFunction("list-copy", ListFunctions::listCopy);
 
     // Car/cdr compositions
     registerFunction("caar", ListFunctions::caar);
@@ -290,6 +292,7 @@ public class LispEnvironment implements Environment {
     registerFunction("=", BooleanFunctions::eq);
     registerFunction("!=", BooleanFunctions::neq);
     registerFunction("not", BooleanFunctions::not);
+    registerFunction("boolean=?", BooleanFunctions::booleanEqual);
 
     // Equality predicates
     registerFunction("eq?", EqualityFunctions::eq);
@@ -335,6 +338,13 @@ public class LispEnvironment implements Environment {
     registerFunction("string-prefix?", StringFunctions::stringPrefix);
     registerFunction("string-suffix?", StringFunctions::stringSuffix);
     registerFunction("string-replace", StringFunctions::stringReplace);
+    registerFunction("make-string", StringFunctions::makeString);
+    registerFunction("string", StringFunctions::string);
+    registerFunction("string->list", StringFunctions::stringToList);
+    registerFunction("list->string", StringFunctions::listToString);
+    registerFunction("string-copy", StringFunctions::stringCopy);
+    registerFunction("string-map", StringFunctions::stringMap);
+    registerFunction("string-for-each", StringFunctions::stringForEach);
 
     // Higher-order functions
     registerFunction("map", HigherOrderFunctions::map);
@@ -371,6 +381,11 @@ public class LispEnvironment implements Environment {
     registerFunction("list->vector", VectorFunctions::listToVector);
     registerFunction("vector-fill!", VectorFunctions::vectorFill);
     registerFunction("vector-copy", VectorFunctions::vectorCopy);
+    registerFunction("vector-append", VectorFunctions::vectorAppend);
+    registerFunction("vector-map", VectorFunctions::vectorMap);
+    registerFunction("vector-for-each", VectorFunctions::vectorForEach);
+    registerFunction("vector->string", VectorFunctions::vectorToString);
+    registerFunction("string->vector", VectorFunctions::stringToVector);
 
     // Symbol functions (require environment reference)
     SymbolFunctions symbolFuncs = new SymbolFunctions(this);
@@ -534,6 +549,15 @@ public class LispEnvironment implements Environment {
     registerFunction("bytevector-append", BytevectorFunctions::bytevectorAppend);
     registerFunction("utf8->string", BytevectorFunctions::utf8ToString);
     registerFunction("string->utf8", BytevectorFunctions::stringToUtf8);
+
+    // System functions (R7RS) - require environment reference
+    SystemFunctions systemFuncs = new SystemFunctions(this);
+    registerFunction("features", systemFuncs::features);
+    registerFunction("command-line", systemFuncs::commandLine);
+    registerFunction("get-environment-variable", systemFuncs::getEnvironmentVariable);
+    registerFunction("get-environment-variables", systemFuncs::getEnvironmentVariables);
+    registerFunction("exit", systemFuncs::exit);
+    registerFunction("emergency-exit", systemFuncs::emergencyExit);
   }
 
   private void initMacroTable() {

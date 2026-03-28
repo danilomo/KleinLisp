@@ -23,14 +23,20 @@
  */
 package net.sourceforge.kleinlisp.api;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import net.sourceforge.kleinlisp.Function;
 import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.BooleanObject;
 import net.sourceforge.kleinlisp.objects.CharObject;
 import net.sourceforge.kleinlisp.objects.DoubleObject;
+import net.sourceforge.kleinlisp.objects.FunctionObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 import net.sourceforge.kleinlisp.objects.StringObject;
+import net.sourceforge.kleinlisp.objects.VoidObject;
 
 /** String manipulation functions for KleinLisp. */
 public class StringFunctions {
@@ -305,5 +311,207 @@ public class StringFunctions {
       throw new LispArgumentError("string-replace requires string arguments");
     }
     return new StringObject(str.value().replace(old.value(), replacement.value()));
+  }
+
+  /** Creates a string of k characters. (make-string k) or (make-string k char) */
+  public static LispObject makeString(LispObject[] params) {
+    if (params.length < 1 || params.length > 2) {
+      throw new LispArgumentError("make-string: expected 1 or 2 arguments");
+    }
+    IntObject kObj = params[0].asInt();
+    if (kObj == null) {
+      throw new LispArgumentError("make-string: expected integer length");
+    }
+    int k = kObj.value;
+    if (k < 0) {
+      throw new LispArgumentError("make-string: negative length");
+    }
+    char fill = '\0';
+    if (params.length > 1) {
+      if (!(params[1] instanceof CharObject)) {
+        throw new LispArgumentError("make-string: expected character as second argument");
+      }
+      fill = ((CharObject) params[1]).getValue();
+    }
+    char[] chars = new char[k];
+    Arrays.fill(chars, fill);
+    return new StringObject(new String(chars));
+  }
+
+  /** Builds a string from characters. (string char ...) */
+  public static LispObject string(LispObject[] params) {
+    StringBuilder sb = new StringBuilder();
+    for (LispObject arg : params) {
+      if (!(arg instanceof CharObject)) {
+        throw new LispArgumentError("string: expected character arguments");
+      }
+      sb.append(((CharObject) arg).getValue());
+    }
+    return new StringObject(sb.toString());
+  }
+
+  /** Converts a string to a list of characters. (string->list string) or with start/end */
+  public static LispObject stringToList(LispObject[] params) {
+    if (params.length < 1 || params.length > 3) {
+      throw new LispArgumentError("string->list: expected 1-3 arguments");
+    }
+    StringObject strObj = params[0].asString();
+    if (strObj == null) {
+      throw new LispArgumentError("string->list: expected string");
+    }
+    String s = strObj.value();
+    int start = 0;
+    int end = s.length();
+
+    if (params.length > 1) {
+      IntObject startObj = params[1].asInt();
+      if (startObj == null) {
+        throw new LispArgumentError("string->list: expected integer start index");
+      }
+      start = startObj.value;
+    }
+    if (params.length > 2) {
+      IntObject endObj = params[2].asInt();
+      if (endObj == null) {
+        throw new LispArgumentError("string->list: expected integer end index");
+      }
+      end = endObj.value;
+    }
+
+    if (start < 0 || end > s.length() || start > end) {
+      throw new LispArgumentError("string->list: index out of bounds");
+    }
+
+    List<LispObject> chars = new ArrayList<>();
+    for (int i = start; i < end; i++) {
+      chars.add(new CharObject(s.charAt(i)));
+    }
+    return ListObject.fromList(chars.toArray(new LispObject[0]));
+  }
+
+  /** Converts a list of characters to a string. (list->string list) */
+  public static LispObject listToString(LispObject[] params) {
+    if (params.length != 1) {
+      throw new LispArgumentError("list->string: expected 1 argument");
+    }
+    if (params[0] == ListObject.NIL) {
+      return new StringObject("");
+    }
+    ListObject list = params[0].asList();
+    if (list == null) {
+      throw new LispArgumentError("list->string: expected list");
+    }
+    StringBuilder sb = new StringBuilder();
+    for (LispObject obj : list) {
+      if (!(obj instanceof CharObject)) {
+        throw new LispArgumentError("list->string: list must contain only characters");
+      }
+      sb.append(((CharObject) obj).getValue());
+    }
+    return new StringObject(sb.toString());
+  }
+
+  /** Copies a string or portion of it. (string-copy string) or with start/end */
+  public static LispObject stringCopy(LispObject[] params) {
+    if (params.length < 1 || params.length > 3) {
+      throw new LispArgumentError("string-copy: expected 1-3 arguments");
+    }
+    StringObject strObj = params[0].asString();
+    if (strObj == null) {
+      throw new LispArgumentError("string-copy: expected string");
+    }
+    String s = strObj.value();
+    int start = 0;
+    int end = s.length();
+
+    if (params.length > 1) {
+      IntObject startObj = params[1].asInt();
+      if (startObj == null) {
+        throw new LispArgumentError("string-copy: expected integer start index");
+      }
+      start = startObj.value;
+    }
+    if (params.length > 2) {
+      IntObject endObj = params[2].asInt();
+      if (endObj == null) {
+        throw new LispArgumentError("string-copy: expected integer end index");
+      }
+      end = endObj.value;
+    }
+
+    if (start < 0 || end > s.length() || start > end) {
+      throw new LispArgumentError("string-copy: index out of bounds");
+    }
+
+    return new StringObject(s.substring(start, end));
+  }
+
+  /** Maps a procedure over string characters. (string-map proc string ...) */
+  public static LispObject stringMap(LispObject[] params) {
+    if (params.length < 2) {
+      throw new LispArgumentError("string-map: expected at least 2 arguments");
+    }
+    FunctionObject funcObj = params[0].asFunction();
+    if (funcObj == null) {
+      throw new LispArgumentError("string-map: expected procedure as first argument");
+    }
+    Function proc = funcObj.function();
+
+    String[] strings = new String[params.length - 1];
+    int minLen = Integer.MAX_VALUE;
+    for (int i = 0; i < strings.length; i++) {
+      StringObject strObj = params[i + 1].asString();
+      if (strObj == null) {
+        throw new LispArgumentError("string-map: expected string arguments");
+      }
+      strings[i] = strObj.value();
+      minLen = Math.min(minLen, strings[i].length());
+    }
+
+    StringBuilder result = new StringBuilder();
+    for (int i = 0; i < minLen; i++) {
+      LispObject[] chars = new LispObject[strings.length];
+      for (int j = 0; j < strings.length; j++) {
+        chars[j] = new CharObject(strings[j].charAt(i));
+      }
+      LispObject r = proc.evaluate(chars);
+      if (!(r instanceof CharObject)) {
+        throw new LispArgumentError("string-map: procedure must return character");
+      }
+      result.append(((CharObject) r).getValue());
+    }
+    return new StringObject(result.toString());
+  }
+
+  /** Applies a procedure to each character for side effects. (string-for-each proc string ...) */
+  public static LispObject stringForEach(LispObject[] params) {
+    if (params.length < 2) {
+      throw new LispArgumentError("string-for-each: expected at least 2 arguments");
+    }
+    FunctionObject funcObj = params[0].asFunction();
+    if (funcObj == null) {
+      throw new LispArgumentError("string-for-each: expected procedure as first argument");
+    }
+    Function proc = funcObj.function();
+
+    String[] strings = new String[params.length - 1];
+    int minLen = Integer.MAX_VALUE;
+    for (int i = 0; i < strings.length; i++) {
+      StringObject strObj = params[i + 1].asString();
+      if (strObj == null) {
+        throw new LispArgumentError("string-for-each: expected string arguments");
+      }
+      strings[i] = strObj.value();
+      minLen = Math.min(minLen, strings[i].length());
+    }
+
+    for (int i = 0; i < minLen; i++) {
+      LispObject[] chars = new LispObject[strings.length];
+      for (int j = 0; j < strings.length; j++) {
+        chars[j] = new CharObject(strings[j].charAt(i));
+      }
+      proc.evaluate(chars);
+    }
+    return VoidObject.VOID;
   }
 }

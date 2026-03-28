@@ -23,6 +23,7 @@
  */
 package net.sourceforge.kleinlisp.api;
 
+import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.BooleanObject;
 
@@ -72,5 +73,27 @@ public class BooleanFunctions {
 
   public static LispObject not(LispObject[] params) {
     return params[0].truthiness() ? BooleanObject.FALSE : BooleanObject.TRUE;
+  }
+
+  /** Tests if all boolean arguments are equal. (boolean=? bool1 bool2 ...) */
+  public static LispObject booleanEqual(LispObject[] params) {
+    if (params.length < 2) {
+      throw new LispArgumentError("boolean=?: expected at least 2 arguments");
+    }
+
+    if (!(params[0] instanceof BooleanObject)) {
+      throw new LispArgumentError("boolean=?: expected boolean");
+    }
+    boolean first = ((BooleanObject) params[0]).truthiness();
+
+    for (int i = 1; i < params.length; i++) {
+      if (!(params[i] instanceof BooleanObject)) {
+        throw new LispArgumentError("boolean=?: expected boolean");
+      }
+      if (((BooleanObject) params[i]).truthiness() != first) {
+        return BooleanObject.FALSE;
+      }
+    }
+    return BooleanObject.TRUE;
   }
 }

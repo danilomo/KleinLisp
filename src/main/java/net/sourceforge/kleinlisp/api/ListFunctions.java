@@ -535,4 +535,23 @@ public class ListFunctions {
     }
     return ListObject.fromList(result);
   }
+
+  /** Creates a shallow copy of a list. (list-copy list) */
+  public static LispObject listCopy(LispObject[] params) {
+    if (params.length != 1) {
+      throw new LispArgumentError("list-copy: expected 1 argument");
+    }
+    if (params[0] == ListObject.NIL) {
+      return ListObject.NIL;
+    }
+    ListObject list = params[0].asList();
+    if (list == null) {
+      throw new LispArgumentError("list-copy: expected list");
+    }
+    List<LispObject> copy = new ArrayList<>();
+    for (LispObject obj : list) {
+      copy.add(obj);
+    }
+    return ListObject.fromList(copy.toArray(new LispObject[0]));
+  }
 }
