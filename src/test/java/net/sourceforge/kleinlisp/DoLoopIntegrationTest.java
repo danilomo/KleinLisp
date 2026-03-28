@@ -36,7 +36,6 @@ import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIf;
 
 /**
  * Integration tests that compare KleinLisp output with Guile for the do loop implementation.
@@ -47,9 +46,7 @@ public class DoLoopIntegrationTest {
 
   private static final String SCRIPT_PATH = "src/test/resources/script_tests/do_loop.scm";
 
-  /**
-   * Check if guile is available on the system.
-   */
+  /** Check if guile is available on the system. */
   static boolean isGuileAvailable() {
     try {
       Process process = new ProcessBuilder("which", "guile").start();
@@ -60,11 +57,10 @@ public class DoLoopIntegrationTest {
   }
 
   /**
-   * Note: Full script comparison is skipped because KleinLisp maps 'display' to 'println'
-   * which adds a newline, while Guile's display doesn't. Individual expression tests
-   * below verify semantic compatibility.
+   * Note: Full script comparison is skipped because KleinLisp maps 'display' to 'println' which
+   * adds a newline, while Guile's display doesn't. Individual expression tests below verify
+   * semantic compatibility.
    */
-
   @Test
   public void testSimpleCounterMatchesGuile() throws Exception {
     String kleinLisp = runKleinLispExpression("(display (do ((i 0 (+ i 1))) ((= i 5) i)))");
@@ -103,7 +99,8 @@ public class DoLoopIntegrationTest {
   @Test
   public void testReverseListMatchesGuile() throws Exception {
     String expr =
-        "(display (do ((lst '(1 2 3) (cdr lst)) (result '() (cons (car lst) result))) ((null? lst) result)))";
+        "(display (do ((lst '(1 2 3) (cdr lst)) (result '() (cons (car lst) result))) ((null? lst)"
+            + " result)))";
     String kleinLisp = runKleinLispExpression(expr);
     if (isGuileAvailable()) {
       String guile = runGuileExpression(expr);

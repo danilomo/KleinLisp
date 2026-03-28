@@ -270,14 +270,14 @@ public class PromiseGuileComparisonTest extends BaseTestClass {
 
     // Get 5th fibonacci number (0, 1, 1, 2, 3)
     String kleinResult =
-        lisp.evaluate(
-                "(car (force (cdr (force (cdr (force (cdr (force (cdr (force fibs))))))))))")
+        lisp.evaluate("(car (force (cdr (force (cdr (force (cdr (force (cdr (force fibs))))))))))")
             .toString();
 
     String guileCode =
         "(define (fib-gen a b) (delay (cons a (fib-gen b (+ a b)))))\n"
             + "(define fibs (fib-gen 0 1))\n"
-            + "(display (car (force (cdr (force (cdr (force (cdr (force (cdr (force fibs)))))))))))\n";
+            + "(display (car (force (cdr (force (cdr (force (cdr (force (cdr (force"
+            + " fibs)))))))))))\n";
     String guileOutput = runGuile(guileCode);
 
     assertEquals(guileOutput, kleinResult);
@@ -335,10 +335,7 @@ public class PromiseGuileComparisonTest extends BaseTestClass {
     String kleinResult = lisp.evaluate("(force p)").toString();
 
     String guileCode =
-        "(define p (delay (+ 10 20)))\n"
-            + "(force p)\n"
-            + "(force p)\n"
-            + "(display (force p))\n";
+        "(define p (delay (+ 10 20)))\n" + "(force p)\n" + "(force p)\n" + "(display (force p))\n";
     String guileOutput = runGuile(guileCode);
 
     assertEquals(guileOutput, kleinResult);

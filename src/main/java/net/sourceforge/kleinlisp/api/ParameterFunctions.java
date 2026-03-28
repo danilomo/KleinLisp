@@ -41,8 +41,7 @@ public class ParameterFunctions {
    */
   public static LispObject makeParameter(LispObject[] args) {
     if (args.length < 1 || args.length > 2) {
-      throw new LispArgumentError(
-          "make-parameter: expected 1 or 2 arguments, got " + args.length);
+      throw new LispArgumentError("make-parameter: expected 1 or 2 arguments, got " + args.length);
     }
 
     LispObject initialValue = args[0];

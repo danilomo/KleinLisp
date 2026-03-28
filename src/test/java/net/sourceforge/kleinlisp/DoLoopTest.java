@@ -78,7 +78,9 @@ public class DoLoopTest extends BaseTestClass {
     // i=1: x=1, y=0 -> step -> x=0, y=1
     // i=2: x=0, y=1 -> step -> x=1, y=0
     // i=3: exit with (1 0)
-    assertEquals("(1 0)", lisp.evaluate("(do ((x 0 y) (y 1 x) (i 0 (+ i 1))) ((= i 3) (list x y)))").toString());
+    assertEquals(
+        "(1 0)",
+        lisp.evaluate("(do ((x 0 y) (y 1 x) (i 0 (+ i 1))) ((= i 3) (list x y)))").toString());
   }
 
   @Test
@@ -95,7 +97,8 @@ public class DoLoopTest extends BaseTestClass {
     assertEquals(
         "(3 2 1)",
         lisp.evaluate(
-                "(do ((lst '(1 2 3) (cdr lst)) (result '() (cons (car lst) result))) ((null? lst) result))")
+                "(do ((lst '(1 2 3) (cdr lst)) (result '() (cons (car lst) result))) ((null? lst)"
+                    + " result))")
             .toString());
   }
 
@@ -144,9 +147,7 @@ public class DoLoopTest extends BaseTestClass {
   @Test
   public void testAccessOuterScope() {
     lisp.evaluate("(define multiplier 10)");
-    assertEquals(
-        100,
-        evalAsInt("(do ((i 0 (+ i 1)) (sum 0 (+ sum multiplier))) ((= i 10) sum))"));
+    assertEquals(100, evalAsInt("(do ((i 0 (+ i 1)) (sum 0 (+ sum multiplier))) ((= i 10) sum))"));
   }
 
   @Test

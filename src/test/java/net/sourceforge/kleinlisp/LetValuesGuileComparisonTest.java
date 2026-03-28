@@ -92,8 +92,7 @@ public class LetValuesGuileComparisonTest extends BaseTestClass {
   public void testLetValuesMultipleComparesWithGuile() throws Exception {
     assumeTrue(guileAvailable, "Guile is not available, skipping comparison test");
 
-    String kleinResult =
-        lisp.evaluate("(let-values (((a b) (values 1 2))) (list a b))").toString();
+    String kleinResult = lisp.evaluate("(let-values (((a b) (values 1 2))) (list a b))").toString();
     String guileCode = "(display (let-values (((a b) (values 1 2))) (list a b)))\n";
     String guileOutput = runGuile(guileCode);
 
@@ -345,9 +344,7 @@ public class LetValuesGuileComparisonTest extends BaseTestClass {
                     + "  (+ a b))") // Returned
             .toString();
     String guileCode =
-        "(display (let-values (((a b) (values 1 2))) "
-            + "  (+ a 0) "
-            + "  (+ a b)))\n";
+        "(display (let-values (((a b) (values 1 2))) " + "  (+ a 0) " + "  (+ a b)))\n";
     String guileOutput = runGuile(guileCode);
 
     assertEquals(guileOutput, kleinResult);

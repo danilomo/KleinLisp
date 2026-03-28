@@ -26,7 +26,6 @@ package net.sourceforge.kleinlisp;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
-import net.sourceforge.kleinlisp.LispArgumentError;
 
 /** Tests for R7RS let-values, let*-values, and define-values. */
 public class LetValuesTest extends BaseTestClass {
@@ -243,9 +242,7 @@ public class LetValuesTest extends BaseTestClass {
 
   @Test
   public void testLetValuesZeroFormals() {
-    assertEquals(
-        "42",
-        lisp.evaluate("(let-values ((() (values))) 42)").toString());
+    assertEquals("42", lisp.evaluate("(let-values ((() (values))) 42)").toString());
   }
 
   // Using exact-integer-sqrt which returns multiple values
@@ -273,9 +270,7 @@ public class LetValuesTest extends BaseTestClass {
   @Test
   public void testLetValuesShadowing() {
     lisp.evaluate("(define x 100)");
-    assertEquals(
-        "1",
-        lisp.evaluate("(let-values (((x) (values 1))) x)").toString());
+    assertEquals("1", lisp.evaluate("(let-values (((x) (values 1))) x)").toString());
     // Original x should be unchanged
     assertEquals("100", lisp.evaluate("x").toString());
   }

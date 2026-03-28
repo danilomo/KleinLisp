@@ -65,8 +65,8 @@ public final class PromiseObject implements LispObject {
    * Force the promise, evaluating if necessary. Returns the cached value on subsequent calls.
    *
    * <p>Note: Unlike some lazy Scheme implementations, standard R7RS force does NOT automatically
-   * force nested promises. If the expression evaluates to a promise, that promise is returned
-   * as-is (not forced).
+   * force nested promises. If the expression evaluates to a promise, that promise is returned as-is
+   * (not forced).
    *
    * @return the forced value
    */

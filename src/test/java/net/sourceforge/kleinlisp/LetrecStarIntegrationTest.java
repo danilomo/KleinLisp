@@ -182,8 +182,7 @@ public class LetrecStarIntegrationTest {
 
   @Test
   public void testNestedLetrecStarMatchesGuile() throws Exception {
-    String expr =
-        "(display (letrec* ((x 1)) (letrec* ((y (+ x 1)) (z (+ y 1))) (+ x y z))))";
+    String expr = "(display (letrec* ((x 1)) (letrec* ((y (+ x 1)) (z (+ y 1))) (+ x y z))))";
     String kleinLisp = runKleinLispExpression(expr);
     if (isGuileAvailable()) {
       String guile = runGuileExpression(expr);
@@ -196,7 +195,8 @@ public class LetrecStarIntegrationTest {
   @Test
   public void testFibonacciMatchesGuile() throws Exception {
     String expr =
-        "(display (letrec* ((fib (lambda (n) (if (<= n 1) n (+ (fib (- n 1)) (fib (- n 2))))))) (fib 6)))";
+        "(display (letrec* ((fib (lambda (n) (if (<= n 1) n (+ (fib (- n 1)) (fib (- n 2)))))))"
+            + " (fib 6)))";
     String kleinLisp = runKleinLispExpression(expr);
     if (isGuileAvailable()) {
       String guile = runGuileExpression(expr);
@@ -246,8 +246,7 @@ public class LetrecStarIntegrationTest {
   }
 
   /**
-   * Normalize boolean representation differences between KleinLisp (true/false) and Guile
-   * (#t/#f).
+   * Normalize boolean representation differences between KleinLisp (true/false) and Guile (#t/#f).
    */
   private String normalizeBooleans(String output) {
     return output.replace("#t", "true").replace("#f", "false");

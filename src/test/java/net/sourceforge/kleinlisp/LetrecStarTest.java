@@ -85,9 +85,7 @@ public class LetrecStarTest extends BaseTestClass {
 
   @Test
   public void testNestedLetrecStar() {
-    assertEquals(
-        6,
-        evalAsInt("(letrec* ((x 1)) (letrec* ((y (+ x 1)) (z (+ y 1))) (+ x y z)))"));
+    assertEquals(6, evalAsInt("(letrec* ((x 1)) (letrec* ((y (+ x 1)) (z (+ y 1))) (+ x y z)))"));
   }
 
   @Test

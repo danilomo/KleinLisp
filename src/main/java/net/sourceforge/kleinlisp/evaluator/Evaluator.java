@@ -315,4 +315,14 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
   public Supplier<LispObject> visit(ParameterObject obj) {
     return () -> obj;
   }
+
+  @Override
+  public Supplier<LispObject> visit(PortObject obj) {
+    return () -> obj;
+  }
+
+  @Override
+  public Supplier<LispObject> visit(EofObject obj) {
+    return () -> obj;
+  }
 }

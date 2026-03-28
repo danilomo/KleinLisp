@@ -80,8 +80,7 @@ public class ExceptionTest extends BaseTestClass {
   public void testErrorCreatesErrorObject() {
     assertEquals(
         "caught-error",
-        lisp.evaluate(
-                "(guard (e ((error-object? e) 'caught-error)) " + "  (error \"message\"))")
+        lisp.evaluate("(guard (e ((error-object? e) 'caught-error)) " + "  (error \"message\"))")
             .toString());
   }
 
@@ -147,7 +146,7 @@ public class ExceptionTest extends BaseTestClass {
                     + "  (guard (inner "
                     + "          ((number? inner) 'inner)) "
                     + "    (raise 'symbol)))" // Not a number, so outer catches it
-            )
+                )
             .toString());
   }
 
@@ -249,10 +248,7 @@ public class ExceptionTest extends BaseTestClass {
 
   @Test
   public void testGuardInFunction() {
-    lisp.evaluate(
-        "(define (safe-div a b) "
-            + "  (guard (e (else 0)) "
-            + "    (/ a b)))");
+    lisp.evaluate("(define (safe-div a b) " + "  (guard (e (else 0)) " + "    (/ a b)))");
     assertEquals("5", lisp.evaluate("(safe-div 10 2)").toString());
     // Division by zero would throw, caught by guard
     assertDoesNotThrow(() -> lisp.evaluate("(safe-div 10 0)"));
@@ -260,21 +256,17 @@ public class ExceptionTest extends BaseTestClass {
 
   @Test
   public void testRaiseWithDifferentTypes() {
-    assertEquals(
-        "42",
-        lisp.evaluate("(guard (e ((number? e) e)) " + "  (raise 42))").toString());
+    assertEquals("42", lisp.evaluate("(guard (e ((number? e) e)) " + "  (raise 42))").toString());
     assertEquals(
         "\"hello\"",
         lisp.evaluate("(guard (e ((string? e) e)) " + "  (raise \"hello\"))").toString());
     assertEquals(
-        BooleanObject.TRUE,
-        lisp.evaluate("(guard (e ((boolean? e) e)) " + "  (raise #t))"));
+        BooleanObject.TRUE, lisp.evaluate("(guard (e ((boolean? e) e)) " + "  (raise #t))"));
   }
 
   @Test
   public void testErrorObjectToString() {
-    String result = lisp.evaluate(
-        "(guard (e (else e)) (error \"test message\" 1 2 3))").toString();
+    String result = lisp.evaluate("(guard (e (else e)) (error \"test message\" 1 2 3))").toString();
     assertTrue(result.contains("error"));
     assertTrue(result.contains("test message"));
   }

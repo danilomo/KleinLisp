@@ -31,17 +31,18 @@ import net.sourceforge.kleinlisp.api.BooleanFunctions;
 import net.sourceforge.kleinlisp.api.CharFunctions;
 import net.sourceforge.kleinlisp.api.EqualityFunctions;
 import net.sourceforge.kleinlisp.api.ExceptionFunctions;
-import net.sourceforge.kleinlisp.api.ParameterFunctions;
-import net.sourceforge.kleinlisp.api.PromiseFunctions;
 import net.sourceforge.kleinlisp.api.HigherOrderFunctions;
 import net.sourceforge.kleinlisp.api.IOFunctions;
 import net.sourceforge.kleinlisp.api.JsonFunctions;
 import net.sourceforge.kleinlisp.api.ListFunctions;
 import net.sourceforge.kleinlisp.api.MathFunctions;
+import net.sourceforge.kleinlisp.api.ParameterFunctions;
 import net.sourceforge.kleinlisp.api.PersistentCollectionFunctions;
 import net.sourceforge.kleinlisp.api.PersistentMapFunctions;
 import net.sourceforge.kleinlisp.api.PersistentSetFunctions;
 import net.sourceforge.kleinlisp.api.PersistentVectorFunctions;
+import net.sourceforge.kleinlisp.api.PortFunctions;
+import net.sourceforge.kleinlisp.api.PromiseFunctions;
 import net.sourceforge.kleinlisp.api.SeqFunctions;
 import net.sourceforge.kleinlisp.api.StringFunctions;
 import net.sourceforge.kleinlisp.api.SymbolFunctions;
@@ -489,6 +490,36 @@ public class LispEnvironment implements Environment {
     // Parameter functions (R7RS)
     registerFunction("make-parameter", ParameterFunctions::makeParameter);
     registerFunction("parameter?", ParameterFunctions::isParameter);
+
+    // Port functions (R7RS)
+    registerFunction("port?", PortFunctions::isPort);
+    registerFunction("input-port?", PortFunctions::isInputPort);
+    registerFunction("output-port?", PortFunctions::isOutputPort);
+    registerFunction("textual-port?", PortFunctions::isTextualPort);
+    registerFunction("binary-port?", PortFunctions::isBinaryPort);
+    registerFunction("port-open?", PortFunctions::isPortOpen);
+    registerFunction("input-port-open?", PortFunctions::isInputPortOpen);
+    registerFunction("output-port-open?", PortFunctions::isOutputPortOpen);
+    registerFunction("current-input-port", PortFunctions::currentInputPortFn);
+    registerFunction("current-output-port", PortFunctions::currentOutputPortFn);
+    registerFunction("current-error-port", PortFunctions::currentErrorPortFn);
+    registerFunction("open-input-file", PortFunctions::openInputFile);
+    registerFunction("open-output-file", PortFunctions::openOutputFile);
+    registerFunction("open-input-string", PortFunctions::openInputString);
+    registerFunction("open-output-string", PortFunctions::openOutputString);
+    registerFunction("get-output-string", PortFunctions::getOutputString);
+    registerFunction("close-port", PortFunctions::closePort);
+    registerFunction("close-input-port", PortFunctions::closeInputPort);
+    registerFunction("close-output-port", PortFunctions::closeOutputPort);
+    registerFunction("read-char", PortFunctions::readChar);
+    registerFunction("peek-char", PortFunctions::peekChar);
+    registerFunction("read-line", PortFunctions::readLine);
+    registerFunction("char-ready?", PortFunctions::charReady);
+    registerFunction("eof-object", PortFunctions::eofObject);
+    registerFunction("eof-object?", PortFunctions::isEofObject);
+    registerFunction("write-char", PortFunctions::writeChar);
+    registerFunction("write-string", PortFunctions::writeString);
+    registerFunction("flush-output-port", PortFunctions::flushOutputPort);
   }
 
   private void initMacroTable() {

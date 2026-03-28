@@ -30,9 +30,7 @@ import net.sourceforge.kleinlisp.objects.BooleanObject;
 import net.sourceforge.kleinlisp.objects.ErrorObject;
 import net.sourceforge.kleinlisp.objects.StringObject;
 
-/**
- * R7RS exception handling functions: raise, raise-continuable, and error object accessors.
- */
+/** R7RS exception handling functions: raise, raise-continuable, and error object accessors. */
 public class ExceptionFunctions {
 
   /**
@@ -62,19 +60,16 @@ public class ExceptionFunctions {
     throw new LispRaisedException(params[0], true);
   }
 
-  /**
-   * (error-object? obj) - returns #t if obj is an error object, #f otherwise.
-   */
+  /** (error-object? obj) - returns #t if obj is an error object, #f otherwise. */
   public static LispObject isErrorObject(LispObject[] params) {
     if (params.length != 1) {
-      throw new LispArgumentError("error-object? requires exactly 1 argument, got " + params.length);
+      throw new LispArgumentError(
+          "error-object? requires exactly 1 argument, got " + params.length);
     }
     return params[0] instanceof ErrorObject ? BooleanObject.TRUE : BooleanObject.FALSE;
   }
 
-  /**
-   * (error-object-message error) - returns the message string from an error object.
-   */
+  /** (error-object-message error) - returns the message string from an error object. */
   public static LispObject errorObjectMessage(LispObject[] params) {
     if (params.length != 1) {
       throw new LispArgumentError(
@@ -82,14 +77,13 @@ public class ExceptionFunctions {
     }
     if (!(params[0] instanceof ErrorObject)) {
       throw new LispArgumentError(
-          "error-object-message requires an error object, got " + params[0].getClass().getSimpleName());
+          "error-object-message requires an error object, got "
+              + params[0].getClass().getSimpleName());
     }
     return new StringObject(((ErrorObject) params[0]).getMessage());
   }
 
-  /**
-   * (error-object-irritants error) - returns the list of irritants from an error object.
-   */
+  /** (error-object-irritants error) - returns the list of irritants from an error object. */
   public static LispObject errorObjectIrritants(LispObject[] params) {
     if (params.length != 1) {
       throw new LispArgumentError(

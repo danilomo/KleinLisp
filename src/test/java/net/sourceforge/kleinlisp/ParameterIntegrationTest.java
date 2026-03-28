@@ -36,8 +36,8 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 /**
- * Integration tests that compare KleinLisp output with Guile for the R7RS parameters
- * implementation (make-parameter, parameterize, parameter?).
+ * Integration tests that compare KleinLisp output with Guile for the R7RS parameters implementation
+ * (make-parameter, parameterize, parameter?).
  *
  * @author danilo
  */
@@ -89,8 +89,7 @@ public class ParameterIntegrationTest {
 
   @Test
   public void testParameterizeMatchesGuile() throws Exception {
-    String expr =
-        "(define p (make-parameter 10)) (display (parameterize ((p 20)) (p))) (newline)";
+    String expr = "(define p (make-parameter 10)) (display (parameterize ((p 20)) (p))) (newline)";
     String kleinLisp = runKleinLispExpression(expr);
     if (isGuileAvailable()) {
       String guile = runGuileExpression(expr);
@@ -147,8 +146,7 @@ public class ParameterIntegrationTest {
 
   @Test
   public void testParameterConverterMatchesGuile() throws Exception {
-    String expr =
-        "(define p (make-parameter 5 (lambda (x) (* x 2)))) (display (p)) (newline)";
+    String expr = "(define p (make-parameter 5 (lambda (x) (* x 2)))) (display (p)) (newline)";
     String kleinLisp = runKleinLispExpression(expr);
     if (isGuileAvailable()) {
       String guile = runGuileExpression(expr);

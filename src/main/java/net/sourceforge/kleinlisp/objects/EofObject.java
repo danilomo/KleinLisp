@@ -21,25 +21,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.sourceforge.kleinlisp;
+package net.sourceforge.kleinlisp.objects;
 
-/** Exception thrown by raise/raise-continuable. Carries the raised value for guard to catch. */
-public class LispRaisedException extends LispException {
+import net.sourceforge.kleinlisp.LispObject;
+import net.sourceforge.kleinlisp.LispVisitor;
 
-  private final LispObject raisedValue;
-  private final boolean continuable;
+/**
+ * R7RS EOF object - returned when end of input is reached.
+ *
+ * @author daolivei
+ */
+public final class EofObject implements LispObject {
 
-  public LispRaisedException(LispObject value, boolean continuable) {
-    super(value.toString());
-    this.raisedValue = value;
-    this.continuable = continuable;
+  public static final EofObject EOF = new EofObject();
+
+  private EofObject() {}
+
+  @Override
+  public Object asObject() {
+    return this;
   }
 
-  public LispObject getRaisedValue() {
-    return raisedValue;
+  @Override
+  public boolean truthiness() {
+    return true;
   }
 
-  public boolean isContinuable() {
-    return continuable;
+  @Override
+  public <T> T accept(LispVisitor<T> visitor) {
+    return visitor.visit(this);
+  }
+
+  @Override
+  public String toString() {
+    return "#<eof>";
   }
 }

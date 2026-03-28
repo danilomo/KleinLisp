@@ -69,9 +69,7 @@ public class ParameterTest extends BaseTestClass {
     assertEquals(
         2,
         evalAsInt(
-            "(parameterize ((radix 16)) "
-                + "  (parameterize ((radix 2)) "
-                + "    (radix)))"));
+            "(parameterize ((radix 16)) " + "  (parameterize ((radix 2)) " + "    (radix)))"));
   }
 
   @Test
@@ -89,10 +87,7 @@ public class ParameterTest extends BaseTestClass {
   public void testMultipleParameters() {
     lisp.evaluate("(define a (make-parameter 1))");
     lisp.evaluate("(define b (make-parameter 2))");
-    assertEquals(
-        30,
-        evalAsInt(
-            "(parameterize ((a 10) (b 20)) " + "  (+ (a) (b)))"));
+    assertEquals(30, evalAsInt("(parameterize ((a 10) (b 20)) " + "  (+ (a) (b)))"));
   }
 
   @Test
@@ -154,11 +149,7 @@ public class ParameterTest extends BaseTestClass {
     lisp.evaluate("(define p (make-parameter 0))");
     assertEquals(
         3,
-        evalAsInt(
-            "(parameterize ((p 1)) "
-                + "  (p (+ (p) 1)) "
-                + "  (p (+ (p) 1)) "
-                + "  (p))"));
+        evalAsInt("(parameterize ((p 1)) " + "  (p (+ (p) 1)) " + "  (p (+ (p) 1)) " + "  (p))"));
   }
 
   @Test
@@ -188,7 +179,8 @@ public class ParameterTest extends BaseTestClass {
         "(define str-param (make-parameter \"default\" "
             + "  (lambda (x) (if (string? x) x (error \"not a string\")))))");
 
-    assertEquals("\"hello\"", lisp.evaluate("(begin (str-param \"hello\") (str-param))").toString());
+    assertEquals(
+        "\"hello\"", lisp.evaluate("(begin (str-param \"hello\") (str-param))").toString());
 
     // Should fail with non-string
     assertThrows(Exception.class, () -> lisp.evaluate("(str-param 123)"));

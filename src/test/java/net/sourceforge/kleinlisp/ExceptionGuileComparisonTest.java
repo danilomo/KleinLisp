@@ -73,11 +73,7 @@ public class ExceptionGuileComparisonTest extends BaseTestClass {
     }
   }
 
-  /**
-   * Normalizes Guile output to match KleinLisp output format.
-   * - #t -> true
-   * - #f -> false
-   */
+  /** Normalizes Guile output to match KleinLisp output format. - #t -> true - #f -> false */
   private String normalizeOutput(String output) {
     return output.replace("#t", "true").replace("#f", "false");
   }
@@ -86,8 +82,7 @@ public class ExceptionGuileComparisonTest extends BaseTestClass {
   public void testGuardWithElseComparesWithGuile() throws Exception {
     assumeTrue(guileAvailable, "Guile is not available, skipping comparison test");
 
-    String kleinResult =
-        lisp.evaluate("(guard (e (else 'caught)) (raise 'error))").toString();
+    String kleinResult = lisp.evaluate("(guard (e (else 'caught)) (raise 'error))").toString();
     String guileCode = "(display (guard (e (else 'caught)) (raise 'error)))\n";
     String guileOutput = runGuile(guileCode);
 
@@ -115,8 +110,7 @@ public class ExceptionGuileComparisonTest extends BaseTestClass {
   public void testGuardNoExceptionComparesWithGuile() throws Exception {
     assumeTrue(guileAvailable, "Guile is not available, skipping comparison test");
 
-    String kleinResult =
-        lisp.evaluate("(guard (e (else 'caught)) (+ 1 2))").toString();
+    String kleinResult = lisp.evaluate("(guard (e (else 'caught)) (+ 1 2))").toString();
     String guileCode = "(display (guard (e (else 'caught)) (+ 1 2)))\n";
     String guileOutput = runGuile(guileCode);
 
@@ -127,8 +121,7 @@ public class ExceptionGuileComparisonTest extends BaseTestClass {
   public void testGuardWithMultipleBodyExprsComparesWithGuile() throws Exception {
     assumeTrue(guileAvailable, "Guile is not available, skipping comparison test");
 
-    String kleinResult =
-        lisp.evaluate("(guard (e (else 'caught)) 1 2 3)").toString();
+    String kleinResult = lisp.evaluate("(guard (e (else 'caught)) 1 2 3)").toString();
     String guileCode = "(display (guard (e (else 'caught)) 1 2 3))\n";
     String guileOutput = runGuile(guileCode);
 
@@ -177,8 +170,7 @@ public class ExceptionGuileComparisonTest extends BaseTestClass {
   public void testGuardExpressionValueComparesWithGuile() throws Exception {
     assumeTrue(guileAvailable, "Guile is not available, skipping comparison test");
 
-    String kleinResult =
-        lisp.evaluate("(guard (e ((= e 42))) (raise 42))").toString();
+    String kleinResult = lisp.evaluate("(guard (e ((= e 42))) (raise 42))").toString();
     String guileCode = "(display (guard (e ((= e 42))) (raise 42)))\n";
     String guileOutput = runGuile(guileCode);
 
@@ -189,8 +181,7 @@ public class ExceptionGuileComparisonTest extends BaseTestClass {
   public void testGuardWithHandlerBodyComparesWithGuile() throws Exception {
     assumeTrue(guileAvailable, "Guile is not available, skipping comparison test");
 
-    String kleinResult =
-        lisp.evaluate("(guard (e (else (+ e 10))) (raise 5))").toString();
+    String kleinResult = lisp.evaluate("(guard (e (else (+ e 10))) (raise 5))").toString();
     String guileCode = "(display (guard (e (else (+ e 10))) (raise 5)))\n";
     String guileOutput = runGuile(guileCode);
 
@@ -201,8 +192,7 @@ public class ExceptionGuileComparisonTest extends BaseTestClass {
   public void testGuardWithSymbolRaisedComparesWithGuile() throws Exception {
     assumeTrue(guileAvailable, "Guile is not available, skipping comparison test");
 
-    String kleinResult =
-        lisp.evaluate("(guard (e ((symbol? e) e)) (raise 'my-error))").toString();
+    String kleinResult = lisp.evaluate("(guard (e ((symbol? e) e)) (raise 'my-error))").toString();
     String guileCode = "(display (guard (e ((symbol? e) e)) (raise 'my-error)))\n";
     String guileOutput = runGuile(guileCode);
 
@@ -267,8 +257,7 @@ public class ExceptionGuileComparisonTest extends BaseTestClass {
     lisp.evaluate("(define (safe-op x) (guard (e (else 0)) (/ 100 x)))");
     String kleinResult = lisp.evaluate("(safe-op 5)").toString();
     String guileCode =
-        "(define (safe-op x) (guard (e (else 0)) (/ 100 x)))\n"
-            + "(display (safe-op 5))\n";
+        "(define (safe-op x) (guard (e (else 0)) (/ 100 x)))\n" + "(display (safe-op 5))\n";
     String guileOutput = runGuile(guileCode);
 
     assertEquals(guileOutput, kleinResult);
@@ -279,15 +268,8 @@ public class ExceptionGuileComparisonTest extends BaseTestClass {
     assumeTrue(guileAvailable, "Guile is not available, skipping comparison test");
 
     String kleinResult =
-        lisp.evaluate(
-                "(let ((x 10)) "
-                    + "(guard (e (else (+ x e))) "
-                    + "(raise 5)))")
-            .toString();
-    String guileCode =
-        "(display (let ((x 10)) "
-            + "(guard (e (else (+ x e))) "
-            + "(raise 5))))\n";
+        lisp.evaluate("(let ((x 10)) " + "(guard (e (else (+ x e))) " + "(raise 5)))").toString();
+    String guileCode = "(display (let ((x 10)) " + "(guard (e (else (+ x e))) " + "(raise 5))))\n";
     String guileOutput = runGuile(guileCode);
 
     assertEquals(guileOutput, kleinResult);
@@ -297,14 +279,8 @@ public class ExceptionGuileComparisonTest extends BaseTestClass {
   public void testGuardWithMultipleHandlerExprsComparesWithGuile() throws Exception {
     assumeTrue(guileAvailable, "Guile is not available, skipping comparison test");
 
-    String kleinResult =
-        lisp.evaluate(
-                "(guard (e (else 1 2 3)) "
-                    + "(raise 'error))")
-            .toString();
-    String guileCode =
-        "(display (guard (e (else 1 2 3)) "
-            + "(raise 'error)))\n";
+    String kleinResult = lisp.evaluate("(guard (e (else 1 2 3)) " + "(raise 'error))").toString();
+    String guileCode = "(display (guard (e (else 1 2 3)) " + "(raise 'error)))\n";
     String guileOutput = runGuile(guileCode);
 
     assertEquals(guileOutput, kleinResult);

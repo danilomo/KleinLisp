@@ -78,5 +78,9 @@ public interface LispVisitor<T> {
 
   T visit(ParameterObject obj);
 
+  T visit(PortObject obj);
+
+  T visit(EofObject obj);
+
   class Void {}
 }

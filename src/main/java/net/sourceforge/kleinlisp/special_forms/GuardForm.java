@@ -124,7 +124,8 @@ public class GuardForm implements SpecialForm {
         return handleException(varAtom, handlers, e.getRaisedValue(), e);
       } catch (RuntimeException e) {
         // Wrap Java runtime exceptions in an ErrorObject
-        ErrorObject errorObj = new ErrorObject(e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName());
+        ErrorObject errorObj =
+            new ErrorObject(e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName());
         return handleException(varAtom, handlers, errorObj, e);
       }
     };
@@ -193,8 +194,7 @@ public class GuardForm implements SpecialForm {
       ListObject bodyList = handlerList.cdr();
 
       // Check for else clause
-      boolean isElse =
-          test.asAtom() != null && test.asAtom().toString().equals("else");
+      boolean isElse = test.asAtom() != null && test.asAtom().toString().equals("else");
 
       Supplier<LispObject> testSupplier;
       if (isElse) {

@@ -207,8 +207,7 @@ public class PromiseTest extends BaseTestClass {
   @Test
   public void testDelayWithRecursiveStructure() {
     // Define a lazy fibonacci stream
-    lisp.evaluate(
-        "(define (fib-gen a b) " + "  (delay (cons a (fib-gen b (+ a b)))))");
+    lisp.evaluate("(define (fib-gen a b) " + "  (delay (cons a (fib-gen b (+ a b)))))");
     lisp.evaluate("(define fibs (fib-gen 0 1))");
 
     // First few fibonacci numbers

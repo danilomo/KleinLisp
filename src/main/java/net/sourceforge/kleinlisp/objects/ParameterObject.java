@@ -34,9 +34,10 @@ import net.sourceforge.kleinlisp.LispVisitor;
  * R7RS Parameter object for dynamically-scoped variables.
  *
  * <p>A parameter is a procedure that can be called with:
+ *
  * <ul>
- *   <li>No arguments: returns current value</li>
- *   <li>One argument: sets the value (after passing through converter)</li>
+ *   <li>No arguments: returns current value
+ *   <li>One argument: sets the value (after passing through converter)
  * </ul>
  *
  * <p>parameterize temporarily binds new values in a dynamic scope.
@@ -100,8 +101,7 @@ public final class ParameterObject implements LispObject, Function {
       setValue(parameters[0]);
       return VoidObject.VOID;
     } else {
-      throw new LispArgumentError(
-          "parameter: expected 0 or 1 arguments, got " + parameters.length);
+      throw new LispArgumentError("parameter: expected 0 or 1 arguments, got " + parameters.length);
     }
   }
 
