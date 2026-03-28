@@ -60,6 +60,7 @@ public class SpecialForms {
     this.insertForm("let", new LetForm(evaluator, environment));
     this.insertForm("let*", new LetStarForm(evaluator, environment));
     this.insertForm("letrec", new LetrecForm(evaluator, environment));
+    this.insertForm("letrec*", new LetrecStarForm(evaluator, environment));
     this.insertForm("and", new AndForm(evaluator));
     this.insertForm("or", new OrForm(evaluator));
     this.insertForm("do", new DoForm(evaluator, environment));
