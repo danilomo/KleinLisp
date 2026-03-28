@@ -163,4 +163,9 @@ public class DefaultVisitor implements LispVisitor<LispObject> {
   public LispObject visit(EofObject obj) {
     return obj;
   }
+
+  @Override
+  public LispObject visit(BytevectorObject obj) {
+    return obj;
+  }
 }

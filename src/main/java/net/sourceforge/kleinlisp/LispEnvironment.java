@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.sourceforge.kleinlisp.api.BooleanFunctions;
+import net.sourceforge.kleinlisp.api.BytevectorFunctions;
 import net.sourceforge.kleinlisp.api.CharFunctions;
 import net.sourceforge.kleinlisp.api.EqualityFunctions;
 import net.sourceforge.kleinlisp.api.ExceptionFunctions;
@@ -520,6 +521,19 @@ public class LispEnvironment implements Environment {
     registerFunction("write-char", PortFunctions::writeChar);
     registerFunction("write-string", PortFunctions::writeString);
     registerFunction("flush-output-port", PortFunctions::flushOutputPort);
+
+    // Bytevector functions (R7RS)
+    registerFunction("bytevector?", BytevectorFunctions::isBytevector);
+    registerFunction("make-bytevector", BytevectorFunctions::makeBytevector);
+    registerFunction("bytevector", BytevectorFunctions::bytevector);
+    registerFunction("bytevector-length", BytevectorFunctions::bytevectorLength);
+    registerFunction("bytevector-u8-ref", BytevectorFunctions::bytevectorU8Ref);
+    registerFunction("bytevector-u8-set!", BytevectorFunctions::bytevectorU8Set);
+    registerFunction("bytevector-copy", BytevectorFunctions::bytevectorCopy);
+    registerFunction("bytevector-copy!", BytevectorFunctions::bytevectorCopyMutate);
+    registerFunction("bytevector-append", BytevectorFunctions::bytevectorAppend);
+    registerFunction("utf8->string", BytevectorFunctions::utf8ToString);
+    registerFunction("string->utf8", BytevectorFunctions::stringToUtf8);
   }
 
   private void initMacroTable() {

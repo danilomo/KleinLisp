@@ -325,4 +325,9 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
   public Supplier<LispObject> visit(EofObject obj) {
     return () -> obj;
   }
+
+  @Override
+  public Supplier<LispObject> visit(BytevectorObject obj) {
+    return () -> obj;
+  }
 }
