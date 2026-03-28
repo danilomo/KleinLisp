@@ -31,6 +31,7 @@ import net.sourceforge.kleinlisp.api.BooleanFunctions;
 import net.sourceforge.kleinlisp.api.CharFunctions;
 import net.sourceforge.kleinlisp.api.EqualityFunctions;
 import net.sourceforge.kleinlisp.api.ExceptionFunctions;
+import net.sourceforge.kleinlisp.api.ParameterFunctions;
 import net.sourceforge.kleinlisp.api.PromiseFunctions;
 import net.sourceforge.kleinlisp.api.HigherOrderFunctions;
 import net.sourceforge.kleinlisp.api.IOFunctions;
@@ -484,6 +485,10 @@ public class LispEnvironment implements Environment {
     registerFunction("error-object?", ExceptionFunctions::isErrorObject);
     registerFunction("error-object-message", ExceptionFunctions::errorObjectMessage);
     registerFunction("error-object-irritants", ExceptionFunctions::errorObjectIrritants);
+
+    // Parameter functions (R7RS)
+    registerFunction("make-parameter", ParameterFunctions::makeParameter);
+    registerFunction("parameter?", ParameterFunctions::isParameter);
   }
 
   private void initMacroTable() {

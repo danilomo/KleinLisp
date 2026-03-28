@@ -66,6 +66,7 @@ public class SpecialForms {
     this.insertForm("do", new DoForm(evaluator, environment));
     this.insertForm("delay", new DelayForm(evaluator, environment));
     this.insertForm("guard", new GuardForm(evaluator, environment));
+    this.insertForm("parameterize", new ParameterizeForm(evaluator));
   }
 
   SpecialForms insertForm(String name, SpecialForm form) {

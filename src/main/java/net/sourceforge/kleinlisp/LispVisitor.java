@@ -76,5 +76,7 @@ public interface LispVisitor<T> {
 
   T visit(PromiseObject obj);
 
+  T visit(ParameterObject obj);
+
   class Void {}
 }

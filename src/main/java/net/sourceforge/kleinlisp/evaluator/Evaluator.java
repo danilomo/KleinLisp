@@ -310,4 +310,9 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
   public Supplier<LispObject> visit(PromiseObject obj) {
     return () -> obj;
   }
+
+  @Override
+  public Supplier<LispObject> visit(ParameterObject obj) {
+    return () -> obj;
+  }
 }
