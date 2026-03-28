@@ -24,21 +24,33 @@
 package net.sourceforge.kleinlisp.special_forms;
 
 import java.util.function.Supplier;
-import net.sourceforge.kleinlisp.Environment;
+import net.sourceforge.kleinlisp.LispEnvironment;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.evaluator.Evaluator;
+import net.sourceforge.kleinlisp.objects.AtomObject;
+import net.sourceforge.kleinlisp.objects.ComputedLispObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 import net.sourceforge.kleinlisp.objects.VoidObject;
 
 /**
+ * Implements set! special form.
+ *
+ * <p>Handles setting variables in different scopes:
+ *
+ * <ul>
+ *   <li>ComputedLispObject: For lambda parameters and closure variables (transformed symbols)
+ *   <li>Let/Do environment: For let-bound and do loop variables
+ *   <li>Global environment: For top-level definitions
+ * </ul>
+ *
  * @author danilo
  */
 public class SetForm implements SpecialForm {
 
   private final Evaluator evaluator;
-  private final Environment environment;
+  private final LispEnvironment environment;
 
-  public SetForm(Evaluator evaluator, Environment environment) {
+  public SetForm(Evaluator evaluator, LispEnvironment environment) {
     this.evaluator = evaluator;
     this.environment = environment;
   }
@@ -50,11 +62,38 @@ public class SetForm implements SpecialForm {
     LispObject symbol = list.car();
     Supplier<LispObject> value = list.cdr().car().accept(evaluator);
 
+    // Check if symbol has been transformed to a ComputedLispObject (lambda params/closures)
+    if (symbol instanceof ComputedLispObject) {
+      return () -> {
+        LispObject val = value.get();
+        symbol.set(val);
+        return VoidObject.VOID;
+      };
+    }
+
+    // Get the atom for environment lookup
+    AtomObject atom = symbol.asAtom();
+    if (atom == null && symbol.asIdentifier() != null) {
+      atom = symbol.asIdentifier().asAtom();
+    }
+
+    if (atom == null) {
+      throw new IllegalArgumentException("set!: expected identifier, got " + symbol);
+    }
+
+    final AtomObject finalAtom = atom;
+
     return () -> {
-      LispObject o = symbol;
       LispObject val = value.get();
 
-      o.set(val);
+      // First check if variable is in let/do environment stack
+      LispObject letValue = environment.lookupInLetEnvStack(finalAtom);
+      if (letValue != null) {
+        environment.setInLetEnvStack(finalAtom, val);
+      } else {
+        // Fall back to global environment
+        environment.set(finalAtom, val);
+      }
 
       return VoidObject.VOID;
     };

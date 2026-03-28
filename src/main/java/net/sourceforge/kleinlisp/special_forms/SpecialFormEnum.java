@@ -35,5 +35,6 @@ public enum SpecialFormEnum {
   LET,
   OR,
   AND,
-  IF
+  IF,
+  DO
 }
