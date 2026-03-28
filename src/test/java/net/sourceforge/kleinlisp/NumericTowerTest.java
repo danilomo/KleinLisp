@@ -227,11 +227,22 @@ public class NumericTowerTest extends BaseTestClass {
 
   @Test
   public void testExactIntegerSqrt() {
-    assertEquals("(3 2)", lisp.evaluate("(exact-integer-sqrt 11)").toString());
-    assertEquals("(4 0)", lisp.evaluate("(exact-integer-sqrt 16)").toString());
-    assertEquals("(0 0)", lisp.evaluate("(exact-integer-sqrt 0)").toString());
-    assertEquals("(5 0)", lisp.evaluate("(exact-integer-sqrt 25)").toString());
-    assertEquals("(5 1)", lisp.evaluate("(exact-integer-sqrt 26)").toString());
+    // exact-integer-sqrt returns multiple values (R7RS), use call-with-values to convert to list
+    assertEquals(
+        "(3 2)",
+        lisp.evaluate("(call-with-values (lambda () (exact-integer-sqrt 11)) list)").toString());
+    assertEquals(
+        "(4 0)",
+        lisp.evaluate("(call-with-values (lambda () (exact-integer-sqrt 16)) list)").toString());
+    assertEquals(
+        "(0 0)",
+        lisp.evaluate("(call-with-values (lambda () (exact-integer-sqrt 0)) list)").toString());
+    assertEquals(
+        "(5 0)",
+        lisp.evaluate("(call-with-values (lambda () (exact-integer-sqrt 25)) list)").toString());
+    assertEquals(
+        "(5 1)",
+        lisp.evaluate("(call-with-values (lambda () (exact-integer-sqrt 26)) list)").toString());
   }
 
   @Test

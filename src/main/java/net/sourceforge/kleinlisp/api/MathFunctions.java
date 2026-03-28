@@ -28,7 +28,7 @@ import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.BooleanObject;
 import net.sourceforge.kleinlisp.objects.DoubleObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
-import net.sourceforge.kleinlisp.objects.ListObject;
+import net.sourceforge.kleinlisp.objects.ValuesObject;
 
 public class MathFunctions {
 
@@ -422,8 +422,8 @@ public class MathFunctions {
     }
     int s = (int) Math.sqrt(n);
     int r = n - s * s;
-    // Return two values as a list
-    return ListObject.fromList(new LispObject[] {IntObject.valueOf(s), IntObject.valueOf(r)});
+    // Return two values using R7RS multiple values
+    return new ValuesObject(new LispObject[] {IntObject.valueOf(s), IntObject.valueOf(r)});
   }
 
   // Rational number functions (simplified for integers only)

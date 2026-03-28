@@ -70,9 +70,7 @@ public class CharacterGuileComparisonTest extends BaseTestClass {
     }
   }
 
-  /**
-   * Normalize boolean output for comparison. Guile uses #t/#f, KleinLisp uses true/false.
-   */
+  /** Normalize boolean output for comparison. Guile uses #t/#f, KleinLisp uses true/false. */
   private String normalizeBoolean(String s) {
     return s.replace("#t", "true").replace("#f", "false");
   }

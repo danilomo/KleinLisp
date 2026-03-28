@@ -203,7 +203,8 @@ public class CharFunctions {
     if (obj instanceof CharObject) {
       return ((CharObject) obj).getValue();
     }
-    throw new LispArgumentError(name + ": expected character, got " + obj.getClass().getSimpleName());
+    throw new LispArgumentError(
+        name + ": expected character, got " + obj.getClass().getSimpleName());
   }
 
   // Helper to extract int from LispObject

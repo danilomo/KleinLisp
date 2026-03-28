@@ -461,11 +461,13 @@ public class NumericTowerGuileComparisonTest extends BaseTestClass {
   public void testExactIntegerSqrtComparesWithGuile() throws Exception {
     assumeTrue(guileAvailable, "Guile is not available, skipping comparison test");
 
-    // Guile returns values, we return a list
-    // We need to format for comparison
-    String kleinResult = lisp.evaluate("(exact-integer-sqrt 11)").toString();
+    // Both Guile and KleinLisp now return multiple values
+    // We use call-with-values to convert to list for comparison
+    String kleinResult =
+        lisp.evaluate("(call-with-values (lambda () (exact-integer-sqrt 11)) list)").toString();
     String guileCode =
-        "(call-with-values (lambda () (exact-integer-sqrt 11)) (lambda (s r) (display (list s r))))\n";
+        "(call-with-values (lambda () (exact-integer-sqrt 11)) (lambda (s r) (display (list s"
+            + " r))))\n";
     String guileOutput = runGuile(guileCode);
 
     assertEquals(guileOutput, kleinResult);
@@ -475,9 +477,11 @@ public class NumericTowerGuileComparisonTest extends BaseTestClass {
   public void testExactIntegerSqrtPerfectSquareComparesWithGuile() throws Exception {
     assumeTrue(guileAvailable, "Guile is not available, skipping comparison test");
 
-    String kleinResult = lisp.evaluate("(exact-integer-sqrt 16)").toString();
+    String kleinResult =
+        lisp.evaluate("(call-with-values (lambda () (exact-integer-sqrt 16)) list)").toString();
     String guileCode =
-        "(call-with-values (lambda () (exact-integer-sqrt 16)) (lambda (s r) (display (list s r))))\n";
+        "(call-with-values (lambda () (exact-integer-sqrt 16)) (lambda (s r) (display (list s"
+            + " r))))\n";
     String guileOutput = runGuile(guileCode);
 
     assertEquals(guileOutput, kleinResult);

@@ -43,6 +43,7 @@ import net.sourceforge.kleinlisp.api.SeqFunctions;
 import net.sourceforge.kleinlisp.api.StringFunctions;
 import net.sourceforge.kleinlisp.api.SymbolFunctions;
 import net.sourceforge.kleinlisp.api.TypePredicates;
+import net.sourceforge.kleinlisp.api.ValuesFunctions;
 import net.sourceforge.kleinlisp.api.VectorFunctions;
 import net.sourceforge.kleinlisp.evaluator.SourceRef;
 import net.sourceforge.kleinlisp.macros.MacroDefinition;
@@ -464,6 +465,11 @@ public class LispEnvironment implements Environment {
     registerFunction("list->p-set", PersistentSetFunctions::listToPSet);
     registerFunction("p-set?", PersistentSetFunctions::isPSet);
     registerFunction("p-set-empty?", PersistentSetFunctions::isPSetEmpty);
+
+    // Multiple values functions (R7RS)
+    registerFunction("values", ValuesFunctions::values);
+    registerFunction("call-with-values", ValuesFunctions::callWithValues);
+    registerFunction("values?", ValuesFunctions::isValues);
   }
 
   private void initMacroTable() {
