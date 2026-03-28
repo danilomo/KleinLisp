@@ -108,64 +108,107 @@ public class StringFunctions {
     return new StringObject(value.substring(s, e));
   }
 
-  /** Tests string equality. (string=? s1 s2) */
+  /** Tests string equality. (string=? s1 s2 ...) - R7RS compliant, variadic */
   public static LispObject stringEqual(LispObject[] params) {
-    StringObject s1 = params[0].asString();
-    StringObject s2 = params[1].asString();
-    if (s1 == null || s2 == null) {
-      throw new LispArgumentError("string=? requires string arguments");
-    }
-    return s1.value().equals(s2.value()) ? BooleanObject.TRUE : BooleanObject.FALSE;
+    return stringCompare(params, "string=?", (a, b) -> a.equals(b));
   }
 
-  /** Tests case-insensitive string equality. (string-ci=? s1 s2) */
+  /** Tests case-insensitive string equality. (string-ci=? s1 s2 ...) - R7RS compliant, variadic */
   public static LispObject stringCiEqual(LispObject[] params) {
-    StringObject s1 = params[0].asString();
-    StringObject s2 = params[1].asString();
-    if (s1 == null || s2 == null) {
-      throw new LispArgumentError("string-ci=? requires string arguments");
-    }
-    return s1.value().equalsIgnoreCase(s2.value()) ? BooleanObject.TRUE : BooleanObject.FALSE;
+    return stringCompareCi(params, "string-ci=?", (a, b) -> a.equals(b));
   }
 
-  /** String lexicographic comparison. (string<? s1 s2) */
+  /** String lexicographic comparison. (string<? s1 s2 ...) - R7RS compliant, variadic */
   public static LispObject stringLessThan(LispObject[] params) {
-    StringObject s1 = params[0].asString();
-    StringObject s2 = params[1].asString();
-    if (s1 == null || s2 == null) {
-      throw new LispArgumentError("string<? requires string arguments");
-    }
-    return s1.value().compareTo(s2.value()) < 0 ? BooleanObject.TRUE : BooleanObject.FALSE;
+    return stringCompare(params, "string<?", (a, b) -> a.compareTo(b) < 0);
   }
 
-  /** String lexicographic comparison. (string>? s1 s2) */
+  /** String lexicographic comparison. (string>? s1 s2 ...) - R7RS compliant, variadic */
   public static LispObject stringGreaterThan(LispObject[] params) {
-    StringObject s1 = params[0].asString();
-    StringObject s2 = params[1].asString();
-    if (s1 == null || s2 == null) {
-      throw new LispArgumentError("string>? requires string arguments");
-    }
-    return s1.value().compareTo(s2.value()) > 0 ? BooleanObject.TRUE : BooleanObject.FALSE;
+    return stringCompare(params, "string>?", (a, b) -> a.compareTo(b) > 0);
   }
 
-  /** String lexicographic comparison. (string<=? s1 s2) */
+  /** String lexicographic comparison. (string<=? s1 s2 ...) - R7RS compliant, variadic */
   public static LispObject stringLessOrEqual(LispObject[] params) {
-    StringObject s1 = params[0].asString();
-    StringObject s2 = params[1].asString();
-    if (s1 == null || s2 == null) {
-      throw new LispArgumentError("string<=? requires string arguments");
-    }
-    return s1.value().compareTo(s2.value()) <= 0 ? BooleanObject.TRUE : BooleanObject.FALSE;
+    return stringCompare(params, "string<=?", (a, b) -> a.compareTo(b) <= 0);
   }
 
-  /** String lexicographic comparison. (string>=? s1 s2) */
+  /** String lexicographic comparison. (string>=? s1 s2 ...) - R7RS compliant, variadic */
   public static LispObject stringGreaterOrEqual(LispObject[] params) {
-    StringObject s1 = params[0].asString();
-    StringObject s2 = params[1].asString();
-    if (s1 == null || s2 == null) {
-      throw new LispArgumentError("string>=? requires string arguments");
+    return stringCompare(params, "string>=?", (a, b) -> a.compareTo(b) >= 0);
+  }
+
+  /** Case-insensitive string less-than. (string-ci<? s1 s2 ...) - R7RS compliant, variadic */
+  public static LispObject stringCiLessThan(LispObject[] params) {
+    return stringCompareCi(params, "string-ci<?", (a, b) -> a.compareTo(b) < 0);
+  }
+
+  /** Case-insensitive string greater-than. (string-ci>? s1 s2 ...) - R7RS compliant, variadic */
+  public static LispObject stringCiGreaterThan(LispObject[] params) {
+    return stringCompareCi(params, "string-ci>?", (a, b) -> a.compareTo(b) > 0);
+  }
+
+  /** Case-insensitive string less-or-equal. (string-ci<=? s1 s2 ...) - R7RS compliant, variadic */
+  public static LispObject stringCiLessOrEqual(LispObject[] params) {
+    return stringCompareCi(params, "string-ci<=?", (a, b) -> a.compareTo(b) <= 0);
+  }
+
+  /**
+   * Case-insensitive string greater-or-equal. (string-ci>=? s1 s2 ...) - R7RS compliant, variadic
+   */
+  public static LispObject stringCiGreaterOrEqual(LispObject[] params) {
+    return stringCompareCi(params, "string-ci>=?", (a, b) -> a.compareTo(b) >= 0);
+  }
+
+  // Helper interface for string comparison
+  private interface StringComparator {
+    boolean compare(String a, String b);
+  }
+
+  // Helper method for variadic case-sensitive string comparison
+  private static LispObject stringCompare(LispObject[] args, String name, StringComparator cmp) {
+    assertMinArgCount(name, args, 2);
+    String prev = asString(name, args[0]);
+    for (int i = 1; i < args.length; i++) {
+      String curr = asString(name, args[i]);
+      if (!cmp.compare(prev, curr)) {
+        return BooleanObject.FALSE;
+      }
+      prev = curr;
     }
-    return s1.value().compareTo(s2.value()) >= 0 ? BooleanObject.TRUE : BooleanObject.FALSE;
+    return BooleanObject.TRUE;
+  }
+
+  // Helper method for variadic case-insensitive string comparison
+  private static LispObject stringCompareCi(LispObject[] args, String name, StringComparator cmp) {
+    assertMinArgCount(name, args, 2);
+    String prev = asString(name, args[0]).toLowerCase();
+    for (int i = 1; i < args.length; i++) {
+      String curr = asString(name, args[i]).toLowerCase();
+      if (!cmp.compare(prev, curr)) {
+        return BooleanObject.FALSE;
+      }
+      prev = curr;
+    }
+    return BooleanObject.TRUE;
+  }
+
+  // Helper to extract string value
+  private static String asString(String name, LispObject obj) {
+    StringObject str = obj.asString();
+    if (str == null) {
+      throw new LispArgumentError(
+          name + ": expected string, got " + obj.getClass().getSimpleName());
+    }
+    return str.value();
+  }
+
+  // Helper to assert minimum argument count
+  private static void assertMinArgCount(String name, LispObject[] args, int min) {
+    if (args.length < min) {
+      throw new LispArgumentError(
+          name + ": expected at least " + min + " argument(s), got " + args.length);
+    }
   }
 
   /** Converts a number to a string. (number->string n) */

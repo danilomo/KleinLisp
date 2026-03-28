@@ -27,6 +27,7 @@ import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.BooleanObject;
 import net.sourceforge.kleinlisp.objects.CellObject;
+import net.sourceforge.kleinlisp.objects.IdentifierObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 import net.sourceforge.kleinlisp.objects.PMapObject;
@@ -52,7 +53,8 @@ public class PersistentMapFunctions {
     }
     PMap<LispObject, LispObject> map = HashTreePMap.empty();
     for (int i = 0; i < params.length; i += 2) {
-      map = map.plus(params[i], params[i + 1]);
+      // Unwrap keys to ensure consistent lookup (e.g., IdentifierObject -> AtomObject)
+      map = map.plus(unwrap(params[i]), unwrap(params[i + 1]));
     }
     return new PMapObject(map);
   }
@@ -66,9 +68,9 @@ public class PersistentMapFunctions {
     }
     if (params.length > 2) {
       // Optional default value
-      return map.getOrDefault(params[1], params[2]);
+      return map.getOrDefault(unwrap(params[1]), params[2]);
     }
-    return map.get(params[1]);
+    return map.get(unwrap(params[1]));
   }
 
   /**
@@ -254,12 +256,16 @@ public class PersistentMapFunctions {
   }
 
   /**
-   * Unwraps a LispObject if it's a CellObject. CellObjects are used to wrap values in closures and
-   * need to be unwrapped before type checks.
+   * Unwraps a LispObject for map key operations. Handles: - CellObjects: unwraps to inner value
+   * (used in closures) - IdentifierObjects: unwraps to underlying AtomObject (for consistent symbol
+   * keys)
    */
   private static LispObject unwrap(LispObject obj) {
     if (obj instanceof CellObject) {
-      return ((CellObject) obj).get();
+      return unwrap(((CellObject) obj).get());
+    }
+    if (obj instanceof IdentifierObject) {
+      return ((IdentifierObject) obj).asAtom();
     }
     return obj;
   }

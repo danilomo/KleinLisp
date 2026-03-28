@@ -89,6 +89,11 @@ public class R7RSTestSuite {
     return loadTestCases("char-tests.scm");
   }
 
+  @TestFactory
+  public Stream<DynamicTest> comparisonTests() throws Exception {
+    return loadTestCases("comparison-tests.scm");
+  }
+
   private Stream<DynamicTest> loadTestCases(String filename) throws Exception {
     Path path = Paths.get(TEST_RESOURCES_PATH + filename);
     if (!Files.exists(path)) {

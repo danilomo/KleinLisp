@@ -322,6 +322,10 @@ public class LispEnvironment implements Environment {
     registerFunction("substring", StringFunctions::substring);
     registerFunction("string=?", StringFunctions::stringEqual);
     registerFunction("string-ci=?", StringFunctions::stringCiEqual);
+    registerFunction("string-ci<?", StringFunctions::stringCiLessThan);
+    registerFunction("string-ci>?", StringFunctions::stringCiGreaterThan);
+    registerFunction("string-ci<=?", StringFunctions::stringCiLessOrEqual);
+    registerFunction("string-ci>=?", StringFunctions::stringCiGreaterOrEqual);
     registerFunction("string<?", StringFunctions::stringLessThan);
     registerFunction("string>?", StringFunctions::stringGreaterThan);
     registerFunction("string<=?", StringFunctions::stringLessOrEqual);

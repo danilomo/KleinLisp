@@ -26,6 +26,7 @@ package net.sourceforge.kleinlisp.evaluator;
 import java.util.function.Supplier;
 import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispObject;
+import net.sourceforge.kleinlisp.api.BooleanFunctions;
 import net.sourceforge.kleinlisp.evaluator.TypeAnalyzer.ExpressionType;
 import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.BooleanObject;
@@ -459,14 +460,8 @@ public class CommonCases {
       return lessThanIntUnchecked(left, right);
     }
 
-    return () -> {
-      IntObject leftInt = left.get().asInt();
-      IntObject rightInt = right.get().asInt();
-      if (leftInt == null || rightInt == null) {
-        throw new LispArgumentError("Wrong argument type passed to < function");
-      }
-      return leftInt.value < rightInt.value ? BooleanObject.TRUE : BooleanObject.FALSE;
-    };
+    // Delegate to BooleanFunctions for full numeric/JavaObject support
+    return () -> BooleanFunctions.lt(new LispObject[] {left.get(), right.get()});
   }
 
   private static Supplier<LispObject> lessThanOrEqual(ListObject list, Evaluator evaluator) {
@@ -489,14 +484,8 @@ public class CommonCases {
       return lessThanOrEqualIntUnchecked(left, right);
     }
 
-    return () -> {
-      IntObject leftInt = left.get().asInt();
-      IntObject rightInt = right.get().asInt();
-      if (leftInt == null || rightInt == null) {
-        throw new LispArgumentError("Wrong argument type passed to <= function");
-      }
-      return leftInt.value <= rightInt.value ? BooleanObject.TRUE : BooleanObject.FALSE;
-    };
+    // Delegate to BooleanFunctions for full numeric/JavaObject support
+    return () -> BooleanFunctions.le(new LispObject[] {left.get(), right.get()});
   }
 
   private static Supplier<LispObject> greaterThan(ListObject list, Evaluator evaluator) {
@@ -519,14 +508,8 @@ public class CommonCases {
       return greaterThanIntUnchecked(left, right);
     }
 
-    return () -> {
-      IntObject leftInt = left.get().asInt();
-      IntObject rightInt = right.get().asInt();
-      if (leftInt == null || rightInt == null) {
-        throw new LispArgumentError("Wrong argument type passed to > function");
-      }
-      return leftInt.value > rightInt.value ? BooleanObject.TRUE : BooleanObject.FALSE;
-    };
+    // Delegate to BooleanFunctions for full numeric/JavaObject support
+    return () -> BooleanFunctions.gt(new LispObject[] {left.get(), right.get()});
   }
 
   private static Supplier<LispObject> greaterThanOrEqual(ListObject list, Evaluator evaluator) {
@@ -549,14 +532,8 @@ public class CommonCases {
       return greaterThanOrEqualIntUnchecked(left, right);
     }
 
-    return () -> {
-      IntObject leftInt = left.get().asInt();
-      IntObject rightInt = right.get().asInt();
-      if (leftInt == null || rightInt == null) {
-        throw new LispArgumentError("Wrong argument type passed to >= function");
-      }
-      return leftInt.value >= rightInt.value ? BooleanObject.TRUE : BooleanObject.FALSE;
-    };
+    // Delegate to BooleanFunctions for full numeric/JavaObject support
+    return () -> BooleanFunctions.ge(new LispObject[] {left.get(), right.get()});
   }
 
   private static Supplier<LispObject> equals(ListObject list, Evaluator evaluator) {
@@ -579,14 +556,8 @@ public class CommonCases {
       return equalsIntUnchecked(left, right);
     }
 
-    return () -> {
-      IntObject leftInt = left.get().asInt();
-      IntObject rightInt = right.get().asInt();
-      if (leftInt == null || rightInt == null) {
-        throw new LispArgumentError("Wrong argument type passed to = function");
-      }
-      return leftInt.value == rightInt.value ? BooleanObject.TRUE : BooleanObject.FALSE;
-    };
+    // Delegate to BooleanFunctions for full numeric/JavaObject support
+    return () -> BooleanFunctions.eq(new LispObject[] {left.get(), right.get()});
   }
 
   // ============ List operations ============

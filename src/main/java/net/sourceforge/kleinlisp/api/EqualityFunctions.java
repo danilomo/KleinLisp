@@ -28,7 +28,11 @@ import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.BooleanObject;
 import net.sourceforge.kleinlisp.objects.DoubleObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
+import net.sourceforge.kleinlisp.objects.JavaObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
+import net.sourceforge.kleinlisp.objects.PMapObject;
+import net.sourceforge.kleinlisp.objects.PSetObject;
+import net.sourceforge.kleinlisp.objects.PVectorObject;
 import net.sourceforge.kleinlisp.objects.StringObject;
 import net.sourceforge.kleinlisp.objects.VectorObject;
 
@@ -231,6 +235,36 @@ public class EqualityFunctions {
         }
       }
       return true;
+    }
+
+    // Compare persistent vectors element by element
+    if (a instanceof PVectorObject && b instanceof PVectorObject) {
+      PVectorObject vecA = (PVectorObject) a;
+      PVectorObject vecB = (PVectorObject) b;
+      if (vecA.length() != vecB.length()) {
+        return false;
+      }
+      for (int i = 0; i < vecA.length(); i++) {
+        if (!deepEqual(vecA.get(i), vecB.get(i))) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    // Compare persistent maps - delegate to PMapObject.equals() which uses structural equality
+    if (a instanceof PMapObject && b instanceof PMapObject) {
+      return a.equals(b);
+    }
+
+    // Compare persistent sets - delegate to PSetObject.equals() which uses structural equality
+    if (a instanceof PSetObject && b instanceof PSetObject) {
+      return a.equals(b);
+    }
+
+    // Compare JavaObjects - delegate to the wrapped object's equals() method
+    if (a instanceof JavaObject && b instanceof JavaObject) {
+      return a.equals(b);
     }
 
     return false;

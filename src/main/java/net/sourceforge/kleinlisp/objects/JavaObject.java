@@ -74,4 +74,49 @@ public final class JavaObject implements LispObject {
   public boolean error() {
     return false;
   }
+
+  /**
+   * Delegates equality to the wrapped Java object's equals() method. Two JavaObjects are equal if
+   * their wrapped objects are equal according to Object.equals().
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof JavaObject)) {
+      return false;
+    }
+    JavaObject other = (JavaObject) obj;
+    if (object == null) {
+      return other.object == null;
+    }
+    return object.equals(other.object);
+  }
+
+  /** Delegates hashCode to the wrapped Java object's hashCode() method. */
+  @Override
+  public int hashCode() {
+    return object == null ? 0 : object.hashCode();
+  }
+
+  /** Returns true if the wrapped object implements Comparable. */
+  public boolean isComparable() {
+    return object instanceof Comparable;
+  }
+
+  /**
+   * Compares this JavaObject with another, if both wrap Comparable objects of compatible types.
+   * Returns negative if this < other, zero if equal, positive if this > other.
+   *
+   * @throws ClassCastException if the wrapped objects are not mutually comparable
+   * @throws IllegalStateException if the wrapped object is not Comparable
+   */
+  @SuppressWarnings("unchecked")
+  public int compareTo(JavaObject other) {
+    if (!(object instanceof Comparable)) {
+      throw new IllegalStateException("Wrapped object is not Comparable: " + object.getClass());
+    }
+    return ((Comparable<Object>) object).compareTo(other.object);
+  }
 }
