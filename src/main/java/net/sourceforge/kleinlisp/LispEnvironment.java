@@ -25,8 +25,10 @@ package net.sourceforge.kleinlisp;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import net.sourceforge.kleinlisp.api.BooleanFunctions;
 import net.sourceforge.kleinlisp.api.BytevectorFunctions;
 import net.sourceforge.kleinlisp.api.CharFunctions;
@@ -34,6 +36,7 @@ import net.sourceforge.kleinlisp.api.EqualityFunctions;
 import net.sourceforge.kleinlisp.api.ExceptionFunctions;
 import net.sourceforge.kleinlisp.api.HigherOrderFunctions;
 import net.sourceforge.kleinlisp.api.IOFunctions;
+import net.sourceforge.kleinlisp.api.IntrospectionFunctions;
 import net.sourceforge.kleinlisp.api.JsonFunctions;
 import net.sourceforge.kleinlisp.api.ListFunctions;
 import net.sourceforge.kleinlisp.api.MathFunctions;
@@ -564,6 +567,21 @@ public class LispEnvironment implements Environment {
     registerFunction("emergency-exit", systemFuncs::emergencyExit);
   }
 
+  /**
+   * Registers introspection functions that require a reference to the Lisp instance. This must be
+   * called after the Lisp instance is created.
+   *
+   * @param lisp the Lisp instance
+   */
+  public void registerIntrospectionFunctions(Lisp lisp) {
+    IntrospectionFunctions introspection = new IntrospectionFunctions(this, lisp);
+    registerFunction("environment-symbols", introspection::environmentSymbols);
+    registerFunction("procedure-arity", introspection::procedureArity);
+    registerFunction("procedure-name", introspection::procedureName);
+    registerFunction("load", introspection::load);
+    registerFunction("eval", introspection::eval);
+  }
+
   private void initMacroTable() {
     StandardMacros macros = new StandardMacros(this);
     registerMacro("when", macros::when);
@@ -721,5 +739,22 @@ public class LispEnvironment implements Environment {
     }
     // If not found in let stack, fall back to global (shouldn't normally happen)
     set(atom, value);
+  }
+
+  /**
+   * Returns the names of all defined symbols in the global environment. Used for introspection and
+   * completions.
+   *
+   * @return a set of symbol names
+   */
+  public Set<String> getDefinedSymbols() {
+    Set<String> symbols = new HashSet<>();
+    for (AtomObject atom : objects.keySet()) {
+      String name = names.get(atom);
+      if (name != null) {
+        symbols.add(name);
+      }
+    }
+    return symbols;
   }
 }

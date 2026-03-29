@@ -26,12 +26,49 @@ package net.sourceforge.kleinlisp;
 import java.nio.file.Paths;
 
 /**
- * @author danilo
+ * KleinLisp main entry point.
+ *
+ * <p>Usage:
+ *
+ * <ul>
+ *   <li>No args → start REPL
+ *   <li>--repl → start REPL (explicit)
+ *   <li>file.scm → execute Scheme file
+ *   <li>-e &lt;expr&gt; → evaluate expression and print result
+ * </ul>
+ *
+ * @author Danilo Oliveira
  */
 public class Main {
   public static void main(String[] args) throws Exception {
-    String script = args[0];
-    Lisp lisp = new Lisp();
-    lisp.execute(Paths.get(script));
+    if (args.length == 0 || (args.length == 1 && args[0].equals("--repl"))) {
+      // Start REPL
+      Repl repl = new Repl();
+      repl.run();
+    } else if (args.length >= 2 && args[0].equals("-e")) {
+      // Evaluate expression
+      StringBuilder expr = new StringBuilder();
+      for (int i = 1; i < args.length; i++) {
+        if (i > 1) {
+          expr.append(" ");
+        }
+        expr.append(args[i]);
+      }
+      Lisp lisp = new Lisp();
+      LispObject result = lisp.evaluate(expr.toString());
+      if (result != null) {
+        System.out.println(result);
+      }
+    } else if (args[0].endsWith(".scm") || args[0].endsWith(".ss") || args[0].endsWith(".lisp")) {
+      // Execute script file
+      String script = args[0];
+      Lisp lisp = new Lisp();
+      lisp.execute(Paths.get(script));
+    } else {
+      // Treat as script file anyway for backward compatibility
+      String script = args[0];
+      Lisp lisp = new Lisp();
+      lisp.execute(Paths.get(script));
+    }
   }
 }

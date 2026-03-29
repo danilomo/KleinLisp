@@ -1,0 +1,32 @@
+#!/bin/bash
+# KleinLisp wrapper script
+# This script finds and runs the KleinLisp JAR file.
+
+# Find the directory containing this script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Look for the JAR file in common locations
+JAR_LOCATIONS=(
+    "$SCRIPT_DIR/../build/libs/KleinLisp-0.0.1.jar"
+    "$SCRIPT_DIR/../build/libs/kleinlisp.jar"
+    "$SCRIPT_DIR/../build/libs/KleinLisp.jar"
+    "$SCRIPT_DIR/../target/kleinlisp.jar"
+    "$SCRIPT_DIR/../kleinlisp.jar"
+)
+
+JAR_PATH=""
+for loc in "${JAR_LOCATIONS[@]}"; do
+    if [ -f "$loc" ]; then
+        JAR_PATH="$loc"
+        break
+    fi
+done
+
+if [ -z "$JAR_PATH" ]; then
+    echo "Error: Could not find kleinlisp.jar" >&2
+    echo "Please build the project first: ./gradlew build" >&2
+    exit 1
+fi
+
+# Run KleinLisp with any arguments passed to this script
+exec java -jar "$JAR_PATH" "$@"

@@ -41,6 +41,7 @@ public class Lisp {
     environment = new LispEnvironment();
     parser = Parser.defaultParser();
     evaluator = new Evaluator(environment);
+    environment.registerIntrospectionFunctions(this);
   }
 
   public LispObject parse(String expression) {

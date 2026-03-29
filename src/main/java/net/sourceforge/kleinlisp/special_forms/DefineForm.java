@@ -29,6 +29,7 @@ import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.evaluator.Evaluator;
 import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.FunctionObject;
+import net.sourceforge.kleinlisp.objects.IdentifierObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 import net.sourceforge.kleinlisp.objects.VoidObject;
 
@@ -78,7 +79,9 @@ public class DefineForm implements SpecialForm {
     LispObject function = evaluator.evaluate(lambda);
     FunctionObject functionObj = function.asFunction();
 
-    functionObj.setIdentifier(id.asIdentifier());
+    // Create an IdentifierObject from the AtomObject for proper function naming
+    IdentifierObject identifier = new IdentifierObject(id, "<define>", -1, -1);
+    functionObj.setIdentifier(identifier);
 
     environment.set(id, function);
   }
