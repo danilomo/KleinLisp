@@ -46,17 +46,20 @@ public class IOFunctions {
   public static LispObject print(LispObject[] params) {
     String asString = Arrays.stream(params).map(Object::toString).collect(Collectors.joining(" "));
     System.out.print(asString);
+    System.out.flush();
     return VoidObject.VOID;
   }
 
   public static LispObject println(LispObject[] params) {
     String asString = Arrays.stream(params).map(Object::toString).collect(Collectors.joining(" "));
     System.out.println(asString);
+    System.out.flush();
     return VoidObject.VOID;
   }
 
   public static LispObject newline(LispObject[] params) {
     System.out.println();
+    System.out.flush();
     return VoidObject.VOID;
   }
 

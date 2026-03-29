@@ -73,6 +73,7 @@ public class Repl {
     System.out.println("KleinLisp REPL");
     System.out.println("Type expressions to evaluate. Press Ctrl+D to exit.");
     System.out.println();
+    System.out.flush();
 
     while (true) {
       try {
@@ -80,6 +81,7 @@ public class Repl {
         if (input == null) {
           // EOF
           System.out.println();
+          System.out.flush();
           break;
         }
 
@@ -90,7 +92,11 @@ public class Repl {
         LispObject result = lisp.evaluate(input);
         if (result != null && !isVoid(result)) {
           System.out.println(result);
+        } else {
+          // Print marker for void results so Geiser knows evaluation completed
+          System.out.println("#<void>");
         }
+        System.out.flush();
       } catch (LispRuntimeException e) {
         System.err.println("Error: " + e.getMessage());
         if (e.getLispStackTrace() != null && !e.getLispStackTrace().isEmpty()) {
@@ -99,8 +105,10 @@ public class Repl {
             System.err.println("  at " + ref);
           }
         }
+        System.err.flush();
       } catch (Exception e) {
         System.err.println("Error: " + e.getMessage());
+        System.err.flush();
       }
     }
   }

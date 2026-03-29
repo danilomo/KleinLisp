@@ -12,16 +12,6 @@
 ;; This file is NOT part of GNU Emacs.
 
 ;; MIT License
-;;
-;; Permission is hereby granted, free of charge, to any person obtaining a copy
-;; of this software and associated documentation files (the "Software"), to deal
-;; in the Software without restriction, including without limitation the rights
-;; to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-;; copies of the Software, and to permit persons to whom the Software is
-;; furnished to do so, subject to the following conditions:
-;;
-;; The above copyright notice and this permission notice shall be included in all
-;; copies or substantial portions of the Software.
 
 ;;; Commentary:
 
@@ -39,8 +29,6 @@
 (require 'geiser-custom)
 (require 'geiser-base)
 (require 'geiser-syntax)
-(require 'geiser-log)
-(require 'geiser-connection)
 (require 'geiser)
 
 (require 'compile)
@@ -54,11 +42,6 @@
 (geiser-custom--defcustom geiser-kleinlisp-binary "kleinlisp"
   "Path to KleinLisp executable or wrapper script."
   :type 'string
-  :group 'geiser-kleinlisp)
-
-(geiser-custom--defcustom geiser-kleinlisp-extra-keywords nil
-  "Extra keywords highlighted in KleinLisp buffers."
-  :type '(repeat string)
   :group 'geiser-kleinlisp)
 
 ;;; Implementation
@@ -82,33 +65,19 @@
   "Transform PROC and ARGS into a KleinLisp procedure call."
   (cl-case proc
     ((eval compile)
-     (let ((form (cadr args))
-           (module (car args)))
-       (format "(geiser:eval '%s '%s)" module form)))
+     (let ((form (cadr args)))
+       ;; Use geiser:eval which returns structured result
+       (format "(geiser:eval '%s)" form)))
     ((load-file compile-file)
      (format "(geiser:load-file %S)" (car args)))
-    ((no-values)
-     "(geiser:no-values)")
     ((completions)
      (format "(geiser:completions %S)" (car args)))
-    ((module-completions)
-     (format "(geiser:module-completions %S)" (car args)))
     ((autodoc)
-     (format "(geiser:autodoc '%s)" (car args)))
-    ((symbol-documentation)
-     (format "(geiser:symbol-documentation '%s)" (car args)))
-    ((module-location)
-     (format "(geiser:module-location '%s)" (car args)))
-    ((symbol-location)
-     (format "(geiser:symbol-location '%s)" (car args)))
-    ((module-exports)
-     (format "(geiser:module-exports '%s)" (car args)))
-    ((find-file)
-     (format "(geiser:find-file %S)" (car args)))
-    ((macroexpand)
-     (format "(geiser:macroexpand '%s)" (car args)))
+     "(geiser:autodoc)")
+    ((no-values)
+     "(geiser:no-values)")
     (t
-     (format "(geiser:no-values)"))))
+     "'()")))
 
 (defun geiser-kleinlisp--get-module (&optional module)
   "Return MODULE or nil (KleinLisp has no module system)."
@@ -120,17 +89,14 @@
     (skip-syntax-backward "w_")
     (point)))
 
-(defun geiser-kleinlisp--import-command (module)
-  "Return import command for MODULE (not supported)."
-  nil)
-
 (defun geiser-kleinlisp--exit-command ()
   "Return the command to exit KleinLisp."
   "(exit)")
 
-(defun geiser-kleinlisp--startup (remote)
-  "Perform startup actions for the KleinLisp REPL."
-  nil)
+(defun geiser-kleinlisp--startup (_remote)
+  "Perform startup actions for the KleinLisp REPL.
+The geiser support code is auto-loaded by KleinLisp at REPL startup."
+  t)
 
 (defun geiser-kleinlisp--version (binary)
   "Return the version of BINARY."
@@ -138,22 +104,27 @@
 
 (defun geiser-kleinlisp--keywords ()
   "Return KleinLisp-specific keywords for syntax highlighting."
-  (append
-   '(("define" "lambda" "let" "let*" "letrec" "letrec*"
-      "if" "cond" "case" "when" "unless" "else"
-      "begin" "do" "and" "or" "not"
-      "quote" "quasiquote" "unquote" "unquote-splicing"
-      "set!" "define-syntax" "let-syntax" "letrec-syntax"
-      "syntax-rules" "guard" "delay" "force"
-      "parameterize" "define-values" "let-values" "let*-values"
-      "values" "call-with-values")
-     ("lambda" "define" "let" "let*" "letrec" "letrec*"
-      "let-values" "let*-values" "define-values"))
-   geiser-kleinlisp-extra-keywords))
+  '(("define" "lambda" "let" "let*" "letrec" "letrec*"
+     "if" "cond" "case" "when" "unless" "else"
+     "begin" "do" "and" "or" "not"
+     "quote" "quasiquote" "unquote" "unquote-splicing"
+     "set!" "define-syntax" "let-syntax" "letrec-syntax"
+     "syntax-rules" "guard" "delay" "force"
+     "parameterize" "define-values" "let-values" "let*-values"
+     "values" "call-with-values")
+    ("lambda" "define" "let" "let*" "letrec" "letrec*"
+     "let-values" "let*-values" "define-values")))
 
 (defun geiser-kleinlisp--case-sensitive ()
   "Return t if KleinLisp is case-sensitive."
   t)
+
+(defun geiser-kleinlisp--display-error (_module key msg)
+  "Display error with KEY and MSG."
+  (when (stringp msg)
+    (newline)
+    (insert msg))
+  (and (not key) msg (not (zerop (length msg)))))
 
 ;;; REPL integration
 
@@ -175,9 +146,9 @@
   (find-module geiser-kleinlisp--get-module)
   (enter-command nil)
   (exit-command geiser-kleinlisp--exit-command)
-  (import-command geiser-kleinlisp--import-command)
+  (import-command nil)
   (find-symbol-begin geiser-kleinlisp--symbol-begin)
-  (display-error nil)
+  (display-error geiser-kleinlisp--display-error)
   (external-help nil)
   (check-buffer nil)
   (keywords geiser-kleinlisp--keywords)
