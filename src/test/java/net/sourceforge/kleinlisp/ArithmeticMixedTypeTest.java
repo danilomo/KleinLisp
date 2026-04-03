@@ -30,8 +30,8 @@ import net.sourceforge.kleinlisp.objects.IntObject;
 import org.junit.jupiter.api.Test;
 
 /**
- * Comprehensive tests for arithmetic operations with mixed int/double types
- * and numeric tower behavior.
+ * Comprehensive tests for arithmetic operations with mixed int/double types and numeric tower
+ * behavior.
  */
 public class ArithmeticMixedTypeTest extends BaseTestClass {
 
@@ -102,14 +102,16 @@ public class ArithmeticMixedTypeTest extends BaseTestClass {
     assertTrue(intResult instanceof IntObject, "Integer subtraction should return IntObject");
 
     LispObject doubleResult = lisp.evaluate("(- 5 3.0)");
-    assertTrue(doubleResult instanceof DoubleObject, "Mixed subtraction should return DoubleObject");
+    assertTrue(
+        doubleResult instanceof DoubleObject, "Mixed subtraction should return DoubleObject");
 
     // Unary negation
     LispObject unaryInt = lisp.evaluate("(- 5)");
     assertTrue(unaryInt instanceof IntObject, "Unary negation of int should return IntObject");
 
     LispObject unaryDouble = lisp.evaluate("(- 5.0)");
-    assertTrue(unaryDouble instanceof DoubleObject, "Unary negation of double should return DoubleObject");
+    assertTrue(
+        unaryDouble instanceof DoubleObject, "Unary negation of double should return DoubleObject");
   }
 
   // ==================== MULTIPLICATION (*) ====================
@@ -142,7 +144,8 @@ public class ArithmeticMixedTypeTest extends BaseTestClass {
     assertTrue(intResult instanceof IntObject, "Integer multiplication should return IntObject");
 
     LispObject doubleResult = lisp.evaluate("(* 2 3.0)");
-    assertTrue(doubleResult instanceof DoubleObject, "Mixed multiplication should return DoubleObject");
+    assertTrue(
+        doubleResult instanceof DoubleObject, "Mixed multiplication should return DoubleObject");
   }
 
   // ==================== DIVISION (/) ====================
@@ -201,7 +204,8 @@ public class ArithmeticMixedTypeTest extends BaseTestClass {
 
     // Inexact division returns double
     LispObject inexactResult = lisp.evaluate("(/ 5 2)");
-    assertTrue(inexactResult instanceof DoubleObject, "Inexact division should return DoubleObject");
+    assertTrue(
+        inexactResult instanceof DoubleObject, "Inexact division should return DoubleObject");
 
     // Mixed types always return double
     LispObject mixedResult = lisp.evaluate("(/ 6 2.0)");
@@ -350,7 +354,8 @@ public class ArithmeticMixedTypeTest extends BaseTestClass {
     assertEquals("2.0", result.toString());
 
     result = lisp.evaluate("(* 2 2.0)");
-    assertTrue(result instanceof DoubleObject, "Multiplying int and double should give DoubleObject");
+    assertTrue(
+        result instanceof DoubleObject, "Multiplying int and double should give DoubleObject");
     assertEquals("4.0", result.toString());
   }
 
@@ -359,7 +364,8 @@ public class ArithmeticMixedTypeTest extends BaseTestClass {
   @Test
   public void testVerySmallNumbers() {
     String result = lisp.evaluate("(+ 0.0000001 0.0000001)").toString();
-    assertTrue(result.contains("E") || result.startsWith("2.0E") || result.startsWith("0.000000"),
+    assertTrue(
+        result.contains("E") || result.startsWith("2.0E") || result.startsWith("0.000000"),
         "Should handle very small numbers");
   }
 

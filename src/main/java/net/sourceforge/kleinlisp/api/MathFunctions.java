@@ -347,8 +347,8 @@ public class MathFunctions {
 
   /**
    * Check if a wrapper type (like ValuesObject) contains a double value rather than an integer.
-   * Returns true if the value has a fractional part (true double) or is an inexact integer.
-   * Returns false if the value is effectively an exact integer.
+   * Returns true if the value has a fractional part (true double) or is an inexact integer. Returns
+   * false if the value is effectively an exact integer.
    */
   private static boolean isEffectivelyDouble(LispObject obj) {
     if (obj instanceof DoubleObject) {

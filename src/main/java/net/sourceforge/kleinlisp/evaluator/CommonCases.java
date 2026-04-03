@@ -109,12 +109,14 @@ public class CommonCases {
     boolean rightIsDouble = rightObj instanceof DoubleObject;
 
     if (leftIsInt && rightIsInt) {
-      IntObject result = IntObject.valueOf(((IntObject) leftObj).value + ((IntObject) rightObj).value);
+      IntObject result =
+          IntObject.valueOf(((IntObject) leftObj).value + ((IntObject) rightObj).value);
       return () -> result;
     }
     if ((leftIsInt || leftIsDouble) && (rightIsInt || rightIsDouble)) {
       double leftVal = leftIsDouble ? ((DoubleObject) leftObj).value : ((IntObject) leftObj).value;
-      double rightVal = rightIsDouble ? ((DoubleObject) rightObj).value : ((IntObject) rightObj).value;
+      double rightVal =
+          rightIsDouble ? ((DoubleObject) rightObj).value : ((IntObject) rightObj).value;
       DoubleObject result = new DoubleObject(leftVal + rightVal);
       return () -> result;
     }
@@ -130,12 +132,14 @@ public class CommonCases {
     boolean rightIsDouble = rightObj instanceof DoubleObject;
 
     if (leftIsInt && rightIsInt) {
-      IntObject result = IntObject.valueOf(((IntObject) leftObj).value - ((IntObject) rightObj).value);
+      IntObject result =
+          IntObject.valueOf(((IntObject) leftObj).value - ((IntObject) rightObj).value);
       return () -> result;
     }
     if ((leftIsInt || leftIsDouble) && (rightIsInt || rightIsDouble)) {
       double leftVal = leftIsDouble ? ((DoubleObject) leftObj).value : ((IntObject) leftObj).value;
-      double rightVal = rightIsDouble ? ((DoubleObject) rightObj).value : ((IntObject) rightObj).value;
+      double rightVal =
+          rightIsDouble ? ((DoubleObject) rightObj).value : ((IntObject) rightObj).value;
       DoubleObject result = new DoubleObject(leftVal - rightVal);
       return () -> result;
     }
@@ -151,12 +155,14 @@ public class CommonCases {
     boolean rightIsDouble = rightObj instanceof DoubleObject;
 
     if (leftIsInt && rightIsInt) {
-      IntObject result = IntObject.valueOf(((IntObject) leftObj).value * ((IntObject) rightObj).value);
+      IntObject result =
+          IntObject.valueOf(((IntObject) leftObj).value * ((IntObject) rightObj).value);
       return () -> result;
     }
     if ((leftIsInt || leftIsDouble) && (rightIsInt || rightIsDouble)) {
       double leftVal = leftIsDouble ? ((DoubleObject) leftObj).value : ((IntObject) leftObj).value;
-      double rightVal = rightIsDouble ? ((DoubleObject) rightObj).value : ((IntObject) rightObj).value;
+      double rightVal =
+          rightIsDouble ? ((DoubleObject) rightObj).value : ((IntObject) rightObj).value;
       DoubleObject result = new DoubleObject(leftVal * rightVal);
       return () -> result;
     }
@@ -187,7 +193,8 @@ public class CommonCases {
     }
     if ((leftIsInt || leftIsDouble) && (rightIsInt || rightIsDouble)) {
       double leftVal = leftIsDouble ? ((DoubleObject) leftObj).value : ((IntObject) leftObj).value;
-      double rightVal = rightIsDouble ? ((DoubleObject) rightObj).value : ((IntObject) rightObj).value;
+      double rightVal =
+          rightIsDouble ? ((DoubleObject) rightObj).value : ((IntObject) rightObj).value;
       if (rightVal != 0) {
         DoubleObject result = new DoubleObject(leftVal / rightVal);
         return () -> result;
@@ -219,7 +226,8 @@ public class CommonCases {
     }
     if ((leftIsInt || leftIsDouble) && (rightIsInt || rightIsDouble)) {
       double leftVal = leftIsDouble ? ((DoubleObject) leftObj).value : ((IntObject) leftObj).value;
-      double rightVal = rightIsDouble ? ((DoubleObject) rightObj).value : ((IntObject) rightObj).value;
+      double rightVal =
+          rightIsDouble ? ((DoubleObject) rightObj).value : ((IntObject) rightObj).value;
       if (rightVal != 0) {
         double result = leftVal % rightVal;
         // R7RS modulo: result has same sign as divisor
@@ -243,7 +251,8 @@ public class CommonCases {
 
     if ((leftIsInt || leftIsDouble) && (rightIsInt || rightIsDouble)) {
       double leftVal = leftIsDouble ? ((DoubleObject) leftObj).value : ((IntObject) leftObj).value;
-      double rightVal = rightIsDouble ? ((DoubleObject) rightObj).value : ((IntObject) rightObj).value;
+      double rightVal =
+          rightIsDouble ? ((DoubleObject) rightObj).value : ((IntObject) rightObj).value;
       BooleanObject result = leftVal < rightVal ? BooleanObject.TRUE : BooleanObject.FALSE;
       return () -> result;
     }
@@ -259,7 +268,8 @@ public class CommonCases {
 
     if ((leftIsInt || leftIsDouble) && (rightIsInt || rightIsDouble)) {
       double leftVal = leftIsDouble ? ((DoubleObject) leftObj).value : ((IntObject) leftObj).value;
-      double rightVal = rightIsDouble ? ((DoubleObject) rightObj).value : ((IntObject) rightObj).value;
+      double rightVal =
+          rightIsDouble ? ((DoubleObject) rightObj).value : ((IntObject) rightObj).value;
       BooleanObject result = leftVal <= rightVal ? BooleanObject.TRUE : BooleanObject.FALSE;
       return () -> result;
     }
@@ -275,7 +285,8 @@ public class CommonCases {
 
     if ((leftIsInt || leftIsDouble) && (rightIsInt || rightIsDouble)) {
       double leftVal = leftIsDouble ? ((DoubleObject) leftObj).value : ((IntObject) leftObj).value;
-      double rightVal = rightIsDouble ? ((DoubleObject) rightObj).value : ((IntObject) rightObj).value;
+      double rightVal =
+          rightIsDouble ? ((DoubleObject) rightObj).value : ((IntObject) rightObj).value;
       BooleanObject result = leftVal > rightVal ? BooleanObject.TRUE : BooleanObject.FALSE;
       return () -> result;
     }
@@ -291,7 +302,8 @@ public class CommonCases {
 
     if ((leftIsInt || leftIsDouble) && (rightIsInt || rightIsDouble)) {
       double leftVal = leftIsDouble ? ((DoubleObject) leftObj).value : ((IntObject) leftObj).value;
-      double rightVal = rightIsDouble ? ((DoubleObject) rightObj).value : ((IntObject) rightObj).value;
+      double rightVal =
+          rightIsDouble ? ((DoubleObject) rightObj).value : ((IntObject) rightObj).value;
       BooleanObject result = leftVal >= rightVal ? BooleanObject.TRUE : BooleanObject.FALSE;
       return () -> result;
     }
@@ -307,7 +319,8 @@ public class CommonCases {
 
     if ((leftIsInt || leftIsDouble) && (rightIsInt || rightIsDouble)) {
       double leftVal = leftIsDouble ? ((DoubleObject) leftObj).value : ((IntObject) leftObj).value;
-      double rightVal = rightIsDouble ? ((DoubleObject) rightObj).value : ((IntObject) rightObj).value;
+      double rightVal =
+          rightIsDouble ? ((DoubleObject) rightObj).value : ((IntObject) rightObj).value;
       BooleanObject result = leftVal == rightVal ? BooleanObject.TRUE : BooleanObject.FALSE;
       return () -> result;
     }
