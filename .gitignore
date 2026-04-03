@@ -9,3 +9,5 @@ KleinLisp.iml
 /.projectile
 /.gradle/
 /build/
+bin/main/
+bin/test/
