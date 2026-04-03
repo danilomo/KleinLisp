@@ -12,7 +12,7 @@ import net.sourceforge.kleinlisp.objects.CharObject;
 %cup
 
 /*number*/
-double_literal          = [-]?([1-9][0-9]*|0)([.][0-9]* )([eE]([+]|[-])?[0-9]+)?
+double_literal          = [-]?([1-9][0-9]*|0)([.][0-9]*)([eE]([+]|[-])?[0-9]+)?
 integer_literal         = [-]?([1-9][0-9]*|0)
 digit		= [0-9]
 symbol          = 

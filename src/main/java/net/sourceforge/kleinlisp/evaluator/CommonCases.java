@@ -27,9 +27,11 @@ import java.util.function.Supplier;
 import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.api.BooleanFunctions;
+import net.sourceforge.kleinlisp.api.MathFunctions;
 import net.sourceforge.kleinlisp.evaluator.TypeAnalyzer.ExpressionType;
 import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.BooleanObject;
+import net.sourceforge.kleinlisp.objects.DoubleObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 
@@ -101,10 +103,19 @@ public class CommonCases {
 
   /** Try constant folding for addition. Returns null if not applicable. */
   private static Supplier<LispObject> tryConstantFoldPlus(LispObject leftObj, LispObject rightObj) {
-    IntObject leftLit = leftObj.asInt();
-    IntObject rightLit = rightObj.asInt();
-    if (leftLit != null && rightLit != null) {
-      IntObject result = IntObject.valueOf(leftLit.value + rightLit.value);
+    boolean leftIsInt = leftObj instanceof IntObject;
+    boolean rightIsInt = rightObj instanceof IntObject;
+    boolean leftIsDouble = leftObj instanceof DoubleObject;
+    boolean rightIsDouble = rightObj instanceof DoubleObject;
+
+    if (leftIsInt && rightIsInt) {
+      IntObject result = IntObject.valueOf(((IntObject) leftObj).value + ((IntObject) rightObj).value);
+      return () -> result;
+    }
+    if ((leftIsInt || leftIsDouble) && (rightIsInt || rightIsDouble)) {
+      double leftVal = leftIsDouble ? ((DoubleObject) leftObj).value : ((IntObject) leftObj).value;
+      double rightVal = rightIsDouble ? ((DoubleObject) rightObj).value : ((IntObject) rightObj).value;
+      DoubleObject result = new DoubleObject(leftVal + rightVal);
       return () -> result;
     }
     return null;
@@ -113,10 +124,19 @@ public class CommonCases {
   /** Try constant folding for subtraction. */
   private static Supplier<LispObject> tryConstantFoldMinus(
       LispObject leftObj, LispObject rightObj) {
-    IntObject leftLit = leftObj.asInt();
-    IntObject rightLit = rightObj.asInt();
-    if (leftLit != null && rightLit != null) {
-      IntObject result = IntObject.valueOf(leftLit.value - rightLit.value);
+    boolean leftIsInt = leftObj instanceof IntObject;
+    boolean rightIsInt = rightObj instanceof IntObject;
+    boolean leftIsDouble = leftObj instanceof DoubleObject;
+    boolean rightIsDouble = rightObj instanceof DoubleObject;
+
+    if (leftIsInt && rightIsInt) {
+      IntObject result = IntObject.valueOf(((IntObject) leftObj).value - ((IntObject) rightObj).value);
+      return () -> result;
+    }
+    if ((leftIsInt || leftIsDouble) && (rightIsInt || rightIsDouble)) {
+      double leftVal = leftIsDouble ? ((DoubleObject) leftObj).value : ((IntObject) leftObj).value;
+      double rightVal = rightIsDouble ? ((DoubleObject) rightObj).value : ((IntObject) rightObj).value;
+      DoubleObject result = new DoubleObject(leftVal - rightVal);
       return () -> result;
     }
     return null;
@@ -125,10 +145,19 @@ public class CommonCases {
   /** Try constant folding for multiplication. */
   private static Supplier<LispObject> tryConstantFoldMultiply(
       LispObject leftObj, LispObject rightObj) {
-    IntObject leftLit = leftObj.asInt();
-    IntObject rightLit = rightObj.asInt();
-    if (leftLit != null && rightLit != null) {
-      IntObject result = IntObject.valueOf(leftLit.value * rightLit.value);
+    boolean leftIsInt = leftObj instanceof IntObject;
+    boolean rightIsInt = rightObj instanceof IntObject;
+    boolean leftIsDouble = leftObj instanceof DoubleObject;
+    boolean rightIsDouble = rightObj instanceof DoubleObject;
+
+    if (leftIsInt && rightIsInt) {
+      IntObject result = IntObject.valueOf(((IntObject) leftObj).value * ((IntObject) rightObj).value);
+      return () -> result;
+    }
+    if ((leftIsInt || leftIsDouble) && (rightIsInt || rightIsDouble)) {
+      double leftVal = leftIsDouble ? ((DoubleObject) leftObj).value : ((IntObject) leftObj).value;
+      double rightVal = rightIsDouble ? ((DoubleObject) rightObj).value : ((IntObject) rightObj).value;
+      DoubleObject result = new DoubleObject(leftVal * rightVal);
       return () -> result;
     }
     return null;
@@ -137,11 +166,32 @@ public class CommonCases {
   /** Try constant folding for division. */
   private static Supplier<LispObject> tryConstantFoldDivide(
       LispObject leftObj, LispObject rightObj) {
-    IntObject leftLit = leftObj.asInt();
-    IntObject rightLit = rightObj.asInt();
-    if (leftLit != null && rightLit != null && rightLit.value != 0) {
-      IntObject result = IntObject.valueOf(leftLit.value / rightLit.value);
-      return () -> result;
+    boolean leftIsInt = leftObj instanceof IntObject;
+    boolean rightIsInt = rightObj instanceof IntObject;
+    boolean leftIsDouble = leftObj instanceof DoubleObject;
+    boolean rightIsDouble = rightObj instanceof DoubleObject;
+
+    if (leftIsInt && rightIsInt) {
+      int leftVal = ((IntObject) leftObj).value;
+      int rightVal = ((IntObject) rightObj).value;
+      if (rightVal != 0) {
+        // Return int if exact, double otherwise
+        if (leftVal % rightVal == 0) {
+          IntObject result = IntObject.valueOf(leftVal / rightVal);
+          return () -> result;
+        } else {
+          DoubleObject result = new DoubleObject((double) leftVal / rightVal);
+          return () -> result;
+        }
+      }
+    }
+    if ((leftIsInt || leftIsDouble) && (rightIsInt || rightIsDouble)) {
+      double leftVal = leftIsDouble ? ((DoubleObject) leftObj).value : ((IntObject) leftObj).value;
+      double rightVal = rightIsDouble ? ((DoubleObject) rightObj).value : ((IntObject) rightObj).value;
+      if (rightVal != 0) {
+        DoubleObject result = new DoubleObject(leftVal / rightVal);
+        return () -> result;
+      }
     }
     return null;
   }
@@ -149,11 +199,36 @@ public class CommonCases {
   /** Try constant folding for modulo. */
   private static Supplier<LispObject> tryConstantFoldModulo(
       LispObject leftObj, LispObject rightObj) {
-    IntObject leftLit = leftObj.asInt();
-    IntObject rightLit = rightObj.asInt();
-    if (leftLit != null && rightLit != null && rightLit.value != 0) {
-      IntObject result = IntObject.valueOf(leftLit.value % rightLit.value);
-      return () -> result;
+    boolean leftIsInt = leftObj instanceof IntObject;
+    boolean rightIsInt = rightObj instanceof IntObject;
+    boolean leftIsDouble = leftObj instanceof DoubleObject;
+    boolean rightIsDouble = rightObj instanceof DoubleObject;
+
+    if (leftIsInt && rightIsInt) {
+      int leftVal = ((IntObject) leftObj).value;
+      int rightVal = ((IntObject) rightObj).value;
+      if (rightVal != 0) {
+        int result = leftVal % rightVal;
+        // R7RS modulo: result has same sign as divisor
+        if ((result < 0 && rightVal > 0) || (result > 0 && rightVal < 0)) {
+          result += rightVal;
+        }
+        IntObject finalResult = IntObject.valueOf(result);
+        return () -> finalResult;
+      }
+    }
+    if ((leftIsInt || leftIsDouble) && (rightIsInt || rightIsDouble)) {
+      double leftVal = leftIsDouble ? ((DoubleObject) leftObj).value : ((IntObject) leftObj).value;
+      double rightVal = rightIsDouble ? ((DoubleObject) rightObj).value : ((IntObject) rightObj).value;
+      if (rightVal != 0) {
+        double result = leftVal % rightVal;
+        // R7RS modulo: result has same sign as divisor
+        if ((result < 0 && rightVal > 0) || (result > 0 && rightVal < 0)) {
+          result += rightVal;
+        }
+        DoubleObject finalResult = new DoubleObject(result);
+        return () -> finalResult;
+      }
     }
     return null;
   }
@@ -161,11 +236,15 @@ public class CommonCases {
   /** Try constant folding for comparison. */
   private static Supplier<LispObject> tryConstantFoldLessThan(
       LispObject leftObj, LispObject rightObj) {
-    IntObject leftLit = leftObj.asInt();
-    IntObject rightLit = rightObj.asInt();
-    if (leftLit != null && rightLit != null) {
-      BooleanObject result =
-          leftLit.value < rightLit.value ? BooleanObject.TRUE : BooleanObject.FALSE;
+    boolean leftIsInt = leftObj instanceof IntObject;
+    boolean rightIsInt = rightObj instanceof IntObject;
+    boolean leftIsDouble = leftObj instanceof DoubleObject;
+    boolean rightIsDouble = rightObj instanceof DoubleObject;
+
+    if ((leftIsInt || leftIsDouble) && (rightIsInt || rightIsDouble)) {
+      double leftVal = leftIsDouble ? ((DoubleObject) leftObj).value : ((IntObject) leftObj).value;
+      double rightVal = rightIsDouble ? ((DoubleObject) rightObj).value : ((IntObject) rightObj).value;
+      BooleanObject result = leftVal < rightVal ? BooleanObject.TRUE : BooleanObject.FALSE;
       return () -> result;
     }
     return null;
@@ -173,11 +252,15 @@ public class CommonCases {
 
   private static Supplier<LispObject> tryConstantFoldLessThanOrEqual(
       LispObject leftObj, LispObject rightObj) {
-    IntObject leftLit = leftObj.asInt();
-    IntObject rightLit = rightObj.asInt();
-    if (leftLit != null && rightLit != null) {
-      BooleanObject result =
-          leftLit.value <= rightLit.value ? BooleanObject.TRUE : BooleanObject.FALSE;
+    boolean leftIsInt = leftObj instanceof IntObject;
+    boolean rightIsInt = rightObj instanceof IntObject;
+    boolean leftIsDouble = leftObj instanceof DoubleObject;
+    boolean rightIsDouble = rightObj instanceof DoubleObject;
+
+    if ((leftIsInt || leftIsDouble) && (rightIsInt || rightIsDouble)) {
+      double leftVal = leftIsDouble ? ((DoubleObject) leftObj).value : ((IntObject) leftObj).value;
+      double rightVal = rightIsDouble ? ((DoubleObject) rightObj).value : ((IntObject) rightObj).value;
+      BooleanObject result = leftVal <= rightVal ? BooleanObject.TRUE : BooleanObject.FALSE;
       return () -> result;
     }
     return null;
@@ -185,11 +268,15 @@ public class CommonCases {
 
   private static Supplier<LispObject> tryConstantFoldGreaterThan(
       LispObject leftObj, LispObject rightObj) {
-    IntObject leftLit = leftObj.asInt();
-    IntObject rightLit = rightObj.asInt();
-    if (leftLit != null && rightLit != null) {
-      BooleanObject result =
-          leftLit.value > rightLit.value ? BooleanObject.TRUE : BooleanObject.FALSE;
+    boolean leftIsInt = leftObj instanceof IntObject;
+    boolean rightIsInt = rightObj instanceof IntObject;
+    boolean leftIsDouble = leftObj instanceof DoubleObject;
+    boolean rightIsDouble = rightObj instanceof DoubleObject;
+
+    if ((leftIsInt || leftIsDouble) && (rightIsInt || rightIsDouble)) {
+      double leftVal = leftIsDouble ? ((DoubleObject) leftObj).value : ((IntObject) leftObj).value;
+      double rightVal = rightIsDouble ? ((DoubleObject) rightObj).value : ((IntObject) rightObj).value;
+      BooleanObject result = leftVal > rightVal ? BooleanObject.TRUE : BooleanObject.FALSE;
       return () -> result;
     }
     return null;
@@ -197,11 +284,15 @@ public class CommonCases {
 
   private static Supplier<LispObject> tryConstantFoldGreaterThanOrEqual(
       LispObject leftObj, LispObject rightObj) {
-    IntObject leftLit = leftObj.asInt();
-    IntObject rightLit = rightObj.asInt();
-    if (leftLit != null && rightLit != null) {
-      BooleanObject result =
-          leftLit.value >= rightLit.value ? BooleanObject.TRUE : BooleanObject.FALSE;
+    boolean leftIsInt = leftObj instanceof IntObject;
+    boolean rightIsInt = rightObj instanceof IntObject;
+    boolean leftIsDouble = leftObj instanceof DoubleObject;
+    boolean rightIsDouble = rightObj instanceof DoubleObject;
+
+    if ((leftIsInt || leftIsDouble) && (rightIsInt || rightIsDouble)) {
+      double leftVal = leftIsDouble ? ((DoubleObject) leftObj).value : ((IntObject) leftObj).value;
+      double rightVal = rightIsDouble ? ((DoubleObject) rightObj).value : ((IntObject) rightObj).value;
+      BooleanObject result = leftVal >= rightVal ? BooleanObject.TRUE : BooleanObject.FALSE;
       return () -> result;
     }
     return null;
@@ -209,11 +300,15 @@ public class CommonCases {
 
   private static Supplier<LispObject> tryConstantFoldEquals(
       LispObject leftObj, LispObject rightObj) {
-    IntObject leftLit = leftObj.asInt();
-    IntObject rightLit = rightObj.asInt();
-    if (leftLit != null && rightLit != null) {
-      BooleanObject result =
-          leftLit.value == rightLit.value ? BooleanObject.TRUE : BooleanObject.FALSE;
+    boolean leftIsInt = leftObj instanceof IntObject;
+    boolean rightIsInt = rightObj instanceof IntObject;
+    boolean leftIsDouble = leftObj instanceof DoubleObject;
+    boolean rightIsDouble = rightObj instanceof DoubleObject;
+
+    if ((leftIsInt || leftIsDouble) && (rightIsInt || rightIsDouble)) {
+      double leftVal = leftIsDouble ? ((DoubleObject) leftObj).value : ((IntObject) leftObj).value;
+      double rightVal = rightIsDouble ? ((DoubleObject) rightObj).value : ((IntObject) rightObj).value;
+      BooleanObject result = leftVal == rightVal ? BooleanObject.TRUE : BooleanObject.FALSE;
       return () -> result;
     }
     return null;
@@ -308,14 +403,8 @@ public class CommonCases {
       return plusIntUnchecked(left, right);
     }
 
-    return () -> {
-      IntObject leftInt = left.get().asInt();
-      IntObject rightInt = right.get().asInt();
-      if (leftInt == null || rightInt == null) {
-        throw new LispArgumentError("Wrong argument type passed to + function");
-      }
-      return IntObject.valueOf(leftInt.value + rightInt.value);
-    };
+    // Delegate to MathFunctions for full numeric support (handles mixed int/double)
+    return () -> MathFunctions.add(new LispObject[] {left.get(), right.get()});
   }
 
   private static Supplier<LispObject> minus(ListObject list, Evaluator evaluator) {
@@ -338,14 +427,8 @@ public class CommonCases {
       return minusIntUnchecked(left, right);
     }
 
-    return () -> {
-      IntObject leftInt = left.get().asInt();
-      IntObject rightInt = right.get().asInt();
-      if (leftInt == null || rightInt == null) {
-        throw new LispArgumentError("Wrong argument type passed to - function");
-      }
-      return IntObject.valueOf(leftInt.value - rightInt.value);
-    };
+    // Delegate to MathFunctions for full numeric support (handles mixed int/double)
+    return () -> MathFunctions.sub(new LispObject[] {left.get(), right.get()});
   }
 
   private static Supplier<LispObject> multiply(ListObject list, Evaluator evaluator) {
@@ -368,14 +451,8 @@ public class CommonCases {
       return multiplyIntUnchecked(left, right);
     }
 
-    return () -> {
-      IntObject leftInt = left.get().asInt();
-      IntObject rightInt = right.get().asInt();
-      if (leftInt == null || rightInt == null) {
-        throw new LispArgumentError("Wrong argument type passed to * function");
-      }
-      return IntObject.valueOf(leftInt.value * rightInt.value);
-    };
+    // Delegate to MathFunctions for full numeric support (handles mixed int/double)
+    return () -> MathFunctions.mul(new LispObject[] {left.get(), right.get()});
   }
 
   private static Supplier<LispObject> divide(ListObject list, Evaluator evaluator) {
@@ -395,17 +472,12 @@ public class CommonCases {
     ExpressionType leftType = TypeAnalyzer.analyze(leftObj);
     ExpressionType rightType = TypeAnalyzer.analyze(rightObj);
     if (leftType == ExpressionType.INT && rightType == ExpressionType.INT) {
-      return divideIntUnchecked(left, right);
+      // Delegate to MathFunctions even for int/int to get proper inexact result handling
+      return () -> MathFunctions.div(new LispObject[] {left.get(), right.get()});
     }
 
-    return () -> {
-      IntObject leftInt = left.get().asInt();
-      IntObject rightInt = right.get().asInt();
-      if (leftInt == null || rightInt == null) {
-        throw new LispArgumentError("Wrong argument type passed to / function");
-      }
-      return IntObject.valueOf(leftInt.value / rightInt.value);
-    };
+    // Delegate to MathFunctions for full numeric support (handles mixed int/double)
+    return () -> MathFunctions.div(new LispObject[] {left.get(), right.get()});
   }
 
   private static Supplier<LispObject> modulo(ListObject list, Evaluator evaluator) {
@@ -428,14 +500,8 @@ public class CommonCases {
       return moduloIntUnchecked(left, right);
     }
 
-    return () -> {
-      IntObject leftInt = left.get().asInt();
-      IntObject rightInt = right.get().asInt();
-      if (leftInt == null || rightInt == null) {
-        throw new LispArgumentError("Wrong argument type passed to mod function");
-      }
-      return IntObject.valueOf(leftInt.value % rightInt.value);
-    };
+    // Delegate to MathFunctions for full numeric support (handles mixed int/double)
+    return () -> MathFunctions.mod(new LispObject[] {left.get(), right.get()});
   }
 
   // ============ Comparison operations with optimization ============

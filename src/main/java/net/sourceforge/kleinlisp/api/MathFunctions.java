@@ -33,105 +33,339 @@ import net.sourceforge.kleinlisp.objects.ValuesObject;
 public class MathFunctions {
 
   public static LispObject add(LispObject[] params) {
-    int sum = 0;
+    boolean useDouble = false;
     for (LispObject i : params) {
-      if (i.asInt() == null) {
-        throw new LispArgumentError("Wrong argument type passed to + function");
+      if (i instanceof DoubleObject) {
+        useDouble = true;
+        break;
+      } else if (!(i instanceof IntObject)) {
+        // Not a direct IntObject/DoubleObject - check via conversion methods
+        // Check if it's effectively an integer or a true double
+        if (isEffectivelyDouble(i)) {
+          useDouble = true;
+          break;
+        } else if (i.asInt() == null) {
+          throw new LispArgumentError("Wrong argument type passed to + function");
+        }
       }
-      sum += i.asInt().value;
     }
-    return IntObject.valueOf(sum);
+    if (useDouble) {
+      double sum = 0.0;
+      for (LispObject i : params) {
+        sum += asDouble("+", i);
+      }
+      return new DoubleObject(sum);
+    } else {
+      int sum = 0;
+      for (LispObject i : params) {
+        IntObject intVal = i.asInt();
+        if (intVal == null) {
+          throw new LispArgumentError("Wrong argument type passed to + function");
+        }
+        sum += intVal.value;
+      }
+      return IntObject.valueOf(sum);
+    }
   }
 
   public static LispObject sub(LispObject[] params) {
-    boolean first = true;
-    int sum = 0;
-
+    if (params.length == 0) {
+      throw new LispArgumentError("-: expected at least 1 argument");
+    }
+    boolean useDouble = false;
     for (LispObject i : params) {
-      if (first) {
-        first = false;
-        sum = i.asInt().value;
-      } else {
-        sum -= i.asInt().value;
+      if (i instanceof DoubleObject) {
+        useDouble = true;
+        break;
+      } else if (!(i instanceof IntObject)) {
+        if (isEffectivelyDouble(i)) {
+          useDouble = true;
+          break;
+        } else if (i.asInt() == null) {
+          throw new LispArgumentError("Wrong argument type passed to - function");
+        }
       }
     }
-    return IntObject.valueOf(sum);
+    if (useDouble) {
+      double result = asDouble("-", params[0]);
+      if (params.length == 1) {
+        return new DoubleObject(-result);
+      }
+      for (int i = 1; i < params.length; i++) {
+        result -= asDouble("-", params[i]);
+      }
+      return new DoubleObject(result);
+    } else {
+      IntObject firstInt = params[0].asInt();
+      if (firstInt == null) {
+        throw new LispArgumentError("Wrong argument type passed to - function");
+      }
+      int result = firstInt.value;
+      if (params.length == 1) {
+        return IntObject.valueOf(-result);
+      }
+      for (int i = 1; i < params.length; i++) {
+        IntObject intVal = params[i].asInt();
+        if (intVal == null) {
+          throw new LispArgumentError("Wrong argument type passed to - function");
+        }
+        result -= intVal.value;
+      }
+      return IntObject.valueOf(result);
+    }
   }
 
   public static LispObject mul(LispObject[] params) {
-    int prod = 1;
-
+    boolean useDouble = false;
     for (LispObject i : params) {
-      prod *= i.asInt().value;
+      if (i instanceof DoubleObject) {
+        useDouble = true;
+        break;
+      } else if (!(i instanceof IntObject)) {
+        if (isEffectivelyDouble(i)) {
+          useDouble = true;
+          break;
+        } else if (i.asInt() == null) {
+          throw new LispArgumentError("Wrong argument type passed to * function");
+        }
+      }
     }
-    return IntObject.valueOf(prod);
+    if (useDouble) {
+      double prod = 1.0;
+      for (LispObject i : params) {
+        prod *= asDouble("*", i);
+      }
+      return new DoubleObject(prod);
+    } else {
+      int prod = 1;
+      for (LispObject i : params) {
+        IntObject intVal = i.asInt();
+        if (intVal == null) {
+          throw new LispArgumentError("Wrong argument type passed to * function");
+        }
+        prod *= intVal.value;
+      }
+      return IntObject.valueOf(prod);
+    }
   }
 
   public static LispObject div(LispObject[] params) {
-    int prod = 1;
-    boolean first = true;
-
+    if (params.length == 0) {
+      throw new LispArgumentError("/: expected at least 1 argument");
+    }
+    boolean useDouble = false;
     for (LispObject i : params) {
-      if (first) {
-        first = false;
-        prod = i.asInt().value;
-      } else {
-        prod /= i.asInt().value;
+      if (i instanceof DoubleObject) {
+        useDouble = true;
+        break;
+      } else if (!(i instanceof IntObject)) {
+        if (isEffectivelyDouble(i)) {
+          useDouble = true;
+          break;
+        } else if (i.asInt() == null) {
+          throw new LispArgumentError("Wrong argument type passed to / function");
+        }
       }
     }
-    return IntObject.valueOf(prod);
+    if (useDouble) {
+      double result = asDouble("/", params[0]);
+      if (params.length == 1) {
+        if (result == 0) {
+          throw new ArithmeticException("/: division by zero");
+        }
+        return new DoubleObject(1.0 / result);
+      }
+      for (int i = 1; i < params.length; i++) {
+        double divisor = asDouble("/", params[i]);
+        if (divisor == 0) {
+          throw new ArithmeticException("/: division by zero");
+        }
+        result /= divisor;
+      }
+      return new DoubleObject(result);
+    } else {
+      // All integers - check if result is exact
+      IntObject firstInt = params[0].asInt();
+      if (firstInt == null) {
+        throw new LispArgumentError("Wrong argument type passed to / function");
+      }
+      int num = firstInt.value;
+      if (params.length == 1) {
+        if (num == 0) {
+          throw new ArithmeticException("/: division by zero");
+        }
+        if (num == 1 || num == -1) {
+          return IntObject.valueOf(num);
+        }
+        return new DoubleObject(1.0 / num);
+      }
+      int denom = 1;
+      for (int i = 1; i < params.length; i++) {
+        IntObject intVal = params[i].asInt();
+        if (intVal == null) {
+          throw new LispArgumentError("Wrong argument type passed to / function");
+        }
+        if (intVal.value == 0) {
+          throw new ArithmeticException("/: division by zero");
+        }
+        denom *= intVal.value;
+      }
+      if (num % denom == 0) {
+        return IntObject.valueOf(num / denom);
+      }
+      return new DoubleObject((double) num / denom);
+    }
   }
 
   public static LispObject mod(LispObject[] params) {
-    int prod = 1;
-
-    for (LispObject i : params) {
-      prod %= i.asInt().value;
+    if (params.length != 2) {
+      throw new LispArgumentError("mod: expected 2 arguments, got " + params.length);
     }
-    return IntObject.valueOf(prod);
-  }
-
-  public static LispObject lt(LispObject[] params) {
-    int i1 = params[0].asInt().value;
-    int i2 = params[1].asInt().value;
-
-    return i1 < i2 ? BooleanObject.TRUE : BooleanObject.FALSE;
+    boolean useDouble = false;
+    for (LispObject i : params) {
+      if (i instanceof DoubleObject) {
+        useDouble = true;
+        break;
+      } else if (!(i instanceof IntObject)) {
+        if (isEffectivelyDouble(i)) {
+          useDouble = true;
+          break;
+        } else if (i.asInt() == null) {
+          throw new LispArgumentError("Wrong argument type passed to mod function");
+        }
+      }
+    }
+    if (useDouble) {
+      double a = asDouble("mod", params[0]);
+      double b = asDouble("mod", params[1]);
+      if (b == 0) {
+        throw new ArithmeticException("mod: division by zero");
+      }
+      double result = a % b;
+      // Make result have same sign as divisor (like R7RS modulo)
+      if ((result < 0 && b > 0) || (result > 0 && b < 0)) {
+        result += b;
+      }
+      return new DoubleObject(result);
+    } else {
+      IntObject aInt = params[0].asInt();
+      IntObject bInt = params[1].asInt();
+      if (aInt == null || bInt == null) {
+        throw new LispArgumentError("Wrong argument type passed to mod function");
+      }
+      int a = aInt.value;
+      int b = bInt.value;
+      if (b == 0) {
+        throw new ArithmeticException("mod: division by zero");
+      }
+      int result = a % b;
+      // Make result have same sign as divisor (like R7RS modulo)
+      if ((result < 0 && b > 0) || (result > 0 && b < 0)) {
+        result += b;
+      }
+      return IntObject.valueOf(result);
+    }
   }
 
   public static LispObject abs(LispObject[] params) {
-    IntObject intVal = params[0].asInt();
-    if (intVal == null) {
-      throw new LispArgumentError("abs requires a numeric argument");
+    assertArgCount("abs", params, 1);
+    if (params[0] instanceof IntObject) {
+      return IntObject.valueOf(Math.abs(((IntObject) params[0]).value));
+    } else if (params[0] instanceof DoubleObject) {
+      return new DoubleObject(Math.abs(((DoubleObject) params[0]).value));
     }
-    return IntObject.valueOf(Math.abs(intVal.value));
+    throw new LispArgumentError("abs requires a numeric argument");
   }
 
   public static LispObject min(LispObject[] params) {
     if (params.length == 0) {
       throw new LispArgumentError("min requires at least one argument");
     }
-    int result = params[0].asInt().value;
-    for (int i = 1; i < params.length; i++) {
-      int val = params[i].asInt().value;
-      if (val < result) {
-        result = val;
+    boolean hasDouble = false;
+    for (LispObject i : params) {
+      if (i instanceof DoubleObject) {
+        hasDouble = true;
+        break;
+      } else if (!(i instanceof IntObject)) {
+        throw new LispArgumentError("min: expected numeric argument");
       }
     }
-    return IntObject.valueOf(result);
+    if (hasDouble) {
+      double result = asDouble("min", params[0]);
+      for (int i = 1; i < params.length; i++) {
+        double val = asDouble("min", params[i]);
+        if (val < result) {
+          result = val;
+        }
+      }
+      return new DoubleObject(result);
+    } else {
+      int result = ((IntObject) params[0]).value;
+      for (int i = 1; i < params.length; i++) {
+        int val = ((IntObject) params[i]).value;
+        if (val < result) {
+          result = val;
+        }
+      }
+      return IntObject.valueOf(result);
+    }
   }
 
   public static LispObject max(LispObject[] params) {
     if (params.length == 0) {
       throw new LispArgumentError("max requires at least one argument");
     }
-    int result = params[0].asInt().value;
-    for (int i = 1; i < params.length; i++) {
-      int val = params[i].asInt().value;
-      if (val > result) {
-        result = val;
+    boolean hasDouble = false;
+    for (LispObject i : params) {
+      if (i instanceof DoubleObject) {
+        hasDouble = true;
+        break;
+      } else if (!(i instanceof IntObject)) {
+        throw new LispArgumentError("max: expected numeric argument");
       }
     }
-    return IntObject.valueOf(result);
+    if (hasDouble) {
+      double result = asDouble("max", params[0]);
+      for (int i = 1; i < params.length; i++) {
+        double val = asDouble("max", params[i]);
+        if (val > result) {
+          result = val;
+        }
+      }
+      return new DoubleObject(result);
+    } else {
+      int result = ((IntObject) params[0]).value;
+      for (int i = 1; i < params.length; i++) {
+        int val = ((IntObject) params[i]).value;
+        if (val > result) {
+          result = val;
+        }
+      }
+      return IntObject.valueOf(result);
+    }
+  }
+
+  /**
+   * Check if a wrapper type (like ValuesObject) contains a double value rather than an integer.
+   * Returns true if the value has a fractional part (true double) or is an inexact integer.
+   * Returns false if the value is effectively an exact integer.
+   */
+  private static boolean isEffectivelyDouble(LispObject obj) {
+    if (obj instanceof DoubleObject) {
+      return true;
+    }
+    if (obj instanceof IntObject) {
+      return false;
+    }
+    // For wrapper types, check if converting to int loses precision
+    IntObject intVal = obj.asInt();
+    DoubleObject dblVal = obj.asDouble();
+    if (intVal != null && dblVal != null) {
+      // If the int conversion equals the double, it's an integer value
+      return (double) intVal.value != dblVal.value;
+    }
+    // If only asDouble() works, it's a double
+    return dblVal != null;
   }
 
   // Helper methods for numeric tower
@@ -162,6 +396,15 @@ public class MathFunctions {
     }
     if (obj instanceof DoubleObject) {
       return ((DoubleObject) obj).value;
+    }
+    // Try conversion methods for wrapper types (CellObject, etc.)
+    DoubleObject dbl = obj.asDouble();
+    if (dbl != null) {
+      return dbl.value;
+    }
+    IntObject intVal = obj.asInt();
+    if (intVal != null) {
+      return intVal.value;
     }
     throw new LispArgumentError(name + ": expected number, got " + obj.getClass().getSimpleName());
   }

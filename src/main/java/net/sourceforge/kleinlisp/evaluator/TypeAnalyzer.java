@@ -45,10 +45,11 @@ public class TypeAnalyzer {
    * expressions that definitely produce integers.
    */
   public static ExpressionType analyze(LispObject obj) {
-    if (obj.asInt() != null) {
+    // Use instanceof to check actual type, not asInt()/asDouble() which can convert
+    if (obj instanceof net.sourceforge.kleinlisp.objects.IntObject) {
       return ExpressionType.INT;
     }
-    if (obj.asDouble() != null) {
+    if (obj instanceof net.sourceforge.kleinlisp.objects.DoubleObject) {
       return ExpressionType.DOUBLE;
     }
 

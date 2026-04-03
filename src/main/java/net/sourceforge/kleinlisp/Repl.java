@@ -41,6 +41,7 @@ public class Repl {
 
   private final Lisp lisp;
   private final BufferedReader reader;
+  private boolean showBanner = true;
 
   public Repl() {
     this.lisp = new Lisp();
@@ -49,8 +50,13 @@ public class Repl {
   }
 
   public Repl(Lisp lisp) {
+    this(lisp, false);
+  }
+
+  public Repl(Lisp lisp, boolean showBanner) {
     this.lisp = lisp;
     this.reader = new BufferedReader(new InputStreamReader(System.in));
+    this.showBanner = showBanner;
     loadGeiserSupport();
   }
 
@@ -70,10 +76,12 @@ public class Repl {
   }
 
   public void run() {
-    System.out.println("KleinLisp REPL");
-    System.out.println("Type expressions to evaluate. Press Ctrl+D to exit.");
-    System.out.println();
-    System.out.flush();
+    if (showBanner) {
+      System.out.println("KleinLisp REPL");
+      System.out.println("Type expressions to evaluate. Press Ctrl+D to exit.");
+      System.out.println();
+      System.out.flush();
+    }
 
     while (true) {
       try {
