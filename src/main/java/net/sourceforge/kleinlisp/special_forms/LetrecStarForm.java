@@ -31,6 +31,7 @@ import net.sourceforge.kleinlisp.LispEnvironment;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.evaluator.Evaluator;
 import net.sourceforge.kleinlisp.objects.AtomObject;
+import net.sourceforge.kleinlisp.objects.IdentifierObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 
 /**
@@ -67,11 +68,20 @@ public class LetrecStarForm implements SpecialForm {
 
     for (LispObject elem : head.asList()) {
       ListObject tuple = elem.asList();
-      AtomObject name = tuple.car().asAtom();
+      AtomObject name = extractAtom(tuple.car());
       LispObject valueExpr = tuple.cdr().car();
 
       names.add(name);
       valueExprs.add(valueExpr);
+    }
+
+    // Apply TCO optimization for ALL function names to each lambda binding
+    // This enables mutual recursion with TCO
+    for (int i = 0; i < valueExprs.size(); i++) {
+      LispObject valueExpr = valueExprs.get(i);
+      for (AtomObject targetName : names) {
+        optimizeTailCallsForLambda(targetName, valueExpr);
+      }
     }
 
     // Compile body expressions
@@ -112,5 +122,39 @@ public class LetrecStarForm implements SpecialForm {
         environment.popLetEnv();
       }
     };
+  }
+
+  /** Extracts the AtomObject from either an AtomObject or IdentifierObject. */
+  private AtomObject extractAtom(LispObject obj) {
+    if (obj.asAtom() != null) {
+      return obj.asAtom();
+    }
+    IdentifierObject id = obj.asIdentifier();
+    if (id != null) {
+      return id.asAtom();
+    }
+    return null;
+  }
+
+  /**
+   * Applies TCO optimization to a lambda expression bound to the given name. This enables tail call
+   * optimization for recursive functions defined in letrec*.
+   */
+  private void optimizeTailCallsForLambda(AtomObject name, LispObject valueExpr) {
+    ListObject lambdaList = valueExpr.asList();
+    if (lambdaList == null || lambdaList.length() < 2) {
+      return;
+    }
+
+    AtomObject head = extractAtom(lambdaList.car());
+    if (head == null || head.specialForm() != SpecialFormEnum.LAMBDA) {
+      return;
+    }
+
+    // Get the lambda body: skip 'lambda' and parameters
+    // (lambda (params...) body...) -> body is cdr().cdr()
+    ListObject body = lambdaList.cdr().cdr();
+    TcoOptimizer optm = new TcoOptimizer(body, name, environment);
+    optm.optimize();
   }
 }

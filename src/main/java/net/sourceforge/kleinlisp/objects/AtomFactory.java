@@ -56,6 +56,15 @@ public class AtomFactory {
         case "let":
           specialForm = SpecialFormEnum.LET;
           break;
+        case "let*":
+          specialForm = SpecialFormEnum.LET_STAR;
+          break;
+        case "letrec":
+          specialForm = SpecialFormEnum.LETREC;
+          break;
+        case "letrec*":
+          specialForm = SpecialFormEnum.LETREC_STAR;
+          break;
         case "begin":
           specialForm = SpecialFormEnum.BEGIN;
           break;
@@ -67,6 +76,12 @@ public class AtomFactory {
           break;
         case "and":
           specialForm = SpecialFormEnum.AND;
+          break;
+        case "cond":
+          specialForm = SpecialFormEnum.COND;
+          break;
+        case "case":
+          specialForm = SpecialFormEnum.CASE;
           break;
         default:
           break;

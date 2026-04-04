@@ -33,8 +33,13 @@ public enum SpecialFormEnum {
   SET,
   BEGIN,
   LET,
+  LET_STAR,
+  LETREC,
+  LETREC_STAR,
   OR,
   AND,
   IF,
-  DO
+  DO,
+  COND,
+  CASE
 }

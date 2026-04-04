@@ -54,4 +54,95 @@ public class TCOTest {
     lisp.evaluate(script);
     Assertions.assertEquals(55, lisp.evaluate("(iter 0 1 10)").asInt().value);
   }
+
+  @Test
+  public void evaluateLetrecTailRecursiveFunction() throws Exception {
+    Lisp lisp = new Lisp();
+    lisp.environment().setStackSize(5);
+
+    // Define a tail-recursive sum function using letrec
+    // With only 5 stack frames, this would overflow without TCO
+    String script =
+        "(letrec ((sum (lambda (n acc)"
+            + "               (if (= n 0)"
+            + "                   acc"
+            + "                   (sum (- n 1) (+ n acc))))))"
+            + "  (sum 1000 0))";
+
+    LispObject result = lisp.evaluate(script);
+    Assertions.assertEquals(500500, result.asInt().value);
+  }
+
+  @Test
+  public void evaluateLetrecStarTailRecursiveFunction() throws Exception {
+    Lisp lisp = new Lisp();
+    lisp.environment().setStackSize(5);
+
+    // Define a tail-recursive countdown function using letrec*
+    String script =
+        "(letrec* ((countdown (lambda (n)"
+            + "                    (if (= n 0)"
+            + "                        0"
+            + "                        (countdown (- n 1))))))"
+            + "  (countdown 1000))";
+
+    LispObject result = lisp.evaluate(script);
+    Assertions.assertEquals(0, result.asInt().value);
+  }
+
+  @Test
+  public void evaluateNamedLetTailRecursiveFunction() throws Exception {
+    Lisp lisp = new Lisp();
+    lisp.environment().setStackSize(5);
+
+    // Named let should also support TCO
+    String script =
+        "(let loop ((n 1000) (acc 0))"
+            + "  (if (= n 0)"
+            + "      acc"
+            + "      (loop (- n 1) (+ n acc))))";
+
+    LispObject result = lisp.evaluate(script);
+    Assertions.assertEquals(500500, result.asInt().value);
+  }
+
+  @Test
+  public void evaluateLetrecTailCallThroughIf() throws Exception {
+    Lisp lisp = new Lisp();
+    lisp.environment().setStackSize(5);
+
+    // Tail calls through both branches of if
+    String script =
+        "(letrec ((even-count (lambda (n)"
+            + "                       (if (= n 0)"
+            + "                           #t"
+            + "                           (odd-count (- n 1)))))"
+            + "         (odd-count (lambda (n)"
+            + "                      (if (= n 0)"
+            + "                          #f"
+            + "                          (even-count (- n 1))))))"
+            + "  (even-count 1000))";
+
+    LispObject result = lisp.evaluate(script);
+    Assertions.assertTrue(result.truthiness());
+  }
+
+  @Test
+  public void evaluateLetrecTailCallThroughLet() throws Exception {
+    Lisp lisp = new Lisp();
+    lisp.environment().setStackSize(5);
+
+    // Tail call through a let form
+    String script =
+        "(letrec ((sum (lambda (n acc)"
+            + "               (if (= n 0)"
+            + "                   acc"
+            + "                   (let ((next (- n 1))"
+            + "                         (newacc (+ n acc)))"
+            + "                     (sum next newacc))))))"
+            + "  (sum 1000 0))";
+
+    LispObject result = lisp.evaluate(script);
+    Assertions.assertEquals(500500, result.asInt().value);
+  }
 }
