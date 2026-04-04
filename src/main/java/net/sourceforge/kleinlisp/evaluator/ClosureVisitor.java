@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import net.sourceforge.kleinlisp.DefaultVisitor;
+import net.sourceforge.kleinlisp.LispEnvironment;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.IdentifierObject;
@@ -346,13 +347,25 @@ public class ClosureVisitor extends DefaultVisitor {
    *
    * <p>Important: Let-bound variables should only be considered closure variables for nested
    * lambdas, not for the containing function. We track this using letBoundInCurrentFunction.
+   *
+   * <p>Also handles named let: (let loop ((var init) ...) body...) where loop is a recursive
+   * binding.
    */
   private LispObject visitLetForm(ListObject obj) {
-    // let form: (let ((var1 val1) (var2 val2) ...) body...)
     ListObject list = obj.cdr();
-    LispObject bindingsObj = list.car();
-    ListObject body = list.cdr();
+    LispObject first = list.car();
 
+    // Check for named let: (let name ((var init) ...) body...)
+    if (first.asAtom() != null) {
+      return visitNamedLetForm(obj, first.asAtom(), list.cdr());
+    }
+
+    // Regular let form: (let ((var1 val1) (var2 val2) ...) body...)
+    return visitRegularLetForm(obj, first, list.cdr());
+  }
+
+  /** Handle regular let: (let ((var1 val1) ...) body...) */
+  private LispObject visitRegularLetForm(ListObject obj, LispObject bindingsObj, ListObject body) {
     // First, visit the binding value expressions (they shouldn't see the bound variables yet)
     // and collect the bound variable names
     List<AtomObject> boundVars = new ArrayList<>();
@@ -405,5 +418,65 @@ public class ClosureVisitor extends DefaultVisitor {
 
     // Result: (let new-bindings-list new-body...)
     return new ListObject(obj.car(), new ListObject(newBindingsList, newBodyList));
+  }
+
+  /**
+   * Handle named let: (let loop ((var1 init1) ...) body...) Transform to letrec: (letrec ((loop
+   * (lambda (var1 ...) body...))) (loop init1 ...))
+   *
+   * <p>This transformation is done here so the lambda gets properly processed by ClosureVisitor.
+   */
+  private LispObject visitNamedLetForm(ListObject obj, AtomObject loopName, ListObject rest) {
+    LispObject bindingsObj = rest.car();
+    ListObject body = rest.cdr();
+
+    // Get the LispEnvironment to create atoms
+    LispEnvironment lisp = (LispEnvironment) loopName.environment();
+
+    // Extract parameter names and initial value expressions from bindings
+    List<LispObject> paramNames = new ArrayList<>();
+    List<LispObject> initValues = new ArrayList<>();
+
+    if (bindingsObj.asList() != null) {
+      for (LispObject binding : bindingsObj.asList()) {
+        ListObject tuple = binding.asList();
+        if (tuple != null && tuple.length() >= 2) {
+          paramNames.add(tuple.car());
+          initValues.add(tuple.cdr().car());
+        }
+      }
+    }
+
+    // Build parameter list: (var1 var2 ...)
+    ListObject paramList = ListObject.NIL;
+    for (int i = paramNames.size() - 1; i >= 0; i--) {
+      paramList = new ListObject(paramNames.get(i), paramList);
+    }
+
+    // Build lambda: (lambda (params...) body...)
+    // body is already a ListObject of expressions
+    AtomObject lambdaAtom = lisp.atomOf("lambda");
+    ListObject lambdaExpr = new ListObject(lambdaAtom, new ListObject(paramList, body));
+
+    // Build letrec binding: ((loop (lambda ...)))
+    ListObject loopBinding = new ListObject(loopName, new ListObject(lambdaExpr, ListObject.NIL));
+    ListObject letrecBindings = new ListObject(loopBinding, ListObject.NIL);
+
+    // Build initial call: (loop init1 init2 ...)
+    ListObject initList = ListObject.NIL;
+    for (int i = initValues.size() - 1; i >= 0; i--) {
+      initList = new ListObject(initValues.get(i), initList);
+    }
+    ListObject initialCall = new ListObject(loopName, initList);
+
+    // Build letrec: (letrec ((loop (lambda ...))) (loop init...))
+    AtomObject letrecAtom = lisp.atomOf("letrec");
+    ListObject letrecExpr =
+        new ListObject(
+            letrecAtom,
+            new ListObject(letrecBindings, new ListObject(initialCall, ListObject.NIL)));
+
+    // Continue visiting the transformed expression - this will process the lambda properly
+    return letrecExpr.accept(this);
   }
 }

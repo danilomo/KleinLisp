@@ -37,6 +37,9 @@ import net.sourceforge.kleinlisp.objects.ListObject;
  * Implements 'let' with direct environment binding instead of lambda transformation. This allows
  * TCO to work correctly through let forms.
  *
+ * <p>Note: Named let (let loop ((var init) ...) body...) is transformed to letrec by ClosureVisitor
+ * before reaching this form.
+ *
  * @author danilo
  */
 public class LetForm implements SpecialForm {
@@ -52,7 +55,6 @@ public class LetForm implements SpecialForm {
   @Override
   public Supplier<LispObject> apply(LispObject obj) {
     ListObject list = obj.asList().cdr();
-
     LispObject head = list.car();
     ListObject body = list.cdr();
 

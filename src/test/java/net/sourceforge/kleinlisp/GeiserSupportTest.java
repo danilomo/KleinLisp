@@ -48,13 +48,20 @@ public class GeiserSupportTest extends BaseTestClass {
 
   @Test
   public void testGeiserEvalSimple() {
-    LispObject result = lisp.evaluate("(geiser:eval #f '(+ 1 2))");
-    assertEquals(3, result.asInt().value);
+    // geiser:eval returns Geiser protocol format: ((result "3") (output . ""))
+    LispObject result = lisp.evaluate("(geiser:eval '(+ 1 2))");
+    ListObject list = result.asList();
+    assertNotNull(list, "geiser:eval should return a list");
+    // Extract (result "3") - first element
+    ListObject resultPair = list.car().asList();
+    assertEquals("result", resultPair.car().asAtom().value());
+    assertEquals("3", resultPair.cdr().car().asString().value());
   }
 
   @Test
   public void testGeiserEvalWithDefine() {
-    lisp.evaluate("(geiser:eval #f '(define geiser-test-x 42))");
+    // geiser:eval returns protocol format, but still defines the variable
+    lisp.evaluate("(geiser:eval '(define geiser-test-x 42))");
     assertEquals(42, evalAsInt("geiser-test-x"));
   }
 
@@ -99,15 +106,25 @@ public class GeiserSupportTest extends BaseTestClass {
   }
 
   @Test
-  public void testGeiserAutodocReturnsEmptyList() {
+  public void testGeiserAutodocReturnsGeiserFormat() {
+    // geiser:autodoc returns Geiser protocol format with empty result
     LispObject result = lisp.evaluate("(geiser:autodoc '(+))");
-    assertEquals(ListObject.NIL, result, "geiser:autodoc should return empty list");
+    ListObject list = result.asList();
+    assertNotNull(list, "geiser:autodoc should return a list in Geiser protocol format");
+    // First element should be (result "()")
+    ListObject resultPair = list.car().asList();
+    assertEquals("result", resultPair.car().asAtom().value());
   }
 
   @Test
-  public void testGeiserNoValuesReturnsEmptyList() {
+  public void testGeiserNoValuesReturnsGeiserFormat() {
+    // geiser:no-values returns Geiser protocol format with empty result
     LispObject result = lisp.evaluate("(geiser:no-values)");
-    assertEquals(ListObject.NIL, result, "geiser:no-values should return empty list");
+    ListObject list = result.asList();
+    assertNotNull(list, "geiser:no-values should return a list in Geiser protocol format");
+    // First element should be (result "()")
+    ListObject resultPair = list.car().asList();
+    assertEquals("result", resultPair.car().asAtom().value());
   }
 
   @Test
