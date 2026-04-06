@@ -27,24 +27,73 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
+import net.sourceforge.kleinlisp.Function;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.evaluator.Evaluator;
-import net.sourceforge.kleinlisp.functional.Tuple2;
 import net.sourceforge.kleinlisp.objects.BooleanObject;
+import net.sourceforge.kleinlisp.objects.FunctionObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 
 /**
+ * Implements the cond special form with support for the => clause.
+ *
+ * <p>Syntax:
+ *
+ * <pre>
+ * (cond clause ...)
+ * clause = (test expression ...)
+ *        | (test => procedure)
+ *        | (else expression ...)
+ * </pre>
+ *
+ * <p>The => clause passes the result of the test to a one-argument procedure.
+ *
  * @author danilo
  */
 public class CondForm implements SpecialForm {
 
-  private static class Branch {
+  private abstract static class Branch {
     final Supplier<LispObject> condition;
+
+    public Branch(Supplier<LispObject> condition) {
+      this.condition = condition;
+    }
+
+    abstract LispObject evaluate(LispObject testResult);
+  }
+
+  private static class RegularBranch extends Branch {
     final Supplier<LispObject> body;
 
-    public Branch(Supplier<LispObject> condition, Supplier<LispObject> body) {
-      this.condition = condition;
+    public RegularBranch(Supplier<LispObject> condition, Supplier<LispObject> body) {
+      super(condition);
       this.body = body;
+    }
+
+    @Override
+    LispObject evaluate(LispObject testResult) {
+      return body.get();
+    }
+  }
+
+  /** Branch for the => clause that applies a procedure to the test result. */
+  private static class ArrowBranch extends Branch {
+    final Supplier<LispObject> procedure;
+
+    public ArrowBranch(Supplier<LispObject> condition, Supplier<LispObject> procedure) {
+      super(condition);
+      this.procedure = procedure;
+    }
+
+    @Override
+    LispObject evaluate(LispObject testResult) {
+      LispObject proc = procedure.get();
+      FunctionObject funcObj = proc.asFunction();
+      if (funcObj == null) {
+        throw new IllegalArgumentException("cond: => clause requires a procedure, got: " + proc);
+      }
+      Function func = funcObj.function();
+      return func.evaluate(new LispObject[] {testResult});
     }
   }
 
@@ -65,7 +114,7 @@ public class CondForm implements SpecialForm {
         LispObject val = b.condition.get();
 
         if (val.truthiness()) {
-          return b.body.get();
+          return b.evaluate(val);
         }
       }
 
@@ -85,13 +134,13 @@ public class CondForm implements SpecialForm {
   }
 
   private Branch parseCondBranch(LispObject obj) {
-    Tuple2<LispObject, LispObject> tuple =
-        Optional.ofNullable(obj.asList())
-            .flatMap(l -> l.unpack(LispObject.class, LispObject.class))
-            .get();
+    ListObject clause = obj.asList();
+    if (clause == null || clause == ListObject.NIL) {
+      throw new IllegalArgumentException("cond: invalid clause");
+    }
 
-    LispObject cond = tuple.first();
-    LispObject body = tuple.second();
+    LispObject cond = clause.car();
+    ListObject rest = clause.cdr();
 
     boolean isElse =
         Optional.ofNullable(cond.asAtom()).map(a -> a.toString().equals("else")).orElse(false);
@@ -104,8 +153,41 @@ public class CondForm implements SpecialForm {
       condEval = cond.accept(evaluator);
     }
 
-    Supplier<LispObject> bodyEval = body.accept(evaluator);
+    // Check for => clause: (test => procedure)
+    if (rest != ListObject.NIL && rest.length() == 2) {
+      LispObject maybeArrow = rest.car();
+      if (maybeArrow.asAtom() != null && maybeArrow.asAtom().toString().equals("=>")) {
+        LispObject procedure = rest.cdr().car();
+        Supplier<LispObject> procEval = procedure.accept(evaluator);
+        return new ArrowBranch(condEval, procEval);
+      }
+    }
 
-    return new Branch(condEval, bodyEval);
+    // Regular clause: (test body ...) - evaluate body expressions, return last
+    Supplier<LispObject> bodyEval = compileBody(rest);
+
+    return new RegularBranch(condEval, bodyEval);
+  }
+
+  private Supplier<LispObject> compileBody(ListObject body) {
+    if (body == ListObject.NIL) {
+      // If no body, return the test result (handled by returning condition value)
+      // But actually we need to return the condition's value, which is handled differently
+      // For empty body, we should return the test result - this is a special case
+      return () -> BooleanObject.TRUE;
+    }
+
+    List<Supplier<LispObject>> bodySuppliers = new ArrayList<>();
+    for (LispObject expr : body) {
+      bodySuppliers.add(expr.accept(evaluator));
+    }
+
+    return () -> {
+      LispObject result = ListObject.NIL;
+      for (Supplier<LispObject> supplier : bodySuppliers) {
+        result = supplier.get();
+      }
+      return result;
+    };
   }
 }

@@ -70,6 +70,8 @@ public class SpecialForms {
     this.insertForm("let-values", new LetValuesForm(evaluator, environment));
     this.insertForm("let*-values", new LetStarValuesForm(evaluator, environment));
     this.insertForm("define-values", new DefineValuesForm(evaluator, environment));
+    this.insertForm("let-syntax", new LetSyntaxForm(evaluator, environment));
+    this.insertForm("letrec-syntax", new LetrecSyntaxForm(evaluator, environment));
   }
 
   SpecialForms insertForm(String name, SpecialForm form) {

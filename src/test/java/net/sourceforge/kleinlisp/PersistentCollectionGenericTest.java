@@ -289,7 +289,8 @@ public class PersistentCollectionGenericTest extends BaseTestClass {
   public void testCallableSet() {
     lisp.evaluate("(define s (p-set 1 2 3))");
     assertEquals(2, lisp.evaluate("(s 2)").asInt().value);
-    assertTrue(lisp.evaluate("(null? (s 99))").truthiness());
+    // R7RS: Sets return #f for not-found, not nil. Use not to check falsiness.
+    assertTrue(lisp.evaluate("(not (s 99))").truthiness());
   }
 
   @Test

@@ -48,6 +48,7 @@ terminal String ATOM;
 terminal String STRING_LITERAL;
 terminal String KEYWORD;
 terminal QUOTE, QUASIQUOTE, UNQUOTE, UNQUOTE_SPLICING, OPEN_PAR, CLOSE_PAR, OPEN_BRACKET, CLOSE_BRACKET;
+terminal VECTOR_OPEN;
 terminal DOT;
 
 terminal Integer INT_LITERAL;
@@ -57,6 +58,7 @@ terminal CharObject CHAR_LITERAL;
 
 non terminal LispObject self_evaluating_form;
 non terminal LispObject list_form;
+non terminal LispObject vector_form;
 non terminal LispObject form_list;
 non terminal LispObject quoted_form;
 non terminal LispObject quasiquoted_form;
@@ -74,6 +76,7 @@ forms ::= forms:fs form:f {: parser.accept(f); :} |
 form ::=
     self_evaluating_form:f {: RESULT = f; :} |
     list_form:f {: RESULT = f; :} |
+    vector_form:f {: RESULT = f; :} |
     quoted_form:f {: RESULT = f; :} |
     quasiquoted_form:f {: RESULT = f; :} |
     unquoted_form:f {: RESULT = f; :} |
@@ -97,7 +100,20 @@ list_form ::=
     OPEN_PAR     form_list:l DOT form:last  CLOSE_PAR     {: ((ListObject) l).last().setTail(last); RESULT = l; :} |
     OPEN_PAR                                CLOSE_PAR     {: RESULT = ListObject.NIL;  :};
 
-form_list ::= 
+vector_form ::=
+    VECTOR_OPEN  form_list:l  CLOSE_PAR     {:
+        // Convert list to vector
+        ListObject list = (ListObject) l;
+        java.util.List<LispObject> elems = new java.util.ArrayList<>();
+        for (LispObject obj : list) {
+            elems.add(obj);
+        }
+        LispObject[] arr = elems.toArray(new LispObject[0]);
+        RESULT = new VectorObject(arr);
+    :} |
+    VECTOR_OPEN               CLOSE_PAR     {: RESULT = new VectorObject(new LispObject[0]); :};
+
+form_list ::=
     form:head form_list:tail {: RESULT = new ListObject( head, tail );         :} |
     form:head                {: RESULT = new ListObject( head, ListObject.NIL ); :};
 

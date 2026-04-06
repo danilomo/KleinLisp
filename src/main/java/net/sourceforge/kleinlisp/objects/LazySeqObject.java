@@ -54,7 +54,8 @@ public final class LazySeqObject implements LispObject {
 
   @Override
   public boolean truthiness() {
-    return !seq.isEmpty();
+    // R7RS: Only #f is false. Empty sequences are truthy.
+    return true;
   }
 
   @Override

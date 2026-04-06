@@ -223,7 +223,8 @@ public class ListObject implements LispObject, Iterable<LispObject> {
 
   @Override
   public boolean truthiness() {
-    return this != NIL;
+    // R7RS: Only #f is false. Empty list () is truthy.
+    return true;
   }
 
   @Override

@@ -688,6 +688,19 @@ public class LispEnvironment implements Environment {
     return MacroExpander.expandMacro(macroTable, obj);
   }
 
+  /**
+   * Returns a copy of the current macro table. Used by let-syntax and letrec-syntax to create
+   * augmented macro environments.
+   */
+  public Map<AtomObject, MacroDefinition> getMacroTable() {
+    return new HashMap<>(macroTable);
+  }
+
+  /** Expands macros using a custom macro table (for local macro scopes). */
+  public LispObject expandMacrosWithTable(LispObject obj, Map<AtomObject, MacroDefinition> macros) {
+    return MacroExpander.expandMacro(macros, obj);
+  }
+
   public void setStackTop(LispObject[] parameters) {
     stack[stackPointer - 1].setParameters(parameters);
   }

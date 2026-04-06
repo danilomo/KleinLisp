@@ -43,19 +43,23 @@ private Symbol symbol(int type, Object value) {
 	return new Symbol(type, yyline, yycolumn, value);
 }
 StringBuilder str = new StringBuilder();
+StringBuilder barredSymbol = new StringBuilder();
 %}
 
 %state STRING
+%state BARRED_SYMBOL
 %state END
 
 %%
 
 <YYINITIAL> {
     "\""                            {str.setLength(0); yybegin(STRING);}
+    "|"                             {barredSymbol.setLength(0); yybegin(BARRED_SYMBOL);}
     "'"                             { return symbol( sym.QUOTE ); }
     "`"                             { return symbol( sym.QUASIQUOTE ); }
     ",@"                            { return symbol( sym.UNQUOTE_SPLICING ); }
     ","                             { return symbol( sym.UNQUOTE ); }
+    "#("                            { return symbol( sym.VECTOR_OPEN ); }
     "("                             { return symbol( sym.OPEN_PAR ); }
     ")"                             { return symbol( sym.CLOSE_PAR ); }
     "["                             { return symbol( sym.OPEN_BRACKET ); }
@@ -95,14 +99,14 @@ StringBuilder str = new StringBuilder();
 }
 
 <STRING> {
-	\"              { yybegin(YYINITIAL); return symbol(sym.STRING_LITERAL, str.toString()); }	
+	\"              { yybegin(YYINITIAL); return symbol(sym.STRING_LITERAL, str.toString()); }
 	\\t             { str.append('\t'); }
 	\\n             { str.append('\n'); }
 	\\r             { str.append('\r'); }
 	\\\"            { str.append('\"'); }
 	\\\\            { str.append('\\'); }
 	\\[']			{ str.append('\''); }
-	\\[0-9][0-9][0-9] 
+	\\[0-9][0-9][0-9]
 	{
 		String s = yytext().substring(1);
 		s = "" + ((char) Integer.parseInt(s));
@@ -110,6 +114,17 @@ StringBuilder str = new StringBuilder();
 	}
 	[^\n\r\"\\\t]+    { str.append( yytext() ); }
 	.               { /* Malformed string */}
+}
+
+<BARRED_SYMBOL> {
+	"|"             { yybegin(YYINITIAL); return symbol(sym.ATOM, barredSymbol.toString()); }
+	"\\|"           { barredSymbol.append('|'); }
+	"\\\\"          { barredSymbol.append('\\'); }
+	"\\n"           { barredSymbol.append('\n'); }
+	"\\t"           { barredSymbol.append('\t'); }
+	"\\r"           { barredSymbol.append('\r'); }
+	[^|\\]+         { barredSymbol.append(yytext()); }
+	.               { barredSymbol.append(yytext()); }
 }
 
 <END>{

@@ -40,7 +40,8 @@ public class VoidObject implements LispObject {
 
   @Override
   public boolean truthiness() {
-    return false;
+    // R7RS: Only #f is false. Void is truthy.
+    return true;
   }
 
   @Override

@@ -53,7 +53,8 @@ public final class StringObject implements LispObject {
 
   @Override
   public boolean truthiness() {
-    return !value.isEmpty();
+    // R7RS: Only #f is false. Empty strings are truthy.
+    return true;
   }
 
   @Override

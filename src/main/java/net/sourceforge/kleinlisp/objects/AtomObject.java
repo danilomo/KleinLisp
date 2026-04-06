@@ -53,7 +53,44 @@ public final class AtomObject implements LispObject {
 
   @Override
   public String toString() {
-    return value();
+    // R7RS: Symbols with special characters (spaces, newlines, etc.) must be
+    // enclosed in vertical bars |...|
+    if (needsEscaping(value)) {
+      return "|" + escapeSymbol(value) + "|";
+    }
+    return value;
+  }
+
+  /** Check if a symbol name needs to be escaped with |...| */
+  private static boolean needsEscaping(String name) {
+    if (name.isEmpty()) {
+      return true;
+    }
+    for (int i = 0; i < name.length(); i++) {
+      char c = name.charAt(i);
+      if (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '|' || c == '\\' || c == '('
+          || c == ')' || c == '[' || c == ']' || c == '"' || c == '\'' || c == '`' || c == ','
+          || c == ';') {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /** Escape special characters within |...| syntax */
+  private static String escapeSymbol(String name) {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < name.length(); i++) {
+      char c = name.charAt(i);
+      if (c == '|') {
+        sb.append("\\|");
+      } else if (c == '\\') {
+        sb.append("\\\\");
+      } else {
+        sb.append(c);
+      }
+    }
+    return sb.toString();
   }
 
   @Override

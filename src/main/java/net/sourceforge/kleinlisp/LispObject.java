@@ -53,10 +53,10 @@ public interface LispObject {
   Object asObject();
 
   /**
-   * Return the boolean value corresponding to the object.Nil (empty list) -> False, 0 -> False,
-   * False -> False, "" -> False, everything else -> true
+   * Return the boolean value corresponding to the object. Per R7RS, only #f is false. All other
+   * values including nil (empty list), 0, and "" are true.
    *
-   * @return
+   * @return true for all values except BooleanObject.FALSE
    */
   boolean truthiness();
 

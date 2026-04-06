@@ -219,8 +219,10 @@ public final class PSetObject implements LispObject, Function, Iterable<LispObje
   }
 
   /**
-   * Makes the set callable as a function. (my-set element) returns element if present, nil
-   * otherwise (my-set element default) returns element or default if not found
+   * Makes the set callable as a function. (my-set element) returns element if present, #f otherwise
+   * (my-set element default) returns element or default if not found
+   *
+   * <p>Note: Returns #f (not nil) for not-found to maintain R7RS compliance where only #f is false.
    */
   @Override
   public LispObject evaluate(LispObject[] parameters) {
@@ -228,7 +230,7 @@ public final class PSetObject implements LispObject, Function, Iterable<LispObje
       throw new LispArgumentError("Set lookup requires an element");
     }
     LispObject element = parameters[0];
-    LispObject defaultVal = parameters.length > 1 ? parameters[1] : ListObject.NIL;
+    LispObject defaultVal = parameters.length > 1 ? parameters[1] : BooleanObject.FALSE;
     return set.contains(element) ? element : defaultVal;
   }
 

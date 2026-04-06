@@ -453,8 +453,14 @@ public class ClosureVisitor extends DefaultVisitor {
   }
 
   /**
-   * Handle named let: (let loop ((var1 init1) ...) body...) Transform to letrec: (letrec ((loop
-   * (lambda (var1 ...) body...))) (loop init1 ...))
+   * Handle named let: (let loop ((var1 init1) ...) body...)
+   *
+   * <p>Transform to (per R7RS 4.2.4): (let ((temp1 init1) (temp2 init2) ...) (letrec ((loop (lambda
+   * (var1 var2 ...) body...))) (loop temp1 temp2 ...)))
+   *
+   * <p>This ensures init expressions are evaluated in the outer scope before the loop procedure is
+   * created, which is important when the loop name shadows a built-in (e.g., using `-` as the loop
+   * name).
    *
    * <p>This transformation is done here so the lambda gets properly processed by ClosureVisitor.
    */
@@ -468,13 +474,17 @@ public class ClosureVisitor extends DefaultVisitor {
     // Extract parameter names and initial value expressions from bindings
     List<LispObject> paramNames = new ArrayList<>();
     List<LispObject> initValues = new ArrayList<>();
+    List<AtomObject> tempNames = new ArrayList<>();
 
     if (bindingsObj.asList() != null) {
+      int tempCount = 0;
       for (LispObject binding : bindingsObj.asList()) {
         ListObject tuple = binding.asList();
         if (tuple != null && tuple.length() >= 2) {
           paramNames.add(tuple.car());
           initValues.add(tuple.cdr().car());
+          // Create temporary variable names for outer let
+          tempNames.add(lisp.atomOf("__named_let_temp_" + (tempCount++)));
         }
       }
     }
@@ -494,22 +504,36 @@ public class ClosureVisitor extends DefaultVisitor {
     ListObject loopBinding = new ListObject(loopName, new ListObject(lambdaExpr, ListObject.NIL));
     ListObject letrecBindings = new ListObject(loopBinding, ListObject.NIL);
 
-    // Build initial call: (loop init1 init2 ...)
-    ListObject initList = ListObject.NIL;
-    for (int i = initValues.size() - 1; i >= 0; i--) {
-      initList = new ListObject(initValues.get(i), initList);
+    // Build initial call using temp names: (loop temp1 temp2 ...)
+    ListObject tempList = ListObject.NIL;
+    for (int i = tempNames.size() - 1; i >= 0; i--) {
+      tempList = new ListObject(tempNames.get(i), tempList);
     }
-    ListObject initialCall = new ListObject(loopName, initList);
+    ListObject initialCall = new ListObject(loopName, tempList);
 
-    // Build letrec: (letrec ((loop (lambda ...))) (loop init...))
+    // Build letrec: (letrec ((loop (lambda ...))) (loop temp...))
     AtomObject letrecAtom = lisp.atomOf("letrec");
     ListObject letrecExpr =
         new ListObject(
             letrecAtom,
             new ListObject(letrecBindings, new ListObject(initialCall, ListObject.NIL)));
 
+    // Build outer let bindings: ((temp1 init1) (temp2 init2) ...)
+    ListObject outerBindings = ListObject.NIL;
+    for (int i = tempNames.size() - 1; i >= 0; i--) {
+      ListObject binding =
+          new ListObject(tempNames.get(i), new ListObject(initValues.get(i), ListObject.NIL));
+      outerBindings = new ListObject(binding, outerBindings);
+    }
+
+    // Build outer let: (let ((temp1 init1) ...) letrec-expr)
+    AtomObject letAtom = lisp.atomOf("let");
+    ListObject outerLet =
+        new ListObject(
+            letAtom, new ListObject(outerBindings, new ListObject(letrecExpr, ListObject.NIL)));
+
     // Continue visiting the transformed expression - this will process the lambda properly
-    return letrecExpr.accept(this);
+    return outerLet.accept(this);
   }
 
   /**

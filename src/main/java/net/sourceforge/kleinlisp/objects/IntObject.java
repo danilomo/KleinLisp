@@ -94,7 +94,8 @@ public final class IntObject implements NumericObject {
 
   @Override
   public boolean truthiness() {
-    return !(value == 0);
+    // R7RS: Only #f is false. Zero is truthy.
+    return true;
   }
 
   @Override
