@@ -23,6 +23,7 @@
  */
 package net.sourceforge.kleinlisp;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -36,11 +37,13 @@ public class Lisp {
   private final LispEnvironment environment;
   private final Parser parser;
   private final Evaluator evaluator;
+  private final LoadContext loadContext;
 
   public Lisp() {
     environment = new LispEnvironment();
     parser = Parser.defaultParser();
     evaluator = new Evaluator(environment);
+    loadContext = new LoadContext();
     environment.registerIntrospectionFunctions(this);
   }
 
@@ -73,8 +76,76 @@ public class Lisp {
     return ref.get();
   }
 
+  /**
+   * Evaluates a Scheme expression with a source path context. This sets up the load context so that
+   * relative paths in (load ...) calls within the code are resolved relative to the source path's
+   * directory.
+   *
+   * <p>This is useful when you have code as a string but want (load ...) calls within it to work
+   * correctly relative to a known source file location.
+   *
+   * @param expression the Scheme expression(s) to evaluate
+   * @param sourcePath the path to use as the context for resolving relative loads
+   * @return the result of evaluating the last expression
+   */
+  public LispObject evaluate(String expression, Path sourcePath) {
+    Path resolvedPath = sourcePath.toAbsolutePath().normalize();
+    loadContext.beginLoad(resolvedPath);
+    try {
+      return evaluate(expression);
+    } finally {
+      loadContext.endLoad();
+    }
+  }
+
+  /**
+   * Executes a Scheme file. Relative paths in (load ...) calls within the file will be resolved
+   * relative to this file's directory.
+   *
+   * @param path the path to the file to execute
+   */
   public void execute(Path path) {
-    parser.parse(path, environment, this::evaluate);
+    executeWithLoadContext(path);
+  }
+
+  /**
+   * Executes a Scheme file with load context tracking. This method:
+   *
+   * <ul>
+   *   <li>Resolves relative paths relative to the current file being loaded
+   *   <li>Detects and prevents cyclical load references
+   *   <li>Updates the current-load-pathname during execution
+   * </ul>
+   *
+   * @param path the path to the file to execute
+   * @throws LispRuntimeException if the file cannot be found or a cycle is detected
+   */
+  public void executeWithLoadContext(Path path) {
+    Path resolvedPath = path.toAbsolutePath().normalize();
+
+    if (!Files.exists(resolvedPath)) {
+      throw new LispRuntimeException("Cannot load file: " + resolvedPath + " (file not found)");
+    }
+
+    if (!Files.isReadable(resolvedPath)) {
+      throw new LispRuntimeException("Cannot load file: " + resolvedPath + " (not readable)");
+    }
+
+    loadContext.beginLoad(resolvedPath);
+    try {
+      parser.parse(resolvedPath, environment, this::evaluate);
+    } finally {
+      loadContext.endLoad();
+    }
+  }
+
+  /**
+   * Returns the load context for tracking file loading operations.
+   *
+   * @return the load context
+   */
+  public LoadContext loadContext() {
+    return loadContext;
   }
 
   public LispEnvironment environment() {

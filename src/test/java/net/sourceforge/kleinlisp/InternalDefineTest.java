@@ -53,4 +53,41 @@ public class InternalDefineTest extends BaseTestClass {
     lisp.evaluate("(define (outer2 x) (letrec* ((inner (lambda (y) (* y 2)))) (+ x (inner x))))");
     assertEquals(15, evalAsInt("(outer2 5)")); // 5 + (5 * 2) = 15
   }
+
+  @Test
+  public void testInternalDefineDoesNotLeakToGlobal() {
+    // Create a fresh Lisp instance to ensure clean global environment
+    Lisp freshLisp = new Lisp();
+
+    // Define a function with internal define
+    freshLisp.evaluate("(define (test-scope) (define local-var 42) local-var)");
+
+    // Call the function - should return 42
+    assertEquals(42, freshLisp.evaluate("(test-scope)").asInt().value);
+
+    // The internal variable should NOT exist in global scope
+    // Looking up an undefined variable should not return an IntObject with value 42
+    LispObject result = freshLisp.evaluate("local-var");
+    // Either result is null, or asInt() is null (not an integer), or its value is not 42
+    assertTrue(result == null || result.asInt() == null || result.asInt().value != 42);
+  }
+
+  @Test
+  public void testInternalDefinesCanReferenceEachOther() {
+    // Internal defines can reference each other (like letrec*)
+    lisp.evaluate(
+        "(define (test-ref)"
+            + "  (define a 10)"
+            + "  (define b (+ a 5))" // b references a
+            + "  (define c (+ a b))" // c references both a and b
+            + "  c)");
+    assertEquals(25, evalAsInt("(test-ref)")); // 10 + (10 + 5) = 25
+  }
+
+  @Test
+  public void testInternalDefineInLambda() {
+    // Test that internal defines also work in anonymous lambdas
+    lisp.evaluate("(define my-func (lambda () (define x 100) (define y 200) (+ x y)))");
+    assertEquals(300, evalAsInt("(my-func)"));
+  }
 }

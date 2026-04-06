@@ -44,6 +44,11 @@
   :type 'string
   :group 'geiser-kleinlisp)
 
+(geiser-custom--defcustom geiser-kleinlisp-default-port 37146
+  "Default port for connecting to KleinLisp REPL server."
+  :type 'integer
+  :group 'geiser-kleinlisp)
+
 ;;; Implementation
 
 (defconst geiser-kleinlisp--prompt-regexp "^kleinlisp> ")
@@ -132,6 +137,20 @@ The geiser support code is auto-loaded by KleinLisp at REPL startup."
   "Start a Geiser KleinLisp REPL."
   (interactive)
   (run-geiser 'kleinlisp))
+
+(defun connect-to-kleinlisp (&optional host port)
+  "Connect to a running KleinLisp REPL server.
+
+Start the server with: java -jar KleinLisp.jar --listen [port]
+
+HOST defaults to localhost.
+PORT defaults to `geiser-kleinlisp-default-port' (37146)."
+  (interactive
+   (list (read-string "Host (default localhost): " nil nil "localhost")
+         (read-number "Port: " geiser-kleinlisp-default-port)))
+  (let ((host (or host "localhost"))
+        (port (or port geiser-kleinlisp-default-port)))
+    (geiser-connect 'kleinlisp host port)))
 
 ;;; Register the implementation
 

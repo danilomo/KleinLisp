@@ -23,6 +23,7 @@
  */
 package net.sourceforge.kleinlisp;
 
+import java.io.IOException;
 import java.nio.file.Paths;
 
 /**
@@ -33,6 +34,7 @@ import java.nio.file.Paths;
  * <ul>
  *   <li>No args → start REPL
  *   <li>--repl → start REPL (explicit)
+ *   <li>--listen [port] → start socket REPL server (default port: 37146)
  *   <li>file.scm → execute Scheme file
  *   <li>-e &lt;expr&gt; → evaluate expression and print result
  * </ul>
@@ -81,6 +83,9 @@ public class Main {
   public void run(String[] args) throws Exception {
     if (args.length == 0 || (args.length == 1 && args[0].equals("--repl"))) {
       runRepl();
+    } else if (args.length >= 1 && args[0].equals("--listen")) {
+      int port = args.length > 1 ? Integer.parseInt(args[1]) : SocketReplServer.DEFAULT_PORT;
+      runSocketServer(port);
     } else if (args.length >= 2 && args[0].equals("-e")) {
       runExpression(args);
     } else {
@@ -135,6 +140,25 @@ public class Main {
   protected void runScript(String scriptPath) throws Exception {
     Lisp lisp = createAndConfigureLisp();
     lisp.execute(Paths.get(scriptPath));
+  }
+
+  /**
+   * Starts a socket REPL server that accepts TCP connections.
+   *
+   * <p>Each connection gets its own isolated Lisp environment. This enables Emacs/Geiser to connect
+   * via geiser-connect.
+   *
+   * @param port the TCP port to listen on
+   * @throws IOException if the server cannot start
+   */
+  protected void runSocketServer(int port) throws IOException {
+    SocketReplServer server = new SocketReplServer(port, this::createAndConfigureLisp);
+    System.out.println("KleinLisp REPL server listening on port " + port);
+    System.out.println("Connect with: M-x connect-to-kleinlisp");
+    System.out.println("Or use: nc localhost " + port);
+    System.out.println("Press Ctrl+C to stop the server.");
+    System.out.flush();
+    server.start();
   }
 
   /**

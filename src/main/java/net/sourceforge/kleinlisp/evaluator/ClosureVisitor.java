@@ -259,6 +259,16 @@ public class ClosureVisitor extends DefaultVisitor {
       return super.visit(obj);
     }
 
+    // Transform internal defines into letrec* (R7RS requirement)
+    ListObject body = obj.cdr().cdr();
+    ListObject transformedBody = transformInternalDefines(body, head);
+    if (transformedBody != body) {
+      // Rebuild lambda with transformed body and continue visiting
+      ListObject newLambda =
+          new ListObject(obj.car(), new ListObject(obj.cdr().car(), transformedBody));
+      return newLambda.accept(this);
+    }
+
     List<AtomObject> parameters = new ArrayList<>();
     AtomObject restParameter = null;
     LispObject paramSpec = obj.cdr().car();
@@ -478,5 +488,114 @@ public class ClosureVisitor extends DefaultVisitor {
 
     // Continue visiting the transformed expression - this will process the lambda properly
     return letrecExpr.accept(this);
+  }
+
+  /**
+   * Transforms internal defines at the beginning of a lambda body into a letrec* form. According to
+   * R7RS, internal definitions at the start of a body should be treated as letrec*.
+   *
+   * <p>For example: (define x 10) (define y 20) (+ x y)
+   *
+   * <p>Becomes: (letrec* ((x 10) (y 20)) (+ x y))
+   *
+   * @param body The body list containing expressions
+   * @param lambdaAtom The lambda atom used for function defines
+   * @return The transformed body, or the original body if no internal defines
+   */
+  private ListObject transformInternalDefines(ListObject body, AtomObject lambdaAtom) {
+    if (body == ListObject.NIL) {
+      return body;
+    }
+
+    LispEnvironment lisp = (LispEnvironment) lambdaAtom.environment();
+    AtomObject defineAtom = lisp.atomOf("define");
+
+    // Collect internal defines and their bindings
+    List<ListObject> bindings = new ArrayList<>();
+    ListObject remaining = body;
+
+    while (remaining != ListObject.NIL) {
+      LispObject expr = remaining.car();
+      ListObject exprList = expr.asList();
+
+      if (exprList == null || exprList == ListObject.NIL) {
+        break;
+      }
+
+      AtomObject head = extractAtom(exprList.car());
+      if (head == null || head.specialForm() != SpecialFormEnum.DEFINE) {
+        break;
+      }
+
+      // Found a define - extract the binding
+      ListObject defineCdr = exprList.cdr();
+      LispObject first = defineCdr.car();
+
+      AtomObject varAtom = extractAtom(first);
+      if (varAtom != null) {
+        // Simple variable define: (define x value)
+        LispObject value = defineCdr.cdr().car();
+        ListObject binding = new ListObject(varAtom, new ListObject(value, ListObject.NIL));
+        bindings.add(binding);
+      } else {
+        // Function define: (define (name args...) body...)
+        // Transform to (name (lambda (args...) body...))
+        ListObject signature = first.asList();
+        if (signature != null && signature != ListObject.NIL) {
+          AtomObject funcName = extractAtom(signature.car());
+          LispObject params = signature.tail();
+          ListObject funcBody = defineCdr.cdr();
+
+          // Build (lambda (params...) body...)
+          ListObject lambdaExpr = new ListObject(lambdaAtom, new ListObject(params, funcBody));
+
+          ListObject binding = new ListObject(funcName, new ListObject(lambdaExpr, ListObject.NIL));
+          bindings.add(binding);
+        }
+      }
+
+      remaining = remaining.cdr();
+    }
+
+    if (bindings.isEmpty()) {
+      return body;
+    }
+
+    // Build the bindings list for letrec*
+    ListObject bindingsList = ListObject.NIL;
+    for (int i = bindings.size() - 1; i >= 0; i--) {
+      bindingsList = new ListObject(bindings.get(i), bindingsList);
+    }
+
+    // If remaining body is empty, use the last binding's value
+    if (remaining == ListObject.NIL) {
+      // R7RS says body must have at least one expression after defines
+      // We'll use (void) as a fallback
+      AtomObject voidAtom = lisp.atomOf("void");
+      ListObject voidCall = new ListObject(voidAtom, ListObject.NIL);
+      remaining = new ListObject(voidCall, ListObject.NIL);
+    }
+
+    // Build (letrec* bindings remaining-body...)
+    AtomObject letrecStarAtom = lisp.atomOf("letrec*");
+    ListObject letrecStar = new ListObject(letrecStarAtom, new ListObject(bindingsList, remaining));
+
+    // Return as a single-element body list containing just the letrec*
+    return new ListObject(letrecStar, ListObject.NIL);
+  }
+
+  /** Extracts the AtomObject from either an AtomObject or IdentifierObject. */
+  private AtomObject extractAtom(LispObject obj) {
+    if (obj == null) {
+      return null;
+    }
+    if (obj.asAtom() != null) {
+      return obj.asAtom();
+    }
+    IdentifierObject id = obj.asIdentifier();
+    if (id != null) {
+      return id.asAtom();
+    }
+    return null;
   }
 }

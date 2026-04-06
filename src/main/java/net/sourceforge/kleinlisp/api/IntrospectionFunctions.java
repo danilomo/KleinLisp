@@ -24,7 +24,6 @@
 package net.sourceforge.kleinlisp.api;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Set;
 import net.sourceforge.kleinlisp.Lisp;
 import net.sourceforge.kleinlisp.LispArgumentError;
@@ -114,6 +113,16 @@ public class IntrospectionFunctions {
    * Loads and evaluates a Scheme file.
    *
    * <p>(load filename) → void
+   *
+   * <p>The filename is resolved as follows:
+   *
+   * <ul>
+   *   <li>If absolute, it is used as-is
+   *   <li>If relative, it is resolved relative to the directory of the file that called load, or
+   *       the current working directory if called from the REPL
+   * </ul>
+   *
+   * <p>Cyclical references are detected and will raise an error.
    */
   public LispObject load(LispObject[] params) {
     if (params.length < 1) {
@@ -126,10 +135,29 @@ public class IntrospectionFunctions {
     }
 
     String filename = filenameObj.value();
-    Path path = Paths.get(filename);
-    lisp.execute(path);
+    Path path = lisp.loadContext().resolvePath(filename);
+    lisp.executeWithLoadContext(path);
 
     return VoidObject.VOID;
+  }
+
+  /**
+   * Returns the pathname of the file currently being loaded, or #f if not loading any file.
+   *
+   * <p>(current-load-pathname) → string or #f
+   *
+   * <p>This is useful for resolving paths relative to the current file, or for debugging purposes.
+   */
+  public LispObject currentLoadPathname(LispObject[] params) {
+    if (params.length != 0) {
+      throw new LispArgumentError("current-load-pathname takes no arguments");
+    }
+
+    Path currentPath = lisp.loadContext().getCurrentLoadPath();
+    if (currentPath == null) {
+      return BooleanObject.FALSE;
+    }
+    return new StringObject(currentPath.toString());
   }
 
   /**
