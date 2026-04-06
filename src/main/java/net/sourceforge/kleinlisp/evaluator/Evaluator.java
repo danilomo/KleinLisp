@@ -27,10 +27,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
-import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispEnvironment;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.LispVisitor;
+import net.sourceforge.kleinlisp.WrongTypeToApplyException;
 import net.sourceforge.kleinlisp.objects.*;
 import net.sourceforge.kleinlisp.special_forms.SpecialForm;
 import net.sourceforge.kleinlisp.special_forms.SpecialForms;
@@ -197,12 +197,7 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
         || head.asString() != null
         || head instanceof BooleanObject
         || head instanceof VectorObject) {
-      SourceRef ref = getSourceRef(list);
-      String location = (ref != null) ? " at " + ref : "";
-      throw new LispArgumentError(
-          String.format(
-              "Invalid function call: [%s] (type: %s) cannot be used as a function%s",
-              head, head.getClass().getSimpleName(), location));
+      throw new WrongTypeToApplyException(head);
     }
   }
 

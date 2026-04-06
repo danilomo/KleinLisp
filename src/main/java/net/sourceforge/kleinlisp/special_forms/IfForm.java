@@ -38,8 +38,10 @@ public class IfForm implements SpecialForm {
 
   @Override
   public Supplier<LispObject> apply(LispObject obj) {
-    ListObject parameters = obj.asList();
-    parameters = parameters.cdr();
+    ListObject form = obj.asList();
+    FormErrors.assertArgRange("if", form, 2, 3);
+
+    ListObject parameters = form.cdr();
 
     LispObject cond = parameters.car();
     LispObject trueForm = parameters.cdr().car();

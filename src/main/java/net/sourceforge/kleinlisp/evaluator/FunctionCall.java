@@ -25,9 +25,9 @@ package net.sourceforge.kleinlisp.evaluator;
 
 import java.util.function.Supplier;
 import net.sourceforge.kleinlisp.Function;
-import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispEnvironment;
 import net.sourceforge.kleinlisp.LispObject;
+import net.sourceforge.kleinlisp.WrongTypeToApplyException;
 import net.sourceforge.kleinlisp.objects.FunctionObject;
 import net.sourceforge.kleinlisp.special_forms.LambdaForm.LambdaFunction;
 
@@ -62,19 +62,7 @@ public class FunctionCall implements Supplier<LispObject> {
     FunctionObject functionObj = headValue.asFunction();
 
     if (functionObj == null) {
-      // Log more details about what we're trying to call
-      System.err.println(
-          "[FunctionCall] ERROR: trying to call non-function: "
-              + headValue
-              + " (type: "
-              + headValue.getClass().getSimpleName()
-              + ")");
-      System.err.println("[FunctionCall] head supplier type: " + head.getClass().getName());
-      System.err.println("[FunctionCall] parameters count: " + parameters.length);
-      if (ref != null) {
-        System.err.println("[FunctionCall] source ref: " + ref);
-      }
-      throw new LispArgumentError(String.format("Value [%s] isn't a valid function", headValue));
+      throw new WrongTypeToApplyException(headValue);
     }
 
     Function function = functionObj.function();

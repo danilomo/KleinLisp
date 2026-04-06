@@ -23,6 +23,8 @@
  */
 package net.sourceforge.kleinlisp.api;
 
+import static net.sourceforge.kleinlisp.api.GuileErrors.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import net.sourceforge.kleinlisp.LispArgumentError;
@@ -43,13 +45,13 @@ public class ListFunctions {
   }
 
   public static LispObject car(LispObject[] params) {
-    ListObject arg = params[0].asList();
+    ListObject arg = requirePair("car", params[0], 1);
 
     return arg.head();
   }
 
   public static LispObject cdr(LispObject[] params) {
-    ListObject arg = params[0].asList();
+    ListObject arg = requirePair("cdr", params[0], 1);
 
     return arg.tail();
   }
@@ -283,64 +285,44 @@ public class ListFunctions {
 
   /** Gets element at index. (list-ref list k) */
   public static LispObject listRef(LispObject[] params) {
-    if (params[0] == ListObject.NIL) {
-      throw new LispArgumentError("list-ref: index out of bounds");
-    }
-    ListObject list = params[0].asList();
-    IntObject idx = params[1].asInt();
-    if (list == null) {
-      throw new LispArgumentError("list-ref requires a list as first argument");
-    }
-    if (idx == null) {
-      throw new LispArgumentError("list-ref requires an integer index");
-    }
+    ListObject list = requireList("list-ref", params[0], 1);
+    int k = requireNonNegativeInt("list-ref", params[1], 2);
 
-    int k = idx.value;
-    if (k < 0) {
-      throw new LispArgumentError("list-ref: index must be non-negative: " + k);
+    if (list == ListObject.NIL) {
+      throw argOutOfRange("list-ref", 2, k);
     }
 
     ListObject current = list;
     for (int i = 0; i < k; i++) {
       if (current == ListObject.NIL) {
-        throw new LispArgumentError("list-ref: index out of bounds: " + k);
+        throw argOutOfRange("list-ref", 2, k);
       }
       current = current.cdr();
     }
 
     if (current == ListObject.NIL) {
-      throw new LispArgumentError("list-ref: index out of bounds: " + k);
+      throw argOutOfRange("list-ref", 2, k);
     }
     return current.car();
   }
 
   /** Gets tail starting at index. (list-tail list k) */
   public static LispObject listTail(LispObject[] params) {
-    if (params[0] == ListObject.NIL) {
-      IntObject idx = params[1].asInt();
-      if (idx != null && idx.value == 0) {
-        return ListObject.NIL;
-      }
-      throw new LispArgumentError("list-tail: index out of bounds");
-    }
-    ListObject list = params[0].asList();
-    IntObject idx = params[1].asInt();
-    if (list == null) {
-      throw new LispArgumentError("list-tail requires a list as first argument");
-    }
-    if (idx == null) {
-      throw new LispArgumentError("list-tail requires an integer index");
+    ListObject list = requireList("list-tail", params[0], 1);
+    int k = requireNonNegativeInt("list-tail", params[1], 2);
+
+    if (list == ListObject.NIL && k == 0) {
+      return ListObject.NIL;
     }
 
-    int k = idx.value;
-    if (k < 0) {
-      throw new LispArgumentError("list-tail: index must be non-negative: " + k);
+    if (list == ListObject.NIL) {
+      throw argOutOfRange("list-tail", 2, k);
     }
 
     ListObject current = list;
     for (int i = 0; i < k; i++) {
       if (current == ListObject.NIL) {
-        throw new LispArgumentError("list-tail: index out of bounds: " + k);
+        throw argOutOfRange("list-tail", 2, k);
       }
       current = current.cdr();
     }

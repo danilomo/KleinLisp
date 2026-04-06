@@ -47,8 +47,10 @@ public class DefineForm implements SpecialForm {
 
   @Override
   public Supplier<LispObject> apply(LispObject t) {
-    ListObject list = t.asList();
-    list = list.cdr();
+    ListObject form = t.asList();
+    FormErrors.assertMinArgs("define", form, 2);
+
+    ListObject list = form.cdr();
     LispObject first = list.car();
 
     AtomObject idOpt = first.asAtom();

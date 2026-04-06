@@ -26,6 +26,7 @@ package net.sourceforge.kleinlisp.evaluator;
 import java.util.function.Supplier;
 import net.sourceforge.kleinlisp.LispEnvironment;
 import net.sourceforge.kleinlisp.LispObject;
+import net.sourceforge.kleinlisp.UnboundVariableException;
 import net.sourceforge.kleinlisp.objects.AtomObject;
 
 /**
@@ -71,6 +72,9 @@ public class CachedFunctionSupplier implements Supplier<LispObject> {
 
     // Cache miss - resolve and cache
     LispObject value = environment.lookupValue(atom);
+    if (value == null) {
+      throw new UnboundVariableException(atom.value());
+    }
     cachedValue = value;
     cacheVersion = currentVersion;
 

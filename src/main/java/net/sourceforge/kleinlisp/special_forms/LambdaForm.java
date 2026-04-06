@@ -246,10 +246,16 @@ public class LambdaForm implements SpecialForm {
   @Override
   public Supplier<LispObject> apply(LispObject obj) {
     ListObject orig = obj.asList();
+    FormErrors.assertMinArgs("lambda", orig, 2);
+
     IdentifierObject id = orig.car().asIdentifier();
 
     ListObject list = orig.cdr();
     LambdaMeta meta = orig.getMeta(LambdaMeta.class);
+
+    // Validate parameters
+    LispObject params = list.car();
+    FormErrors.validateParameters("lambda", params, obj);
 
     ListObject body = list.cdr();
     Set<AtomObject> fromClosure = new HashSet<>(meta.getParent().getClosureInfo().keySet());

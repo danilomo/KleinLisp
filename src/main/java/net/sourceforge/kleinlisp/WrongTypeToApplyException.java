@@ -21,42 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.sourceforge.kleinlisp.special_forms;
-
-import java.util.List;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import net.sourceforge.kleinlisp.LispObject;
-import net.sourceforge.kleinlisp.evaluator.Evaluator;
-import net.sourceforge.kleinlisp.objects.VoidObject;
+package net.sourceforge.kleinlisp;
 
 /**
- * @author danilo
+ * Exception thrown when trying to call a non-procedure value. Message format follows Guile Scheme:
+ * "Wrong type to apply: <value>"
+ *
+ * @author Danilo Oliveira
  */
-public class BeginForm implements SpecialForm {
+public class WrongTypeToApplyException extends LispRuntimeException {
 
-  private final Evaluator evaluator;
+  private final LispObject value;
 
-  public BeginForm(Evaluator evaluator) {
-    this.evaluator = evaluator;
+  public WrongTypeToApplyException(LispObject value) {
+    super("Wrong type to apply: " + value);
+    this.value = value;
   }
 
-  @Override
-  public Supplier<LispObject> apply(LispObject obj) {
-    // Skip the 'begin' symbol itself (first element)
-    List<Supplier<LispObject>> commands =
-        obj.asList().cdr().toList().stream()
-            .map(elem -> elem.accept(evaluator))
-            .collect(Collectors.toList());
-
-    return () -> {
-      LispObject result = VoidObject.VOID;
-
-      for (Supplier<LispObject> command : commands) {
-        result = command.get();
-      }
-
-      return result;
-    };
+  public LispObject getValue() {
+    return value;
   }
 }

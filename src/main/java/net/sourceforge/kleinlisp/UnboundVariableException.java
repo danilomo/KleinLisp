@@ -21,42 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.sourceforge.kleinlisp.special_forms;
-
-import java.util.List;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import net.sourceforge.kleinlisp.LispObject;
-import net.sourceforge.kleinlisp.evaluator.Evaluator;
-import net.sourceforge.kleinlisp.objects.VoidObject;
+package net.sourceforge.kleinlisp;
 
 /**
- * @author danilo
+ * Exception thrown when trying to access an undefined variable. Message format follows Guile
+ * Scheme: "Unbound variable: <name>"
+ *
+ * @author Danilo Oliveira
  */
-public class BeginForm implements SpecialForm {
+public class UnboundVariableException extends LispRuntimeException {
 
-  private final Evaluator evaluator;
+  private final String symbolName;
 
-  public BeginForm(Evaluator evaluator) {
-    this.evaluator = evaluator;
+  public UnboundVariableException(String symbolName) {
+    super("Unbound variable: " + symbolName);
+    this.symbolName = symbolName;
   }
 
-  @Override
-  public Supplier<LispObject> apply(LispObject obj) {
-    // Skip the 'begin' symbol itself (first element)
-    List<Supplier<LispObject>> commands =
-        obj.asList().cdr().toList().stream()
-            .map(elem -> elem.accept(evaluator))
-            .collect(Collectors.toList());
-
-    return () -> {
-      LispObject result = VoidObject.VOID;
-
-      for (Supplier<LispObject> command : commands) {
-        result = command.get();
-      }
-
-      return result;
-    };
+  public String getSymbolName() {
+    return symbolName;
   }
 }

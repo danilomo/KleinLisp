@@ -25,8 +25,8 @@ package net.sourceforge.kleinlisp.evaluator;
 
 import java.util.function.Supplier;
 import net.sourceforge.kleinlisp.Function;
-import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispObject;
+import net.sourceforge.kleinlisp.WrongTypeToApplyException;
 import net.sourceforge.kleinlisp.objects.FunctionObject;
 import net.sourceforge.kleinlisp.objects.TailCallObject;
 import net.sourceforge.kleinlisp.special_forms.LambdaForm.LambdaFunction;
@@ -58,10 +58,11 @@ public class TailFunctionCall3 implements Supplier<LispObject> {
 
   @Override
   public LispObject get() {
-    FunctionObject functionObj = head.get().asFunction();
+    LispObject headValue = head.get();
+    FunctionObject functionObj = headValue.asFunction();
 
     if (functionObj == null) {
-      throw new LispArgumentError("Value isn't a valid function");
+      throw new WrongTypeToApplyException(headValue);
     }
 
     Function function = functionObj.function();

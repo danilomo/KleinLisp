@@ -66,10 +66,10 @@ public class InternalDefineTest extends BaseTestClass {
     assertEquals(42, freshLisp.evaluate("(test-scope)").asInt().value);
 
     // The internal variable should NOT exist in global scope
-    // Looking up an undefined variable should not return an IntObject with value 42
-    LispObject result = freshLisp.evaluate("local-var");
-    // Either result is null, or asInt() is null (not an integer), or its value is not 42
-    assertTrue(result == null || result.asInt() == null || result.asInt().value != 42);
+    // Looking up an undefined variable should throw UnboundVariableException
+    UnboundVariableException ex =
+        assertThrows(UnboundVariableException.class, () -> freshLisp.evaluate("local-var"));
+    assertEquals("local-var", ex.getSymbolName());
   }
 
   @Test

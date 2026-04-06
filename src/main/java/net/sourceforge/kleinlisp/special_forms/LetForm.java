@@ -54,9 +54,14 @@ public class LetForm implements SpecialForm {
 
   @Override
   public Supplier<LispObject> apply(LispObject obj) {
-    ListObject list = obj.asList().cdr();
+    ListObject form = obj.asList();
+    FormErrors.assertMinArgs("let", form, 2);
+
+    ListObject list = form.cdr();
     LispObject head = list.car();
     ListObject body = list.cdr();
+
+    FormErrors.validateBindings("let", head, obj);
 
     // Parse bindings: ((var1 val1) (var2 val2) ...)
     List<AtomObject> names = new ArrayList<>();

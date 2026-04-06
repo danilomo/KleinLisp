@@ -36,6 +36,7 @@ import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.IdentifierObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
+import net.sourceforge.kleinlisp.special_forms.FormErrors;
 import net.sourceforge.kleinlisp.special_forms.SpecialFormEnum;
 
 /**
@@ -259,6 +260,13 @@ public class ClosureVisitor extends DefaultVisitor {
       return super.visit(obj);
     }
 
+    // Validate lambda form has at least (lambda params body)
+    if (obj.cdr() == ListObject.NIL
+        || obj.cdr().cdr() == null
+        || obj.cdr().cdr() == ListObject.NIL) {
+      throw FormErrors.badForm("lambda", obj);
+    }
+
     // Transform internal defines into letrec* (R7RS requirement)
     ListObject body = obj.cdr().cdr();
     ListObject transformedBody = transformInternalDefines(body, head);
@@ -363,7 +371,16 @@ public class ClosureVisitor extends DefaultVisitor {
    */
   private LispObject visitLetForm(ListObject obj) {
     ListObject list = obj.cdr();
+
+    // Handle malformed let with no arguments
+    if (list == ListObject.NIL) {
+      throw FormErrors.badForm("let", obj);
+    }
+
     LispObject first = list.car();
+    if (first == null) {
+      throw FormErrors.badForm("let", obj);
+    }
 
     // Check for named let: (let name ((var init) ...) body...)
     if (first.asAtom() != null) {
@@ -376,6 +393,11 @@ public class ClosureVisitor extends DefaultVisitor {
 
   /** Handle regular let: (let ((var1 val1) ...) body...) */
   private LispObject visitRegularLetForm(ListObject obj, LispObject bindingsObj, ListObject body) {
+    // Validate bindings is a list
+    if (bindingsObj != ListObject.NIL && bindingsObj.asList() == null) {
+      throw FormErrors.badForm("let", obj);
+    }
+
     // First, visit the binding value expressions (they shouldn't see the bound variables yet)
     // and collect the bound variable names
     List<AtomObject> boundVars = new ArrayList<>();

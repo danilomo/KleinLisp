@@ -23,6 +23,8 @@
  */
 package net.sourceforge.kleinlisp.evaluator;
 
+import static net.sourceforge.kleinlisp.api.GuileErrors.requirePair;
+
 import java.util.function.Supplier;
 import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispObject;
@@ -643,12 +645,12 @@ public class CommonCases {
 
   private static Supplier<LispObject> car(ListObject list, Evaluator evaluator) {
     Supplier<LispObject> arg = list.car().accept(evaluator);
-    return () -> arg.get().asList().head();
+    return () -> requirePair("car", arg.get(), 1).head();
   }
 
   private static Supplier<LispObject> cdr(ListObject list, Evaluator evaluator) {
     Supplier<LispObject> arg = list.car().accept(evaluator);
-    return () -> arg.get().asList().tail();
+    return () -> requirePair("cdr", arg.get(), 1).tail();
   }
 
   private static Supplier<LispObject> isNull(ListObject list, Evaluator evaluator) {
