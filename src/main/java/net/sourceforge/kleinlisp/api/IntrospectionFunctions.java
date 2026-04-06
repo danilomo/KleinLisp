@@ -118,11 +118,15 @@ public class IntrospectionFunctions {
    *
    * <ul>
    *   <li>If absolute, it is used as-is
-   *   <li>If relative, it is resolved relative to the directory of the file that called load, or
-   *       the current working directory if called from the REPL
+   *   <li>If relative, it is resolved relative to the current working directory
    * </ul>
    *
+   * <p>This follows standard R7RS/Guile/Chicken semantics where load resolves paths relative to the
+   * application's current working directory, not the source file.
+   *
    * <p>Cyclical references are detected and will raise an error.
+   *
+   * @see #loadRelative(LispObject[]) for loading relative to the current source file
    */
   public LispObject load(LispObject[] params) {
     if (params.length < 1) {
@@ -135,7 +139,44 @@ public class IntrospectionFunctions {
     }
 
     String filename = filenameObj.value();
-    Path path = lisp.loadContext().resolvePath(filename);
+    Path path = lisp.loadContext().resolveCwdPath(filename);
+    lisp.executeWithLoadContext(path);
+
+    return VoidObject.VOID;
+  }
+
+  /**
+   * Loads and evaluates a Scheme file relative to the current source file.
+   *
+   * <p>(load-relative filename) → void
+   *
+   * <p>The filename is resolved as follows:
+   *
+   * <ul>
+   *   <li>If absolute, it is used as-is
+   *   <li>If relative, it is resolved relative to the directory of the file that called
+   *       load-relative, or the current working directory if called from the REPL
+   * </ul>
+   *
+   * <p>This follows Chicken Scheme's load-relative semantics, which is useful for organizing
+   * multi-file projects where files reference each other based on their relative positions.
+   *
+   * <p>Cyclical references are detected and will raise an error.
+   *
+   * @see #load(LispObject[]) for standard load semantics (relative to CWD)
+   */
+  public LispObject loadRelative(LispObject[] params) {
+    if (params.length < 1) {
+      throw new LispArgumentError("load-relative requires a filename argument");
+    }
+
+    StringObject filenameObj = params[0].asString();
+    if (filenameObj == null) {
+      throw new LispArgumentError("load-relative requires a string filename, got: " + params[0]);
+    }
+
+    String filename = filenameObj.value();
+    Path path = lisp.loadContext().resolveRelativePath(filename);
     lisp.executeWithLoadContext(path);
 
     return VoidObject.VOID;

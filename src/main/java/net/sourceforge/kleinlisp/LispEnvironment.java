@@ -579,6 +579,7 @@ public class LispEnvironment implements Environment {
     registerFunction("procedure-arity", introspection::procedureArity);
     registerFunction("procedure-name", introspection::procedureName);
     registerFunction("load", introspection::load);
+    registerFunction("load-relative", introspection::loadRelative);
     registerFunction("current-load-pathname", introspection::currentLoadPathname);
     registerFunction("eval", introspection::eval);
   }

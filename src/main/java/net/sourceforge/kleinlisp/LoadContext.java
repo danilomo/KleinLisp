@@ -78,17 +78,33 @@ public class LoadContext {
   /**
    * Resolves a filename relative to the current loading context. If the filename is absolute, it is
    * returned as-is. Otherwise, it is resolved relative to the directory of the current file being
-   * loaded.
+   * loaded. This implements load-relative semantics (Chicken Scheme style).
    *
    * @param filename the filename to resolve
    * @return the resolved absolute path
    */
-  public Path resolvePath(String filename) {
+  public Path resolveRelativePath(String filename) {
     Path path = Paths.get(filename);
     if (path.isAbsolute()) {
       return path.normalize();
     }
     return getBaseDirectory().resolve(path).normalize();
+  }
+
+  /**
+   * Resolves a filename relative to the current working directory. If the filename is absolute, it
+   * is returned as-is. Otherwise, it is resolved relative to the application's current working
+   * directory. This implements standard load semantics (R7RS, Guile, Chicken style).
+   *
+   * @param filename the filename to resolve
+   * @return the resolved absolute path
+   */
+  public Path resolveCwdPath(String filename) {
+    Path path = Paths.get(filename);
+    if (path.isAbsolute()) {
+      return path.normalize();
+    }
+    return Paths.get("").toAbsolutePath().resolve(path).normalize();
   }
 
   /**

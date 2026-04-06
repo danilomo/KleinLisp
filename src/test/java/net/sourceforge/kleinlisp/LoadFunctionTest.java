@@ -33,7 +33,7 @@ import net.sourceforge.kleinlisp.objects.StringObject;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for the load function, including relative path resolution and cycle detection.
+ * Tests for the load and load-relative functions, including path resolution and cycle detection.
  *
  * @author Danilo Oliveira
  */
@@ -43,6 +43,8 @@ public class LoadFunctionTest extends BaseTestClass {
     return Paths.get("src/test/resources/load-test", filename).toAbsolutePath();
   }
 
+  // ==================== Standard load tests (relative to CWD) ====================
+
   @Test
   public void testLoadSimpleFile() {
     Path path = getTestResourcePath("simple.scm");
@@ -51,8 +53,18 @@ public class LoadFunctionTest extends BaseTestClass {
   }
 
   @Test
-  public void testLoadWithRelativePath() {
-    // Load main.scm which loads helper.scm using a relative path
+  public void testLoadRelativeToCwd() {
+    // load with relative path should resolve relative to CWD
+    // Use the path relative to the project root (which is the CWD during tests)
+    lisp.evaluate("(load \"src/test/resources/load-test/simple.scm\")");
+    assertEquals(42, evalAsInt("simple-loaded-value"));
+  }
+
+  // ==================== load-relative tests (relative to source file) ====================
+
+  @Test
+  public void testLoadRelativeWithRelativePath() {
+    // Load main.scm which uses load-relative to load helper.scm
     Path path = getTestResourcePath("main.scm");
     lisp.evaluate("(load \"" + path + "\")");
 
@@ -64,8 +76,8 @@ public class LoadFunctionTest extends BaseTestClass {
   }
 
   @Test
-  public void testLoadFromNestedDirectory() {
-    // Load nested.scm which loads ../helper.scm
+  public void testLoadRelativeFromNestedDirectory() {
+    // Load nested.scm which uses load-relative to load ../helper.scm
     Path path = getTestResourcePath("subdir/nested.scm");
     lisp.evaluate("(load \"" + path + "\")");
 
