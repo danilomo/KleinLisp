@@ -32,6 +32,7 @@ import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.BooleanObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
+import net.sourceforge.kleinlisp.objects.VoidObject;
 
 /**
  * @author Danilo Oliveira
@@ -383,6 +384,66 @@ public class ListFunctions {
     return params[0].asList().cdr().cdr().cdr().car();
   }
 
+  public static LispObject caaaar(LispObject[] params) {
+    return params[0].asList().car().asList().car().asList().car().asList().car();
+  }
+
+  public static LispObject caaadr(LispObject[] params) {
+    return params[0].asList().cdr().car().asList().car().asList().car();
+  }
+
+  public static LispObject caadar(LispObject[] params) {
+    return params[0].asList().car().asList().cdr().car().asList().car();
+  }
+
+  public static LispObject caaddr(LispObject[] params) {
+    return params[0].asList().cdr().cdr().car().asList().car();
+  }
+
+  public static LispObject cadaar(LispObject[] params) {
+    return params[0].asList().car().asList().car().asList().cdr().car();
+  }
+
+  public static LispObject cadadr(LispObject[] params) {
+    return params[0].asList().cdr().car().asList().cdr().car();
+  }
+
+  public static LispObject caddar(LispObject[] params) {
+    return params[0].asList().car().asList().cdr().cdr().car();
+  }
+
+  public static LispObject cdaaar(LispObject[] params) {
+    return params[0].asList().car().asList().car().asList().car().asList().cdr();
+  }
+
+  public static LispObject cdaadr(LispObject[] params) {
+    return params[0].asList().cdr().car().asList().car().asList().cdr();
+  }
+
+  public static LispObject cdadar(LispObject[] params) {
+    return params[0].asList().car().asList().cdr().car().asList().cdr();
+  }
+
+  public static LispObject cdaddr(LispObject[] params) {
+    return params[0].asList().cdr().cdr().car().asList().cdr();
+  }
+
+  public static LispObject cddaar(LispObject[] params) {
+    return params[0].asList().car().asList().car().asList().cdr().cdr();
+  }
+
+  public static LispObject cddadr(LispObject[] params) {
+    return params[0].asList().cdr().car().asList().cdr().cdr();
+  }
+
+  public static LispObject cdddar(LispObject[] params) {
+    return params[0].asList().car().asList().cdr().cdr().cdr();
+  }
+
+  public static LispObject cddddr(LispObject[] params) {
+    return params[0].asList().cdr().cdr().cdr().cdr();
+  }
+
   /** Returns the last pair in a list. (last-pair list) */
   public static LispObject lastPair(LispObject[] params) {
     if (params[0] == ListObject.NIL) {
@@ -535,5 +596,59 @@ public class ListFunctions {
       copy.add(obj);
     }
     return ListObject.fromList(copy.toArray(new LispObject[0]));
+  }
+
+  /** Mutates the car of a pair. (set-car! pair obj) */
+  public static LispObject setCar(LispObject[] params) {
+    ListObject pair = requirePair("set-car!", params[0], 1);
+    pair.setHead(params[1]);
+    return VoidObject.VOID;
+  }
+
+  /** Mutates the cdr of a pair. (set-cdr! pair obj) */
+  public static LispObject setCdr(LispObject[] params) {
+    ListObject pair = requirePair("set-cdr!", params[0], 1);
+    pair.setTail(params[1]);
+    return VoidObject.VOID;
+  }
+
+  /** Mutates an element at index k in a list. (list-set! list k obj) */
+  public static LispObject listSet(LispObject[] params) {
+    ListObject list = requireList("list-set!", params[0], 1);
+    int k = requireNonNegativeInt("list-set!", params[1], 2);
+
+    if (list == ListObject.NIL) {
+      throw argOutOfRange("list-set!", 2, k);
+    }
+
+    ListObject current = list;
+    for (int i = 0; i < k; i++) {
+      if (current == ListObject.NIL) {
+        throw argOutOfRange("list-set!", 2, k);
+      }
+      current = current.cdr();
+    }
+
+    if (current == ListObject.NIL) {
+      throw argOutOfRange("list-set!", 2, k);
+    }
+    current.setHead(params[2]);
+    return VoidObject.VOID;
+  }
+
+  /** Creates a list of k elements, all initialized to fill. (make-list k [fill]) */
+  public static LispObject makeList(LispObject[] params) {
+    int k = requireNonNegativeInt("make-list", params[0], 1);
+
+    LispObject fill = ListObject.NIL;
+    if (params.length > 1) {
+      fill = params[1];
+    }
+
+    LispObject[] elements = new LispObject[k];
+    for (int i = 0; i < k; i++) {
+      elements[i] = fill;
+    }
+    return ListObject.fromList(elements);
   }
 }

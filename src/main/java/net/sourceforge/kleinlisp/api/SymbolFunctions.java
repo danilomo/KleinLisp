@@ -28,6 +28,7 @@ import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispEnvironment;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.AtomObject;
+import net.sourceforge.kleinlisp.objects.BooleanObject;
 import net.sourceforge.kleinlisp.objects.StringObject;
 
 /** Symbol manipulation functions for KleinLisp. */
@@ -75,5 +76,29 @@ public class SymbolFunctions {
     }
     long id = gensymCounter.incrementAndGet();
     return environment.atomOf(prefix + id);
+  }
+
+  /** Compares symbols for equality. (symbol=? sym1 sym2 ...) */
+  public LispObject symbolEqual(LispObject[] params) {
+    if (params.length < 2) {
+      throw new LispArgumentError("symbol=?: expected at least 2 arguments");
+    }
+
+    AtomObject first = params[0].asAtom();
+    if (first == null) {
+      throw new LispArgumentError("symbol=?: expected symbol as argument 1");
+    }
+
+    for (int i = 1; i < params.length; i++) {
+      AtomObject sym = params[i].asAtom();
+      if (sym == null) {
+        throw new LispArgumentError("symbol=?: expected symbol as argument " + (i + 1));
+      }
+      // Symbols are interned, so can use reference equality
+      if (first != sym) {
+        return BooleanObject.FALSE;
+      }
+    }
+    return BooleanObject.TRUE;
   }
 }

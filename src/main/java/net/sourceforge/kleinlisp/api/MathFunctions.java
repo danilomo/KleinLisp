@@ -498,6 +498,83 @@ public class MathFunctions {
     return IntObject.valueOf(result);
   }
 
+  /** Floor division - returns quotient and remainder. (floor/ n d) */
+  public static LispObject floorDiv(LispObject[] params) {
+    assertArgCount("floor/", params, 2);
+    int n = asInt("floor/", params[0]);
+    int d = asInt("floor/", params[1]);
+    if (d == 0) {
+      throw new ArithmeticException("floor/: division by zero");
+    }
+
+    // Floor division: quotient rounds toward negative infinity
+    int q = (int) Math.floor((double) n / d);
+    int r = n - q * d;
+
+    return new ValuesObject(new LispObject[] {IntObject.valueOf(q), IntObject.valueOf(r)});
+  }
+
+  /** Floor quotient. (floor-quotient n d) */
+  public static LispObject floorQuotient(LispObject[] params) {
+    assertArgCount("floor-quotient", params, 2);
+    int n = asInt("floor-quotient", params[0]);
+    int d = asInt("floor-quotient", params[1]);
+    if (d == 0) {
+      throw new ArithmeticException("floor-quotient: division by zero");
+    }
+    return IntObject.valueOf((int) Math.floor((double) n / d));
+  }
+
+  /** Floor remainder. (floor-remainder n d) */
+  public static LispObject floorRemainder(LispObject[] params) {
+    assertArgCount("floor-remainder", params, 2);
+    int n = asInt("floor-remainder", params[0]);
+    int d = asInt("floor-remainder", params[1]);
+    if (d == 0) {
+      throw new ArithmeticException("floor-remainder: division by zero");
+    }
+    int q = (int) Math.floor((double) n / d);
+    return IntObject.valueOf(n - q * d);
+  }
+
+  /** Truncate division - returns quotient and remainder. (truncate/ n d) */
+  public static LispObject truncateDiv(LispObject[] params) {
+    assertArgCount("truncate/", params, 2);
+    int n = asInt("truncate/", params[0]);
+    int d = asInt("truncate/", params[1]);
+    if (d == 0) {
+      throw new ArithmeticException("truncate/: division by zero");
+    }
+
+    // Truncate division: quotient rounds toward zero (Java's default)
+    int q = n / d;
+    int r = n % d;
+
+    return new ValuesObject(new LispObject[] {IntObject.valueOf(q), IntObject.valueOf(r)});
+  }
+
+  /** Truncate quotient. (truncate-quotient n d) */
+  public static LispObject truncateQuotient(LispObject[] params) {
+    assertArgCount("truncate-quotient", params, 2);
+    int n = asInt("truncate-quotient", params[0]);
+    int d = asInt("truncate-quotient", params[1]);
+    if (d == 0) {
+      throw new ArithmeticException("truncate-quotient: division by zero");
+    }
+    return IntObject.valueOf(n / d);
+  }
+
+  /** Truncate remainder. (truncate-remainder n d) */
+  public static LispObject truncateRemainder(LispObject[] params) {
+    assertArgCount("truncate-remainder", params, 2);
+    int n = asInt("truncate-remainder", params[0]);
+    int d = asInt("truncate-remainder", params[1]);
+    if (d == 0) {
+      throw new ArithmeticException("truncate-remainder: division by zero");
+    }
+    return IntObject.valueOf(n % d);
+  }
+
   // GCD and LCM
   public static LispObject gcdFn(LispObject[] params) {
     if (params.length == 0) {

@@ -202,6 +202,12 @@ public class LispEnvironment implements Environment {
     registerFunction("quotient", MathFunctions::quotient);
     registerFunction("remainder", MathFunctions::remainder);
     registerFunction("modulo", MathFunctions::modulo);
+    registerFunction("floor/", MathFunctions::floorDiv);
+    registerFunction("floor-quotient", MathFunctions::floorQuotient);
+    registerFunction("floor-remainder", MathFunctions::floorRemainder);
+    registerFunction("truncate/", MathFunctions::truncateDiv);
+    registerFunction("truncate-quotient", MathFunctions::truncateQuotient);
+    registerFunction("truncate-remainder", MathFunctions::truncateRemainder);
 
     // GCD and LCM
     registerFunction("gcd", MathFunctions::gcdFn);
@@ -271,6 +277,10 @@ public class LispEnvironment implements Environment {
     registerFunction("drop", ListFunctions::drop);
     registerFunction("iota", ListFunctions::iota);
     registerFunction("list-copy", ListFunctions::listCopy);
+    registerFunction("set-car!", ListFunctions::setCar);
+    registerFunction("set-cdr!", ListFunctions::setCdr);
+    registerFunction("list-set!", ListFunctions::listSet);
+    registerFunction("make-list", ListFunctions::makeList);
 
     // Car/cdr compositions
     registerFunction("caar", ListFunctions::caar);
@@ -286,6 +296,21 @@ public class LispEnvironment implements Environment {
     registerFunction("cddar", ListFunctions::cddar);
     registerFunction("cdddr", ListFunctions::cdddr);
     registerFunction("cadddr", ListFunctions::cadddr);
+    registerFunction("caaaar", ListFunctions::caaaar);
+    registerFunction("caaadr", ListFunctions::caaadr);
+    registerFunction("caadar", ListFunctions::caadar);
+    registerFunction("caaddr", ListFunctions::caaddr);
+    registerFunction("cadaar", ListFunctions::cadaar);
+    registerFunction("cadadr", ListFunctions::cadadr);
+    registerFunction("caddar", ListFunctions::caddar);
+    registerFunction("cdaaar", ListFunctions::cdaaar);
+    registerFunction("cdaadr", ListFunctions::cdaadr);
+    registerFunction("cdadar", ListFunctions::cdadar);
+    registerFunction("cdaddr", ListFunctions::cdaddr);
+    registerFunction("cddaar", ListFunctions::cddaar);
+    registerFunction("cddadr", ListFunctions::cddadr);
+    registerFunction("cdddar", ListFunctions::cdddar);
+    registerFunction("cddddr", ListFunctions::cddddr);
 
     // Boolean/comparison functions
     registerFunction("<", BooleanFunctions::lt);
@@ -399,6 +424,7 @@ public class LispEnvironment implements Environment {
     registerFunction("symbol->string", symbolFuncs::symbolToString);
     registerFunction("string->symbol", symbolFuncs::stringToSymbol);
     registerFunction("gensym", symbolFuncs::gensym);
+    registerFunction("symbol=?", symbolFuncs::symbolEqual);
 
     // I/O functions
     registerFunction("print", IOFunctions::print);
