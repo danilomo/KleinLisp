@@ -587,6 +587,10 @@ public class LispEnvironment implements Environment {
   private void initMacroTable() {
     StandardMacros macros = new StandardMacros(this);
     registerMacro("when", macros::when);
+    // Note: 'unless' is intentionally NOT registered as a built-in macro
+    // to allow users to override it with define-syntax. Users can define it as:
+    // (define-syntax unless (syntax-rules () ((unless cond body ...) (if cond '() (begin body
+    // ...)))))
     // Note: 'let' is now implemented as a special form for TCO compatibility
   }
 

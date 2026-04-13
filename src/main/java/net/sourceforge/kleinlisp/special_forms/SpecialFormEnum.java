@@ -41,5 +41,6 @@ public enum SpecialFormEnum {
   IF,
   DO,
   COND,
-  CASE
+  CASE,
+  CASE_LAMBDA
 }

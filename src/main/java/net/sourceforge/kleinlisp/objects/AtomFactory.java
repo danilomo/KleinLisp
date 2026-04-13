@@ -83,6 +83,9 @@ public class AtomFactory {
         case "case":
           specialForm = SpecialFormEnum.CASE;
           break;
+        case "case-lambda":
+          specialForm = SpecialFormEnum.CASE_LAMBDA;
+          break;
         default:
           break;
       }

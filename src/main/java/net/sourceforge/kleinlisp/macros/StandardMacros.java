@@ -53,6 +53,23 @@ public class StandardMacros {
     return new ListObject(atom("if"), new ListObject(condition, ifBody));
   }
 
+  /**
+   * Transforms (unless condition body...) into (if condition '() (begin body...))
+   *
+   * <p>R7RS: unless evaluates body if condition is false.
+   */
+  public ListObject unless(ListObject body) {
+    body = body.cdr();
+
+    LispObject condition = body.car();
+    ListObject statements = body.cdr();
+
+    ListObject falseBranch = new ListObject(atom("begin"), statements);
+    ListObject ifBody = new ListObject(ListObject.NIL, new ListObject(falseBranch, ListObject.NIL));
+
+    return new ListObject(atom("if"), new ListObject(condition, ifBody));
+  }
+
   public ListObject let(ListObject list) {
     List<LispObject> parameters = new ArrayList<>();
     List<LispObject> values = new ArrayList<>();

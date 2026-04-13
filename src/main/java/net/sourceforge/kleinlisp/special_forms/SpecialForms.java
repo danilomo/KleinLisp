@@ -72,6 +72,7 @@ public class SpecialForms {
     this.insertForm("define-values", new DefineValuesForm(evaluator, environment));
     this.insertForm("let-syntax", new LetSyntaxForm(evaluator, environment));
     this.insertForm("letrec-syntax", new LetrecSyntaxForm(evaluator, environment));
+    this.insertForm("case-lambda", new CaseLambdaForm(evaluator, environment));
   }
 
   SpecialForms insertForm(String name, SpecialForm form) {
