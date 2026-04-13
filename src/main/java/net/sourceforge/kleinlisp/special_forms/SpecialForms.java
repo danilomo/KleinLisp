@@ -73,6 +73,8 @@ public class SpecialForms {
     this.insertForm("let-syntax", new LetSyntaxForm(evaluator, environment));
     this.insertForm("letrec-syntax", new LetrecSyntaxForm(evaluator, environment));
     this.insertForm("case-lambda", new CaseLambdaForm(evaluator, environment));
+    this.insertForm("cond-expand", new CondExpandForm(evaluator, environment));
+    this.insertForm("syntax-error", new SyntaxErrorForm());
   }
 
   SpecialForms insertForm(String name, SpecialForm form) {
