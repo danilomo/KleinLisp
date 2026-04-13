@@ -75,6 +75,7 @@ public class SpecialForms {
     this.insertForm("case-lambda", new CaseLambdaForm(evaluator, environment));
     this.insertForm("cond-expand", new CondExpandForm(evaluator, environment));
     this.insertForm("syntax-error", new SyntaxErrorForm());
+    this.insertForm("define-record-type", new DefineRecordTypeForm(environment));
   }
 
   SpecialForms insertForm(String name, SpecialForm form) {

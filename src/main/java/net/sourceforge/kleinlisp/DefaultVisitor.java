@@ -168,4 +168,14 @@ public class DefaultVisitor implements LispVisitor<LispObject> {
   public LispObject visit(BytevectorObject obj) {
     return obj;
   }
+
+  @Override
+  public LispObject visit(RecordTypeObject obj) {
+    return obj;
+  }
+
+  @Override
+  public LispObject visit(RecordObject obj) {
+    return obj;
+  }
 }

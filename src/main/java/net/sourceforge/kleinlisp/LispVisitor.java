@@ -84,5 +84,9 @@ public interface LispVisitor<T> {
 
   T visit(BytevectorObject obj);
 
+  T visit(RecordTypeObject obj);
+
+  T visit(RecordObject obj);
+
   class Void {}
 }
