@@ -27,8 +27,10 @@ import java.io.IOException;
 import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.BooleanObject;
+import net.sourceforge.kleinlisp.objects.BytevectorObject;
 import net.sourceforge.kleinlisp.objects.CharObject;
 import net.sourceforge.kleinlisp.objects.EofObject;
+import net.sourceforge.kleinlisp.objects.IntObject;
 import net.sourceforge.kleinlisp.objects.PortObject;
 import net.sourceforge.kleinlisp.objects.StringObject;
 import net.sourceforge.kleinlisp.objects.VoidObject;
@@ -133,6 +135,24 @@ public class PortFunctions {
     return currentErrorPort.get();
   }
 
+  // Current port accessors (for use by FilePortFunctions)
+
+  public static PortObject getCurrentInputPort() {
+    return currentInputPort.get();
+  }
+
+  public static void setCurrentInputPort(PortObject port) {
+    currentInputPort.set(port);
+  }
+
+  public static PortObject getCurrentOutputPort() {
+    return currentOutputPort.get();
+  }
+
+  public static void setCurrentOutputPort(PortObject port) {
+    currentOutputPort.set(port);
+  }
+
   // File ports
 
   /** (open-input-file filename) - Opens file for reading. */
@@ -155,6 +175,52 @@ public class PortFunctions {
     } catch (IOException e) {
       throw new LispArgumentError("Cannot create file: " + filename + ": " + e.getMessage());
     }
+  }
+
+  // Binary file ports
+
+  /** (open-binary-input-file filename) - Opens binary file for reading. */
+  public static LispObject openBinaryInputFile(LispObject[] params) {
+    assertArgCount("open-binary-input-file", params, 1);
+    String filename = asString("open-binary-input-file", params[0]);
+    try {
+      return PortObject.openBinaryInputFile(filename);
+    } catch (IOException e) {
+      throw new LispArgumentError("Cannot open file: " + filename + ": " + e.getMessage());
+    }
+  }
+
+  /** (open-binary-output-file filename) - Opens binary file for writing. */
+  public static LispObject openBinaryOutputFile(LispObject[] params) {
+    assertArgCount("open-binary-output-file", params, 1);
+    String filename = asString("open-binary-output-file", params[0]);
+    try {
+      return PortObject.openBinaryOutputFile(filename);
+    } catch (IOException e) {
+      throw new LispArgumentError("Cannot create file: " + filename + ": " + e.getMessage());
+    }
+  }
+
+  // Bytevector ports
+
+  /** (open-input-bytevector bv) - Opens bytevector for reading. */
+  public static LispObject openInputBytevector(LispObject[] params) {
+    assertArgCount("open-input-bytevector", params, 1);
+    BytevectorObject bv = asBytevector("open-input-bytevector", params[0]);
+    return PortObject.openInputBytevector(bv);
+  }
+
+  /** (open-output-bytevector) - Creates a bytevector output port. */
+  public static LispObject openOutputBytevector(LispObject[] params) {
+    assertArgCount("open-output-bytevector", params, 0);
+    return PortObject.openOutputBytevector();
+  }
+
+  /** (get-output-bytevector port) - Gets accumulated bytes from bytevector output port. */
+  public static LispObject getOutputBytevector(LispObject[] params) {
+    assertArgCount("get-output-bytevector", params, 1);
+    PortObject port = asPort("get-output-bytevector", params[0]);
+    return port.getOutputBytevector();
   }
 
   // String ports
@@ -331,6 +397,61 @@ public class PortFunctions {
     return VoidObject.VOID;
   }
 
+  // Binary I/O operations
+
+  /** (read-u8 [port]) - Reads a byte from binary port. */
+  public static LispObject readU8(LispObject[] params) {
+    PortObject port = params.length > 0 ? asPort("read-u8", params[0]) : currentInputPort.get();
+    try {
+      int b = port.readU8();
+      if (b == -1) {
+        return EofObject.EOF;
+      }
+      return IntObject.valueOf(b);
+    } catch (IOException e) {
+      throw new LispArgumentError("Error reading byte: " + e.getMessage());
+    }
+  }
+
+  /** (peek-u8 [port]) - Peeks at the next byte without consuming it. */
+  public static LispObject peekU8(LispObject[] params) {
+    PortObject port = params.length > 0 ? asPort("peek-u8", params[0]) : currentInputPort.get();
+    try {
+      int b = port.peekU8();
+      if (b == -1) {
+        return EofObject.EOF;
+      }
+      return IntObject.valueOf(b);
+    } catch (IOException e) {
+      throw new LispArgumentError("Error peeking byte: " + e.getMessage());
+    }
+  }
+
+  /** (u8-ready? [port]) - Returns #t if a byte is ready to be read. */
+  public static LispObject u8Ready(LispObject[] params) {
+    PortObject port = params.length > 0 ? asPort("u8-ready?", params[0]) : currentInputPort.get();
+    try {
+      return fromBoolean(port.u8Ready());
+    } catch (IOException e) {
+      throw new LispArgumentError("Error checking byte ready: " + e.getMessage());
+    }
+  }
+
+  /** (write-u8 byte [port]) - Writes a byte to binary port. */
+  public static LispObject writeU8(LispObject[] params) {
+    assertArgCountRange("write-u8", params, 1, 2);
+    int b = asInt("write-u8", params[0]);
+    PortObject port = params.length > 1 ? asPort("write-u8", params[1]) : currentOutputPort.get();
+    try {
+      port.writeU8(b);
+      return VoidObject.VOID;
+    } catch (IOException e) {
+      throw new LispArgumentError("Error writing byte: " + e.getMessage());
+    } catch (IllegalArgumentException e) {
+      throw new LispArgumentError("write-u8: " + e.getMessage());
+    }
+  }
+
   // Helper methods
 
   private static String asString(String name, LispObject obj) {
@@ -360,6 +481,14 @@ public class PortFunctions {
       return obj.asInt().value;
     }
     throw new LispArgumentError(name + ": expected integer, got " + obj.getClass().getSimpleName());
+  }
+
+  private static BytevectorObject asBytevector(String name, LispObject obj) {
+    if (obj instanceof BytevectorObject) {
+      return (BytevectorObject) obj;
+    }
+    throw new LispArgumentError(
+        name + ": expected bytevector, got " + obj.getClass().getSimpleName());
   }
 
   private static void assertArgCount(String name, LispObject[] args, int expected) {

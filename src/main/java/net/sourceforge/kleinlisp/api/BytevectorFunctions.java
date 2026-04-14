@@ -23,11 +23,14 @@
  */
 package net.sourceforge.kleinlisp.api;
 
+import java.io.IOException;
 import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.BooleanObject;
 import net.sourceforge.kleinlisp.objects.BytevectorObject;
+import net.sourceforge.kleinlisp.objects.EofObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
+import net.sourceforge.kleinlisp.objects.PortObject;
 import net.sourceforge.kleinlisp.objects.StringObject;
 import net.sourceforge.kleinlisp.objects.VoidObject;
 
@@ -171,6 +174,114 @@ public class BytevectorFunctions {
     return BytevectorObject.fromUtf8String(s, start, end);
   }
 
+  // Bytevector I/O
+
+  /** (read-bytevector k [port]) - Reads k bytes from port. */
+  public static LispObject readBytevector(LispObject[] params) {
+    if (params.length < 1 || params.length > 2) {
+      throw new LispArgumentError("read-bytevector: expected 1-2 arguments, got " + params.length);
+    }
+    int k = asInt("read-bytevector", params[0]);
+    PortObject port =
+        params.length > 1
+            ? asPort("read-bytevector", params[1])
+            : PortFunctions.getCurrentInputPort();
+
+    if (k < 0) {
+      throw new LispArgumentError("read-bytevector: negative count: " + k);
+    }
+
+    try {
+      byte[] buffer = new byte[k];
+      int totalRead = 0;
+      while (totalRead < k) {
+        int b = port.readU8();
+        if (b == -1) {
+          if (totalRead == 0) {
+            return EofObject.EOF;
+          }
+          break;
+        }
+        buffer[totalRead++] = (byte) b;
+      }
+
+      if (totalRead < k) {
+        byte[] result = new byte[totalRead];
+        System.arraycopy(buffer, 0, result, 0, totalRead);
+        return new BytevectorObject(result);
+      }
+      return new BytevectorObject(buffer);
+    } catch (IOException e) {
+      throw new LispArgumentError("read-bytevector: " + e.getMessage());
+    }
+  }
+
+  /** (read-bytevector! bv [port [start [end]]]) - Reads bytes into bytevector. */
+  public static LispObject readBytevectorMutate(LispObject[] params) {
+    if (params.length < 1 || params.length > 4) {
+      throw new LispArgumentError("read-bytevector!: expected 1-4 arguments, got " + params.length);
+    }
+    BytevectorObject bv = asBytevector("read-bytevector!", params[0]);
+    PortObject port =
+        params.length > 1
+            ? asPort("read-bytevector!", params[1])
+            : PortFunctions.getCurrentInputPort();
+    int start = params.length > 2 ? asInt("read-bytevector!", params[2]) : 0;
+    int end = params.length > 3 ? asInt("read-bytevector!", params[3]) : bv.length();
+
+    if (start < 0 || start > bv.length()) {
+      throw new LispArgumentError("read-bytevector!: start index out of range: " + start);
+    }
+    if (end < start || end > bv.length()) {
+      throw new LispArgumentError("read-bytevector!: end index out of range: " + end);
+    }
+
+    try {
+      int count = 0;
+      for (int i = start; i < end; i++) {
+        int b = port.readU8();
+        if (b == -1) {
+          return count == 0 ? EofObject.EOF : IntObject.valueOf(count);
+        }
+        bv.set(i, b);
+        count++;
+      }
+      return IntObject.valueOf(count);
+    } catch (IOException e) {
+      throw new LispArgumentError("read-bytevector!: " + e.getMessage());
+    }
+  }
+
+  /** (write-bytevector bv [port [start [end]]]) - Writes bytevector to port. */
+  public static LispObject writeBytevector(LispObject[] params) {
+    if (params.length < 1 || params.length > 4) {
+      throw new LispArgumentError("write-bytevector: expected 1-4 arguments, got " + params.length);
+    }
+    BytevectorObject bv = asBytevector("write-bytevector", params[0]);
+    PortObject port =
+        params.length > 1
+            ? asPort("write-bytevector", params[1])
+            : PortFunctions.getCurrentOutputPort();
+    int start = params.length > 2 ? asInt("write-bytevector", params[2]) : 0;
+    int end = params.length > 3 ? asInt("write-bytevector", params[3]) : bv.length();
+
+    if (start < 0 || start > bv.length()) {
+      throw new LispArgumentError("write-bytevector: start index out of range: " + start);
+    }
+    if (end < start || end > bv.length()) {
+      throw new LispArgumentError("write-bytevector: end index out of range: " + end);
+    }
+
+    try {
+      for (int i = start; i < end; i++) {
+        port.writeU8(bv.get(i));
+      }
+      return VoidObject.VOID;
+    } catch (IOException e) {
+      throw new LispArgumentError("write-bytevector: " + e.getMessage());
+    }
+  }
+
   // Helper methods
 
   private static int asInt(String name, LispObject obj) {
@@ -193,6 +304,13 @@ public class BytevectorFunctions {
     }
     throw new LispArgumentError(
         name + ": expected bytevector, got " + obj.getClass().getSimpleName());
+  }
+
+  private static PortObject asPort(String name, LispObject obj) {
+    if (obj instanceof PortObject) {
+      return (PortObject) obj;
+    }
+    throw new LispArgumentError(name + ": expected port, got " + obj.getClass().getSimpleName());
   }
 
   private static void assertArgCount(String name, LispObject[] args, int expected) {

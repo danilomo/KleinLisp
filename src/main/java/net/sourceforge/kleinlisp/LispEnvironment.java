@@ -34,6 +34,7 @@ import net.sourceforge.kleinlisp.api.BytevectorFunctions;
 import net.sourceforge.kleinlisp.api.CharFunctions;
 import net.sourceforge.kleinlisp.api.EqualityFunctions;
 import net.sourceforge.kleinlisp.api.ExceptionFunctions;
+import net.sourceforge.kleinlisp.api.FileFunctions;
 import net.sourceforge.kleinlisp.api.HigherOrderFunctions;
 import net.sourceforge.kleinlisp.api.IOFunctions;
 import net.sourceforge.kleinlisp.api.IntrospectionFunctions;
@@ -47,6 +48,7 @@ import net.sourceforge.kleinlisp.api.PersistentSetFunctions;
 import net.sourceforge.kleinlisp.api.PersistentVectorFunctions;
 import net.sourceforge.kleinlisp.api.PortFunctions;
 import net.sourceforge.kleinlisp.api.PromiseFunctions;
+import net.sourceforge.kleinlisp.api.ReadWriteFunctions;
 import net.sourceforge.kleinlisp.api.SeqFunctions;
 import net.sourceforge.kleinlisp.api.StringFunctions;
 import net.sourceforge.kleinlisp.api.SymbolFunctions;
@@ -583,6 +585,20 @@ public class LispEnvironment implements Environment {
     registerFunction("utf8->string", BytevectorFunctions::utf8ToString);
     registerFunction("string->utf8", BytevectorFunctions::stringToUtf8);
 
+    // Binary ports (R7RS)
+    registerFunction("open-binary-input-file", PortFunctions::openBinaryInputFile);
+    registerFunction("open-binary-output-file", PortFunctions::openBinaryOutputFile);
+    registerFunction("open-input-bytevector", PortFunctions::openInputBytevector);
+    registerFunction("open-output-bytevector", PortFunctions::openOutputBytevector);
+    registerFunction("get-output-bytevector", PortFunctions::getOutputBytevector);
+    registerFunction("read-u8", PortFunctions::readU8);
+    registerFunction("peek-u8", PortFunctions::peekU8);
+    registerFunction("u8-ready?", PortFunctions::u8Ready);
+    registerFunction("write-u8", PortFunctions::writeU8);
+    registerFunction("read-bytevector", BytevectorFunctions::readBytevector);
+    registerFunction("read-bytevector!", BytevectorFunctions::readBytevectorMutate);
+    registerFunction("write-bytevector", BytevectorFunctions::writeBytevector);
+
     // System functions (R7RS) - require environment reference
     SystemFunctions systemFuncs = new SystemFunctions(this);
     registerFunction("features", systemFuncs::features);
@@ -591,6 +607,14 @@ public class LispEnvironment implements Environment {
     registerFunction("get-environment-variables", systemFuncs::getEnvironmentVariables);
     registerFunction("exit", systemFuncs::exit);
     registerFunction("emergency-exit", systemFuncs::emergencyExit);
+
+    // File functions (R7RS - scheme.file)
+    registerFunction("file-exists?", FileFunctions::fileExists);
+    registerFunction("delete-file", FileFunctions::deleteFile);
+    registerFunction("call-with-input-file", FileFunctions::callWithInputFile);
+    registerFunction("call-with-output-file", FileFunctions::callWithOutputFile);
+    registerFunction("with-input-from-file", FileFunctions::withInputFromFile);
+    registerFunction("with-output-to-file", FileFunctions::withOutputToFile);
   }
 
   /**
@@ -607,6 +631,12 @@ public class LispEnvironment implements Environment {
     registerFunction("load", introspection::load);
     registerFunction("load-relative", introspection::loadRelative);
     registerFunction("current-load-pathname", introspection::currentLoadPathname);
+
+    // Read/write functions (R7RS)
+    ReadWriteFunctions readWrite = new ReadWriteFunctions(Parser.defaultParser(), this);
+    registerFunction("read", readWrite::read);
+    registerFunction("write", ReadWriteFunctions::write);
+    registerFunction("write-simple", ReadWriteFunctions::writeSimple);
     registerFunction("eval", introspection::eval);
   }
 

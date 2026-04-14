@@ -24,7 +24,11 @@
 package net.sourceforge.kleinlisp.objects;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -62,6 +66,11 @@ public class PortObject implements LispObject, Closeable {
   private BufferedReader reader;
   private PrintWriter writer;
   private StringWriter stringWriter;
+
+  // Binary I/O streams
+  private InputStream binaryInput;
+  private OutputStream binaryOutput;
+  private ByteArrayOutputStream byteArrayOutput;
 
   private boolean closed = false;
 
@@ -106,6 +115,33 @@ public class PortObject implements LispObject, Closeable {
   public static PortObject fromOutputStream(OutputStream out, String name) {
     PortObject port = new PortObject(Direction.OUTPUT, Type.TEXTUAL, name);
     port.writer = new PrintWriter(out, true);
+    return port;
+  }
+
+  // Binary port factory methods
+
+  public static PortObject openBinaryInputFile(String filename) throws IOException {
+    PortObject port = new PortObject(Direction.INPUT, Type.BINARY, filename);
+    port.binaryInput = new FileInputStream(filename);
+    return port;
+  }
+
+  public static PortObject openBinaryOutputFile(String filename) throws IOException {
+    PortObject port = new PortObject(Direction.OUTPUT, Type.BINARY, filename);
+    port.binaryOutput = new FileOutputStream(filename);
+    return port;
+  }
+
+  public static PortObject openInputBytevector(BytevectorObject bv) {
+    PortObject port = new PortObject(Direction.INPUT, Type.BINARY, "<bytevector>");
+    port.binaryInput = new ByteArrayInputStream(bv.getBytes());
+    return port;
+  }
+
+  public static PortObject openOutputBytevector() {
+    PortObject port = new PortObject(Direction.OUTPUT, Type.BINARY, "<bytevector>");
+    port.byteArrayOutput = new ByteArrayOutputStream();
+    port.binaryOutput = port.byteArrayOutput;
     return port;
   }
 
@@ -203,6 +239,62 @@ public class PortObject implements LispObject, Closeable {
     return stringWriter.toString();
   }
 
+  // Binary I/O operations
+
+  /** Reads a single byte (0-255) or returns -1 for EOF. */
+  public int readU8() throws IOException {
+    ensureOpen();
+    ensureInput();
+    if (binaryInput == null) {
+      throw new IllegalStateException("Not a binary input port");
+    }
+    return binaryInput.read();
+  }
+
+  /** Peeks at the next byte without consuming it. */
+  public int peekU8() throws IOException {
+    ensureOpen();
+    ensureInput();
+    if (binaryInput == null) {
+      throw new IllegalStateException("Not a binary input port");
+    }
+    binaryInput.mark(1);
+    int b = binaryInput.read();
+    binaryInput.reset();
+    return b;
+  }
+
+  /** Checks if a byte is available to read. */
+  public boolean u8Ready() throws IOException {
+    ensureOpen();
+    ensureInput();
+    if (binaryInput == null) {
+      throw new IllegalStateException("Not a binary input port");
+    }
+    return binaryInput.available() > 0;
+  }
+
+  /** Writes a single byte (0-255). */
+  public void writeU8(int b) throws IOException {
+    ensureOpen();
+    ensureOutput();
+    if (binaryOutput == null) {
+      throw new IllegalStateException("Not a binary output port");
+    }
+    if (b < 0 || b > 255) {
+      throw new IllegalArgumentException("Byte value out of range (0-255): " + b);
+    }
+    binaryOutput.write(b);
+  }
+
+  /** Gets the accumulated bytes from a bytevector output port. */
+  public BytevectorObject getOutputBytevector() {
+    if (byteArrayOutput == null) {
+      throw new IllegalStateException("Not a bytevector output port");
+    }
+    return new BytevectorObject(byteArrayOutput.toByteArray());
+  }
+
   @Override
   public void close() throws IOException {
     if (!closed) {
@@ -212,6 +304,12 @@ public class PortObject implements LispObject, Closeable {
       }
       if (writer != null) {
         writer.close();
+      }
+      if (binaryInput != null) {
+        binaryInput.close();
+      }
+      if (binaryOutput != null) {
+        binaryOutput.close();
       }
     }
   }

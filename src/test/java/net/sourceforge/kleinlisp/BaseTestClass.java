@@ -27,6 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
+import net.sourceforge.kleinlisp.objects.StringObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -61,6 +62,24 @@ public abstract class BaseTestClass {
   protected ListObject evalAsList(String str) {
     LispObject result = lisp.evaluate(str);
     return result.asList();
+  }
+
+  protected String evalAsString(String str) {
+    LispObject result = lisp.evaluate(str);
+    // If it's a StringObject, return the actual string value
+    if (result instanceof StringObject) {
+      return ((StringObject) result).value();
+    }
+    // Otherwise return toString representation
+    return result.toString();
+  }
+
+  protected boolean evalAsBoolean(String str) {
+    return lisp.evaluate(str).truthiness();
+  }
+
+  protected LispObject eval(String str) {
+    return lisp.evaluate(str);
   }
 
   protected String getStdOut() {
