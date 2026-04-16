@@ -33,18 +33,35 @@ import net.sourceforge.kleinlisp.objects.ListObject;
 import net.sourceforge.kleinlisp.objects.PromiseObject;
 
 /**
- * Implements R7RS delay special form.
+ * Implements R7RS delay-force special form.
  *
- * <p>(delay expr) creates a promise that will evaluate expr when forced. The expression captures
- * the current execution context (stack frame) at the time delay is evaluated, so that lambda
- * parameters can be properly resolved when the promise is forced.
+ * <p>(delay-force expr) creates a promise that will iteratively force the result when forced. The
+ * expression captures the current execution context (stack frame) at the time delay-force is
+ * evaluated, so that lambda parameters can be properly resolved when the promise is forced.
+ *
+ * <p>Unlike delay, delay-force continues forcing if the result is a promise. This prevents stack
+ * overflow on long lazy sequences and is the proper way to implement iterative lazy algorithms.
+ *
+ * <p>Example:
+ *
+ * <pre>
+ * (define (stream-filter p? s)
+ *   (delay-force
+ *     (if (null? (force s))
+ *         (delay '())
+ *         (let ((h (car (force s)))
+ *               (t (cdr (force s))))
+ *           (if (p? h)
+ *               (delay (cons h (stream-filter p? t)))
+ *               (stream-filter p? t))))))
+ * </pre>
  */
-public class DelayForm implements SpecialForm {
+public class DelayForceForm implements SpecialForm {
 
   private final Evaluator evaluator;
   private final LispEnvironment environment;
 
-  public DelayForm(Evaluator evaluator, LispEnvironment environment) {
+  public DelayForceForm(Evaluator evaluator, LispEnvironment environment) {
     this.evaluator = evaluator;
     this.environment = environment;
   }
@@ -55,11 +72,11 @@ public class DelayForm implements SpecialForm {
     ListObject args = list.cdr();
 
     if (args == ListObject.NIL) {
-      throw new LispArgumentError("delay: requires an expression");
+      throw new LispArgumentError("delay-force: requires an expression");
     }
 
     if (args.length() > 1) {
-      throw new LispArgumentError("delay: expects exactly one expression");
+      throw new LispArgumentError("delay-force: expects exactly one expression");
     }
 
     LispObject expression = args.car();
@@ -68,7 +85,7 @@ public class DelayForm implements SpecialForm {
 
     // Return a supplier that creates the promise, capturing the current execution context
     return () -> {
-      // Capture current stack frame at the time delay is evaluated
+      // Capture current stack frame at the time delay-force is evaluated
       LispObject[] capturedParams = null;
       Environment capturedEnv = null;
 
@@ -114,7 +131,8 @@ public class DelayForm implements SpecialForm {
             }
           };
 
-      return new PromiseObject(contextualSupplier);
+      // Create promise with iterative forcing enabled
+      return new PromiseObject(contextualSupplier, true);
     };
   }
 }

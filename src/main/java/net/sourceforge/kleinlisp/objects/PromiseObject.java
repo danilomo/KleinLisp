@@ -38,6 +38,7 @@ public final class PromiseObject implements LispObject {
   private Supplier<LispObject> computation; // The unevaluated computation (null after forced)
   private LispObject value; // Cached result (null until forced)
   private boolean forced; // Has this promise been forced?
+  private boolean iterativeForce; // If true, force iteratively (for delay-force)
 
   /**
    * Create a promise from an unevaluated computation.
@@ -45,9 +46,20 @@ public final class PromiseObject implements LispObject {
    * @param computation the supplier that will compute the value when forced
    */
   public PromiseObject(Supplier<LispObject> computation) {
+    this(computation, false);
+  }
+
+  /**
+   * Create a promise from an unevaluated computation with optional iterative forcing.
+   *
+   * @param computation the supplier that will compute the value when forced
+   * @param iterativeForce if true, force iteratively (for delay-force)
+   */
+  public PromiseObject(Supplier<LispObject> computation, boolean iterativeForce) {
     this.computation = computation;
     this.value = null;
     this.forced = false;
+    this.iterativeForce = iterativeForce;
   }
 
   /**
@@ -68,6 +80,10 @@ public final class PromiseObject implements LispObject {
    * force nested promises. If the expression evaluates to a promise, that promise is returned as-is
    * (not forced).
    *
+   * <p>However, for delay-force promises, forcing is iterative: if the result is a promise, it
+   * continues forcing until a non-promise value is obtained. This prevents stack overflow on long
+   * lazy sequences.
+   *
    * @return the forced value
    */
   public LispObject force() {
@@ -78,6 +94,14 @@ public final class PromiseObject implements LispObject {
       // Clear reference to allow garbage collection
       computation = null;
       forced = true;
+
+      // For delay-force promises, iteratively force the result if it's a promise
+      if (iterativeForce) {
+        while (value instanceof PromiseObject) {
+          PromiseObject innerPromise = (PromiseObject) value;
+          value = innerPromise.force();
+        }
+      }
     }
     return value;
   }

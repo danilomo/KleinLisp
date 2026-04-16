@@ -823,6 +823,46 @@ public class LispEnvironment implements Environment {
   }
 
   /**
+   * Capture the current let environment stack for delayed evaluation. Returns a copy of the current
+   * let environments that can be restored later.
+   *
+   * @return a list of captured let environments, or null if no let environments are active
+   */
+  public List<Environment> captureLetEnvStack() {
+    if (letEnvStack.isEmpty()) {
+      return null;
+    }
+    // Return a copy of the current let environment stack
+    return new ArrayList<>(letEnvStack);
+  }
+
+  /**
+   * Restore a previously captured let environment stack. Used by delay/delay-force to restore the
+   * environment when forcing a promise.
+   *
+   * @param captured the captured let environments to restore
+   */
+  public void restoreLetEnvStack(List<Environment> captured) {
+    if (captured != null) {
+      letEnvStack.addAll(captured);
+    }
+  }
+
+  /**
+   * Pop multiple let environments from the stack. Used to clean up after restoring a captured let
+   * environment stack.
+   *
+   * @param count the number of let environments to pop
+   */
+  public void popLetEnvs(int count) {
+    for (int i = 0; i < count; i++) {
+      if (!letEnvStack.isEmpty()) {
+        letEnvStack.remove(letEnvStack.size() - 1);
+      }
+    }
+  }
+
+  /**
    * Returns the names of all defined symbols in the global environment. Used for introspection and
    * completions.
    *

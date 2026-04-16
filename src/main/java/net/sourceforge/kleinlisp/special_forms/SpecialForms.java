@@ -65,6 +65,7 @@ public class SpecialForms {
     this.insertForm("or", new OrForm(evaluator));
     this.insertForm("do", new DoForm(evaluator, environment));
     this.insertForm("delay", new DelayForm(evaluator, environment));
+    this.insertForm("delay-force", new DelayForceForm(evaluator, environment));
     this.insertForm("guard", new GuardForm(evaluator, environment));
     this.insertForm("parameterize", new ParameterizeForm(evaluator));
     this.insertForm("let-values", new LetValuesForm(evaluator, environment));

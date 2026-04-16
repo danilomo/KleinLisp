@@ -227,4 +227,31 @@ public class PromiseTest extends BaseTestClass {
     // Force should throw the error
     assertThrows(Exception.class, () -> lisp.evaluate("(force p)"));
   }
+
+  @Test
+  public void testDelayWithLetBindings() {
+    // Test that let bindings are properly captured in delay
+    lisp.evaluate("(define p (delay (let ((x 10) (y 20)) (+ x y))))");
+    assertEquals(30, evalAsInt("(force p)"));
+
+    // Test nested let bindings
+    lisp.evaluate("(define p2 (delay (let ((x 5)) (let ((y 10)) (+ x y)))))");
+    assertEquals(15, evalAsInt("(force p2)"));
+
+    // Test let bindings with closures
+    lisp.evaluate("(define (make-delayed-let n) " + "  (delay (let ((x (* n 2))) (+ x n))))");
+    lisp.evaluate("(define p3 (make-delayed-let 7))");
+    assertEquals(21, evalAsInt("(force p3)"));
+  }
+
+  @Test
+  public void testDelayWithNestedLetAndDelay() {
+    // Test delay inside let inside delay - complex environment capture
+    lisp.evaluate(
+        "(define p "
+            + "  (delay "
+            + "    (let ((x 10)) "
+            + "      (force (delay (let ((y 20)) (+ x y)))))))");
+    assertEquals(30, evalAsInt("(force p)"));
+  }
 }
