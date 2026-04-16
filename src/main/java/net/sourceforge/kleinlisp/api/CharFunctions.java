@@ -154,6 +154,13 @@ public class CharFunctions {
     return new CharObject(Character.toLowerCase(c));
   }
 
+  /** Applies Unicode case folding to a character. (char-foldcase c) */
+  public static LispObject charFoldcase(LispObject[] params) {
+    assertArgCount("char-foldcase", params, 1);
+    char c = asChar("char-foldcase", params[0]);
+    return new CharObject(Character.toLowerCase(c));
+  }
+
   /** Returns the numeric value of a digit character, or #f if not a digit. (digit-value c) */
   public static LispObject digitValue(LispObject[] params) {
     assertArgCount("digit-value", params, 1);

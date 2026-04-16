@@ -242,6 +242,13 @@ public class CharacterTest extends BaseTestClass {
   }
 
   @Test
+  public void testCharFoldcase() {
+    assertEquals("#\\a", lisp.evaluate("(char-foldcase #\\A)").toString());
+    assertEquals("#\\a", lisp.evaluate("(char-foldcase #\\a)").toString());
+    assertEquals("#\\z", lisp.evaluate("(char-foldcase #\\Z)").toString());
+  }
+
+  @Test
   public void testDigitValueSuccess() {
     assertEquals("5", lisp.evaluate("(digit-value #\\5)").toString());
     assertEquals("0", lisp.evaluate("(digit-value #\\0)").toString());

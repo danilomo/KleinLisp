@@ -118,6 +118,14 @@ public class StringFunctionsTest extends BaseTestClass {
   }
 
   @Test
+  public void testStringFoldcase() {
+    assertEquals("hello", lisp.evaluate("(string-foldcase \"HELLO\")").asString().value());
+    assertEquals(
+        "hello world", lisp.evaluate("(string-foldcase \"Hello World\")").asString().value());
+    assertEquals("abc123", lisp.evaluate("(string-foldcase \"ABC123\")").asString().value());
+  }
+
+  @Test
   public void testStringSplit() {
     LispObject result = lisp.evaluate("(string-split \"a,b,c\" \",\")");
     assertEquals(3, result.asList().length());

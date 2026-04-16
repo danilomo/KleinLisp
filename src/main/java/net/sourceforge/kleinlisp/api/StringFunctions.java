@@ -262,6 +262,15 @@ public class StringFunctions {
     return new StringObject(str.value().toLowerCase());
   }
 
+  /** Applies Unicode case folding to a string. (string-foldcase s) */
+  public static LispObject stringFoldcase(LispObject[] params) {
+    StringObject str = params[0].asString();
+    if (str == null) {
+      throw new LispArgumentError("string-foldcase requires a string argument");
+    }
+    return new StringObject(str.value().toLowerCase());
+  }
+
   /** Splits a string by a delimiter. (string-split s delimiter) */
   public static LispObject stringSplit(LispObject[] params) {
     StringObject str = params[0].asString();

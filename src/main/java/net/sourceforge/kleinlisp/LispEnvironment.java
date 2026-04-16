@@ -365,6 +365,7 @@ public class LispEnvironment implements Environment {
     registerFunction("string->number", StringFunctions::stringToNumber);
     registerFunction("string-upcase", StringFunctions::stringUpcase);
     registerFunction("string-downcase", StringFunctions::stringDowncase);
+    registerFunction("string-foldcase", StringFunctions::stringFoldcase);
     registerFunction("string-split", StringFunctions::stringSplit);
     registerFunction("string-join", StringFunctions::stringJoin);
     registerFunction("string-trim", StringFunctions::stringTrim);
@@ -465,6 +466,7 @@ public class LispEnvironment implements Environment {
     registerFunction("integer->char", CharFunctions::integerToChar);
     registerFunction("char-upcase", CharFunctions::charUpcase);
     registerFunction("char-downcase", CharFunctions::charDowncase);
+    registerFunction("char-foldcase", CharFunctions::charFoldcase);
     registerFunction("digit-value", CharFunctions::digitValue);
 
     // Persistent vector functions
