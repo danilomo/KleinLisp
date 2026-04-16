@@ -122,6 +122,14 @@ public class GuardForm implements SpecialForm {
         return result;
       } catch (LispRaisedException e) {
         return handleException(varAtom, handlers, e.getRaisedValue(), e);
+      } catch (net.sourceforge.kleinlisp.LispFileException e) {
+        // Wrap file exceptions in a FILE-type ErrorObject
+        ErrorObject errorObj = e.toErrorObject();
+        return handleException(varAtom, handlers, errorObj, e);
+      } catch (net.sourceforge.kleinlisp.LispReadException e) {
+        // Wrap read exceptions in a READ-type ErrorObject
+        ErrorObject errorObj = e.toErrorObject();
+        return handleException(varAtom, handlers, errorObj, e);
       } catch (RuntimeException e) {
         // Wrap Java runtime exceptions in an ErrorObject
         ErrorObject errorObj =

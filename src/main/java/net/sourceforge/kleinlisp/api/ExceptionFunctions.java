@@ -28,6 +28,7 @@ import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.LispRaisedException;
 import net.sourceforge.kleinlisp.objects.BooleanObject;
 import net.sourceforge.kleinlisp.objects.ErrorObject;
+import net.sourceforge.kleinlisp.objects.ErrorType;
 import net.sourceforge.kleinlisp.objects.StringObject;
 
 /** R7RS exception handling functions: raise, raise-continuable, and error object accessors. */
@@ -95,5 +96,31 @@ public class ExceptionFunctions {
               + params[0].getClass().getSimpleName());
     }
     return ((ErrorObject) params[0]).getIrritantsList();
+  }
+
+  /** (read-error? obj) - returns #t if obj is a read error, #f otherwise. */
+  public static LispObject isReadError(LispObject[] params) {
+    if (params.length != 1) {
+      throw new LispArgumentError("read-error? requires exactly 1 argument, got " + params.length);
+    }
+    if (!(params[0] instanceof ErrorObject)) {
+      return BooleanObject.FALSE;
+    }
+    return ((ErrorObject) params[0]).getErrorType() == ErrorType.READ
+        ? BooleanObject.TRUE
+        : BooleanObject.FALSE;
+  }
+
+  /** (file-error? obj) - returns #t if obj is a file error, #f otherwise. */
+  public static LispObject isFileError(LispObject[] params) {
+    if (params.length != 1) {
+      throw new LispArgumentError("file-error? requires exactly 1 argument, got " + params.length);
+    }
+    if (!(params[0] instanceof ErrorObject)) {
+      return BooleanObject.FALSE;
+    }
+    return ((ErrorObject) params[0]).getErrorType() == ErrorType.FILE
+        ? BooleanObject.TRUE
+        : BooleanObject.FALSE;
   }
 }

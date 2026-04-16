@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispEnvironment;
 import net.sourceforge.kleinlisp.LispObject;
+import net.sourceforge.kleinlisp.LispReadException;
 import net.sourceforge.kleinlisp.Parser;
 import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.BooleanObject;
@@ -109,7 +110,7 @@ public class ReadWriteFunctions {
               break;
             }
             if (parenDepth < 0) {
-              throw new LispArgumentError("read: unexpected closing parenthesis");
+              throw new LispReadException("read: unexpected closing parenthesis");
             }
           } else if (parenDepth == 0 && Character.isWhitespace(ch)) {
             // Non-list expression complete (atom)
@@ -128,7 +129,7 @@ public class ReadWriteFunctions {
       parser.parse(expression, environment, result::set);
       return result.get();
     } catch (IOException e) {
-      throw new LispArgumentError("read: " + e.getMessage());
+      throw new LispReadException("read: " + e.getMessage());
     }
   }
 

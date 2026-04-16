@@ -86,7 +86,7 @@ public class FileOperationsTest extends BaseTestClass {
     String nonExistent = tempDir.resolve("nonexistent.txt").toFile().getAbsolutePath();
     String code = String.format("(delete-file \"%s\")", nonExistent);
 
-    assertThrows(LispArgumentError.class, () -> eval(code));
+    assertThrows(LispFileException.class, () -> eval(code));
   }
 
   @Test
@@ -231,7 +231,7 @@ public class FileOperationsTest extends BaseTestClass {
         String.format(
             "(call-with-input-file \"%s\" (lambda (port) (read-line port)))", nonExistent);
 
-    assertThrows(LispArgumentError.class, () -> eval(code));
+    assertThrows(LispFileException.class, () -> eval(code));
   }
 
   @Test

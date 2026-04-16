@@ -36,15 +36,20 @@ public final class ErrorObject implements LispObject {
 
   private final String message;
   private final LispObject[] irritants;
+  private final ErrorType errorType;
 
   public ErrorObject(String message) {
-    this.message = message;
-    this.irritants = new LispObject[0];
+    this(message, new LispObject[0], ErrorType.GENERIC);
   }
 
   public ErrorObject(String message, LispObject[] irritants) {
+    this(message, irritants, ErrorType.GENERIC);
+  }
+
+  public ErrorObject(String message, LispObject[] irritants, ErrorType errorType) {
     this.message = message;
     this.irritants = irritants;
+    this.errorType = errorType;
   }
 
   public String getMessage() {
@@ -57,6 +62,10 @@ public final class ErrorObject implements LispObject {
 
   public ListObject getIrritantsList() {
     return (ListObject) ListObject.fromList(Arrays.asList(irritants));
+  }
+
+  public ErrorType getErrorType() {
+    return errorType;
   }
 
   @Override

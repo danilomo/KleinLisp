@@ -543,6 +543,8 @@ public class LispEnvironment implements Environment {
     registerFunction("error-object?", ExceptionFunctions::isErrorObject);
     registerFunction("error-object-message", ExceptionFunctions::errorObjectMessage);
     registerFunction("error-object-irritants", ExceptionFunctions::errorObjectIrritants);
+    registerFunction("read-error?", ExceptionFunctions::isReadError);
+    registerFunction("file-error?", ExceptionFunctions::isFileError);
 
     // Parameter functions (R7RS)
     registerFunction("make-parameter", ParameterFunctions::makeParameter);

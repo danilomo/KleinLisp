@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import net.sourceforge.kleinlisp.Function;
 import net.sourceforge.kleinlisp.LispArgumentError;
+import net.sourceforge.kleinlisp.LispFileException;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.BooleanObject;
 import net.sourceforge.kleinlisp.objects.FunctionObject;
@@ -52,12 +53,12 @@ public class FileFunctions {
     File file = new File(filename);
 
     if (!file.exists()) {
-      throw new LispArgumentError("delete-file: file does not exist: " + filename);
+      throw new LispFileException("delete-file: file does not exist: " + filename);
     }
 
     boolean success = file.delete();
     if (!success) {
-      throw new LispArgumentError("delete-file: failed to delete file: " + filename);
+      throw new LispFileException("delete-file: failed to delete file: " + filename);
     }
 
     return VoidObject.VOID;
@@ -81,7 +82,7 @@ public class FileFunctions {
       // Call the procedure with the port
       return proc.evaluate(args);
     } catch (IOException e) {
-      throw new LispArgumentError("call-with-input-file: " + e.getMessage());
+      throw new LispFileException("call-with-input-file: " + e.getMessage());
     } finally {
       if (port != null) {
         try {
@@ -111,7 +112,7 @@ public class FileFunctions {
       // Call the procedure with the port
       return proc.evaluate(args);
     } catch (IOException e) {
-      throw new LispArgumentError("call-with-output-file: " + e.getMessage());
+      throw new LispFileException("call-with-output-file: " + e.getMessage());
     } finally {
       if (port != null) {
         try {
@@ -144,7 +145,7 @@ public class FileFunctions {
       // Call the thunk
       return thunk.evaluate(new LispObject[0]);
     } catch (IOException e) {
-      throw new LispArgumentError("with-input-from-file: " + e.getMessage());
+      throw new LispFileException("with-input-from-file: " + e.getMessage());
     } finally {
       // Always restore the original port
       PortFunctions.setCurrentInputPort(savedPort);
@@ -178,7 +179,7 @@ public class FileFunctions {
       // Call the thunk
       return thunk.evaluate(new LispObject[0]);
     } catch (IOException e) {
-      throw new LispArgumentError("with-output-to-file: " + e.getMessage());
+      throw new LispFileException("with-output-to-file: " + e.getMessage());
     } finally {
       // Always restore the original port
       PortFunctions.setCurrentOutputPort(savedPort);
