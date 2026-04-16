@@ -232,6 +232,11 @@ public class Evaluator implements LispVisitor<Supplier<LispObject>> {
   }
 
   @Override
+  public Supplier<LispObject> visit(MutableStringObject obj) {
+    return () -> obj;
+  }
+
+  @Override
   public Supplier<LispObject> visit(FunctionObject obj) {
     return () -> obj;
   }

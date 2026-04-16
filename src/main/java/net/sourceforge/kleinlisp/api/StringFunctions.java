@@ -24,7 +24,6 @@
 package net.sourceforge.kleinlisp.api;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import net.sourceforge.kleinlisp.Function;
 import net.sourceforge.kleinlisp.LispArgumentError;
@@ -35,6 +34,7 @@ import net.sourceforge.kleinlisp.objects.DoubleObject;
 import net.sourceforge.kleinlisp.objects.FunctionObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
+import net.sourceforge.kleinlisp.objects.MutableStringObject;
 import net.sourceforge.kleinlisp.objects.StringObject;
 import net.sourceforge.kleinlisp.objects.VoidObject;
 
@@ -356,7 +356,7 @@ public class StringFunctions {
     return new StringObject(str.value().replace(old.value(), replacement.value()));
   }
 
-  /** Creates a string of k characters. (make-string k) or (make-string k char) */
+  /** Creates a mutable string of k characters. (make-string k) or (make-string k char) */
   public static LispObject makeString(LispObject[] params) {
     if (params.length < 1 || params.length > 2) {
       throw new LispArgumentError("make-string: expected 1 or 2 arguments");
@@ -376,9 +376,7 @@ public class StringFunctions {
       }
       fill = ((CharObject) params[1]).getValue();
     }
-    char[] chars = new char[k];
-    Arrays.fill(chars, fill);
-    return new StringObject(new String(chars));
+    return new MutableStringObject(k, fill);
   }
 
   /** Builds a string from characters. (string char ...) */
@@ -555,6 +553,151 @@ public class StringFunctions {
       }
       proc.evaluate(chars);
     }
+    return VoidObject.VOID;
+  }
+
+  /** Sets the character at a given index in a mutable string. (string-set! string k char) */
+  public static LispObject stringSet(LispObject[] params) {
+    if (params.length != 3) {
+      throw new LispArgumentError("string-set!: expected 3 arguments");
+    }
+
+    if (!(params[0] instanceof MutableStringObject)) {
+      throw new LispArgumentError(
+          "string-set!: expected mutable string (created with make-string)");
+    }
+    MutableStringObject str = (MutableStringObject) params[0];
+
+    IntObject idxObj = params[1].asInt();
+    if (idxObj == null) {
+      throw new LispArgumentError("string-set!: expected integer index");
+    }
+    int idx = idxObj.value;
+
+    if (!(params[2] instanceof CharObject)) {
+      throw new LispArgumentError("string-set!: expected character as third argument");
+    }
+    char ch = ((CharObject) params[2]).getValue();
+
+    if (idx < 0 || idx >= str.length()) {
+      throw new LispArgumentError(
+          "string-set!: index out of bounds: " + idx + " for string of length " + str.length());
+    }
+
+    str.setCharAt(idx, ch);
+    return VoidObject.VOID;
+  }
+
+  /**
+   * Copies characters from one string to another. (string-copy! to at from) or (string-copy! to at
+   * from start) or (string-copy! to at from start end)
+   */
+  public static LispObject stringCopyBang(LispObject[] params) {
+    if (params.length < 3 || params.length > 5) {
+      throw new LispArgumentError("string-copy!: expected 3-5 arguments");
+    }
+
+    if (!(params[0] instanceof MutableStringObject)) {
+      throw new LispArgumentError(
+          "string-copy!: expected mutable string as first argument (created with make-string)");
+    }
+    MutableStringObject to = (MutableStringObject) params[0];
+
+    IntObject atObj = params[1].asInt();
+    if (atObj == null) {
+      throw new LispArgumentError("string-copy!: expected integer 'at' index");
+    }
+    int at = atObj.value;
+
+    // Source string can be either mutable or immutable
+    String from;
+    if (params[2] instanceof MutableStringObject) {
+      from = ((MutableStringObject) params[2]).value();
+    } else {
+      StringObject fromObj = params[2].asString();
+      if (fromObj == null) {
+        throw new LispArgumentError("string-copy!: expected string as third argument");
+      }
+      from = fromObj.value();
+    }
+
+    int start = 0;
+    int end = from.length();
+
+    if (params.length > 3) {
+      IntObject startObj = params[3].asInt();
+      if (startObj == null) {
+        throw new LispArgumentError("string-copy!: expected integer start index");
+      }
+      start = startObj.value;
+    }
+
+    if (params.length > 4) {
+      IntObject endObj = params[4].asInt();
+      if (endObj == null) {
+        throw new LispArgumentError("string-copy!: expected integer end index");
+      }
+      end = endObj.value;
+    }
+
+    if (at < 0 || at > to.length()) {
+      throw new LispArgumentError("string-copy!: 'at' index out of bounds: " + at);
+    }
+    if (start < 0 || end > from.length() || start > end) {
+      throw new LispArgumentError("string-copy!: source indices out of bounds");
+    }
+    if (at + (end - start) > to.length()) {
+      throw new LispArgumentError("string-copy!: not enough space in destination string");
+    }
+
+    to.copyFrom(at, from, start, end);
+    return VoidObject.VOID;
+  }
+
+  /**
+   * Fills a mutable string with a character. (string-fill! string char) or (string-fill! string
+   * char start) or (string-fill! string char start end)
+   */
+  public static LispObject stringFillBang(LispObject[] params) {
+    if (params.length < 2 || params.length > 4) {
+      throw new LispArgumentError("string-fill!: expected 2-4 arguments");
+    }
+
+    if (!(params[0] instanceof MutableStringObject)) {
+      throw new LispArgumentError(
+          "string-fill!: expected mutable string (created with make-string)");
+    }
+    MutableStringObject str = (MutableStringObject) params[0];
+
+    if (!(params[1] instanceof CharObject)) {
+      throw new LispArgumentError("string-fill!: expected character as second argument");
+    }
+    char ch = ((CharObject) params[1]).getValue();
+
+    int start = 0;
+    int end = str.length();
+
+    if (params.length > 2) {
+      IntObject startObj = params[2].asInt();
+      if (startObj == null) {
+        throw new LispArgumentError("string-fill!: expected integer start index");
+      }
+      start = startObj.value;
+    }
+
+    if (params.length > 3) {
+      IntObject endObj = params[3].asInt();
+      if (endObj == null) {
+        throw new LispArgumentError("string-fill!: expected integer end index");
+      }
+      end = endObj.value;
+    }
+
+    if (start < 0 || end > str.length() || start > end) {
+      throw new LispArgumentError("string-fill!: index out of bounds");
+    }
+
+    str.fill(ch, start, end);
     return VoidObject.VOID;
   }
 }

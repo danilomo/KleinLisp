@@ -80,6 +80,11 @@ public class DefaultVisitor implements LispVisitor<LispObject> {
   }
 
   @Override
+  public LispObject visit(MutableStringObject obj) {
+    return obj;
+  }
+
+  @Override
   public LispObject visit(FunctionObject obj) {
     return obj;
   }

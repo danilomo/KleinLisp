@@ -380,6 +380,9 @@ public class LispEnvironment implements Environment {
     registerFunction("string-copy", StringFunctions::stringCopy);
     registerFunction("string-map", StringFunctions::stringMap);
     registerFunction("string-for-each", StringFunctions::stringForEach);
+    registerFunction("string-set!", StringFunctions::stringSet);
+    registerFunction("string-copy!", StringFunctions::stringCopyBang);
+    registerFunction("string-fill!", StringFunctions::stringFillBang);
 
     // Higher-order functions
     registerFunction("map", HigherOrderFunctions::map);

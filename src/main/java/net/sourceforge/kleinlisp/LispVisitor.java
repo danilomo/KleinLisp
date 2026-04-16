@@ -46,6 +46,8 @@ public interface LispVisitor<T> {
 
   T visit(StringObject obj);
 
+  T visit(MutableStringObject obj);
+
   T visit(FunctionObject obj);
 
   T visit(ErrorObject obj);
