@@ -94,6 +94,12 @@ public class R7RSTestSuite {
     return loadTestCases("comparison-tests.scm");
   }
 
+  // Note: Time functions (current-second, current-jiffy, jiffies-per-second) are tested
+  // in TimeFunctionsTest.java instead of here because:
+  // 1. They are not supported by reference implementations (Guile/Chicken)
+  // 2. They are non-deterministic (time-based)
+  // 3. JUnit tests provide better control for testing time-based functions
+
   private Stream<DynamicTest> loadTestCases(String filename) throws Exception {
     Path path = Paths.get(TEST_RESOURCES_PATH + filename);
     if (!Files.exists(path)) {

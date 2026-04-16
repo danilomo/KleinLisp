@@ -53,6 +53,7 @@ import net.sourceforge.kleinlisp.api.SeqFunctions;
 import net.sourceforge.kleinlisp.api.StringFunctions;
 import net.sourceforge.kleinlisp.api.SymbolFunctions;
 import net.sourceforge.kleinlisp.api.SystemFunctions;
+import net.sourceforge.kleinlisp.api.TimeFunctions;
 import net.sourceforge.kleinlisp.api.TypePredicates;
 import net.sourceforge.kleinlisp.api.ValuesFunctions;
 import net.sourceforge.kleinlisp.api.VectorFunctions;
@@ -638,6 +639,11 @@ public class LispEnvironment implements Environment {
     registerFunction("write", ReadWriteFunctions::write);
     registerFunction("write-simple", ReadWriteFunctions::writeSimple);
     registerFunction("eval", introspection::eval);
+
+    // Time functions (R7RS - scheme.time)
+    registerFunction("current-second", TimeFunctions::currentSecond);
+    registerFunction("current-jiffy", TimeFunctions::currentJiffy);
+    registerFunction("jiffies-per-second", TimeFunctions::jiffiesPerSecond);
   }
 
   private void initMacroTable() {
