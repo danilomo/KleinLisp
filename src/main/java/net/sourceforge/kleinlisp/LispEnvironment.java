@@ -143,6 +143,12 @@ public class LispEnvironment implements Environment {
   private final Map<AtomObject, Long> definitionVersions = new HashMap<>();
   private long globalVersion = 0;
 
+  // Reference to Lisp instance for accessing configuration (e.g., r7rsMode)
+  private Lisp lispInstance;
+
+  // R7RS library registry
+  private final LibraryRegistry libraryRegistry;
+
   public LispEnvironment() {
     this.objects = new HashMap<>();
     this.names = new HashMap<>();
@@ -154,6 +160,7 @@ public class LispEnvironment implements Environment {
     this.functionCalls = new ArrayList<>();
     this.macroTable = new HashMap<>();
     this.letEnvStack = new ArrayList<>();
+    this.libraryRegistry = new LibraryRegistry();
     initFunctionTable();
     initMacroTable();
   }
@@ -176,6 +183,24 @@ public class LispEnvironment implements Environment {
 
   public List<FunctionRef> getFunctionCalls() {
     return functionCalls;
+  }
+
+  /**
+   * Returns the Lisp instance associated with this environment.
+   *
+   * @return the Lisp instance, or null if not set
+   */
+  public Lisp getLispInstance() {
+    return lispInstance;
+  }
+
+  /**
+   * Returns the library registry for R7RS library management.
+   *
+   * @return the library registry
+   */
+  public LibraryRegistry getLibraryRegistry() {
+    return libraryRegistry;
   }
 
   public void printStackTrace() {
@@ -632,6 +657,7 @@ public class LispEnvironment implements Environment {
    * @param lisp the Lisp instance
    */
   public void registerIntrospectionFunctions(Lisp lisp) {
+    this.lispInstance = lisp;
     IntrospectionFunctions introspection = new IntrospectionFunctions(this, lisp);
     registerFunction("environment-symbols", introspection::environmentSymbols);
     registerFunction("procedure-arity", introspection::procedureArity);

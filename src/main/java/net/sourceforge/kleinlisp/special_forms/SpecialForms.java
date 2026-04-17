@@ -77,6 +77,8 @@ public class SpecialForms {
     this.insertForm("cond-expand", new CondExpandForm(evaluator, environment));
     this.insertForm("syntax-error", new SyntaxErrorForm());
     this.insertForm("define-record-type", new DefineRecordTypeForm(environment));
+    this.insertForm("import", new ImportForm(environment));
+    this.insertForm("define-library", new DefineLibraryForm(evaluator, environment));
   }
 
   SpecialForms insertForm(String name, SpecialForm form) {
