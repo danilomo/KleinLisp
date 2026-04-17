@@ -183,4 +183,9 @@ public class DefaultVisitor implements LispVisitor<LispObject> {
   public LispObject visit(RecordObject obj) {
     return obj;
   }
+
+  @Override
+  public LispObject visit(EnvironmentObject obj) {
+    return obj;
+  }
 }

@@ -640,6 +640,11 @@ public class LispEnvironment implements Environment {
     registerFunction("load-relative", introspection::loadRelative);
     registerFunction("current-load-pathname", introspection::currentLoadPathname);
 
+    // Environment functions (R7RS)
+    registerFunction("interaction-environment", introspection::interactionEnvironment);
+    registerFunction("scheme-report-environment", introspection::schemeReportEnvironment);
+    registerFunction("null-environment", introspection::nullEnvironment);
+
     // Read/write functions (R7RS)
     ReadWriteFunctions readWrite = new ReadWriteFunctions(Parser.defaultParser(), this);
     registerFunction("read", readWrite::read);

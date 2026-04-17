@@ -90,5 +90,7 @@ public interface LispVisitor<T> {
 
   T visit(RecordObject obj);
 
+  T visit(EnvironmentObject obj);
+
   class Void {}
 }

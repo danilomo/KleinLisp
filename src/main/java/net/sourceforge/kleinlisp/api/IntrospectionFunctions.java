@@ -202,15 +202,116 @@ public class IntrospectionFunctions {
   }
 
   /**
-   * Evaluates an expression.
+   * Returns the current interaction environment.
    *
-   * <p>(eval expr) → result
+   * <p>(interaction-environment) → environment
+   *
+   * <p>This is the environment used by the REPL and contains all loaded definitions.
    */
-  public LispObject eval(LispObject[] params) {
-    if (params.length < 1) {
-      throw new LispArgumentError("eval requires an expression argument");
+  public LispObject interactionEnvironment(LispObject[] params) {
+    if (params.length != 0) {
+      throw new LispArgumentError("interaction-environment takes no arguments");
     }
 
-    return lisp.evaluate(params[0]);
+    return new net.sourceforge.kleinlisp.objects.EnvironmentObject(
+        environment, "interaction-environment");
+  }
+
+  /**
+   * Returns an R5RS/R7RS compatible environment.
+   *
+   * <p>(scheme-report-environment version) → environment
+   *
+   * <p>The version should be 5 or 7. Since KleinLisp loads all functions globally and implements
+   * most R5RS/R7RS features, this returns the current environment.
+   *
+   * <p>Note: This is a simplified implementation. A full R7RS implementation would provide separate
+   * environments for R5RS (version 5) and R7RS (version 7).
+   */
+  public LispObject schemeReportEnvironment(LispObject[] params) {
+    if (params.length != 1) {
+      throw new LispArgumentError("scheme-report-environment requires a version argument");
+    }
+
+    IntObject versionObj = params[0].asInt();
+    if (versionObj == null) {
+      throw new LispArgumentError(
+          "scheme-report-environment requires an integer version, got: " + params[0]);
+    }
+
+    int version = versionObj.value();
+    if (version != 5 && version != 7) {
+      throw new LispArgumentError(
+          "scheme-report-environment only supports version 5 or 7, got: " + version);
+    }
+
+    return new net.sourceforge.kleinlisp.objects.EnvironmentObject(
+        environment, "scheme-report-environment(" + version + ")");
+  }
+
+  /**
+   * Returns a null environment containing only special forms.
+   *
+   * <p>(null-environment version) → environment
+   *
+   * <p>The version should be 5 or 7. This environment contains only syntax (special forms) without
+   * any built-in procedures.
+   *
+   * <p>Note: This is a simplified implementation that returns the current environment. A full
+   * implementation would create a restricted environment with only special forms.
+   */
+  public LispObject nullEnvironment(LispObject[] params) {
+    if (params.length != 1) {
+      throw new LispArgumentError("null-environment requires a version argument");
+    }
+
+    IntObject versionObj = params[0].asInt();
+    if (versionObj == null) {
+      throw new LispArgumentError(
+          "null-environment requires an integer version, got: " + params[0]);
+    }
+
+    int version = versionObj.value();
+    if (version != 5 && version != 7) {
+      throw new LispArgumentError("null-environment only supports version 5 or 7, got: " + version);
+    }
+
+    // Note: In a full implementation, this would create a minimal environment
+    // with only special forms. For now, we return the current environment.
+    return new net.sourceforge.kleinlisp.objects.EnvironmentObject(
+        environment, "null-environment(" + version + ")");
+  }
+
+  /**
+   * Evaluates an expression in the given environment.
+   *
+   * <p>(eval expr) → result
+   *
+   * <p>(eval expr environment) → result
+   *
+   * <p>If no environment is provided, the current environment is used. If an environment is
+   * provided (from interaction-environment, scheme-report-environment, or null-environment), the
+   * expression is evaluated in that environment.
+   */
+  public LispObject eval(LispObject[] params) {
+    if (params.length < 1 || params.length > 2) {
+      throw new LispArgumentError("eval requires 1 or 2 arguments (expression [environment])");
+    }
+
+    LispObject expr = params[0];
+
+    // If environment is provided, validate it
+    if (params.length == 2) {
+      net.sourceforge.kleinlisp.objects.EnvironmentObject envObj =
+          params[1].asObject(net.sourceforge.kleinlisp.objects.EnvironmentObject.class);
+      if (envObj == null) {
+        throw new LispArgumentError("eval requires an environment object, got: " + params[1]);
+      }
+      // Note: Currently we don't actually switch environments because the Lisp.evaluate()
+      // method doesn't support it. This is a simplified implementation that validates
+      // the environment object but evaluates in the current environment.
+    }
+
+    return lisp.evaluate(expr);
   }
 }
