@@ -34,6 +34,7 @@ import java.nio.file.Paths;
  * <ul>
  *   <li>No args → start REPL
  *   <li>--repl → start REPL (explicit)
+ *   <li>--r7rs → enable R7RS mode (can be combined with other options)
  *   <li>--listen [port] → start socket REPL server (default port: 37146)
  *   <li>file.scm → execute Scheme file
  *   <li>-e &lt;expr&gt; → evaluate expression and print result
@@ -69,6 +70,8 @@ import java.nio.file.Paths;
  */
 public class Main {
 
+  private boolean r7rsMode = false;
+
   public static void main(String[] args) throws Exception {
     new Main().run(args);
   }
@@ -81,16 +84,41 @@ public class Main {
    * @throws Exception if an error occurs during execution
    */
   public void run(String[] args) throws Exception {
-    if (args.length == 0 || (args.length == 1 && args[0].equals("--repl"))) {
+    // Parse flags and filter non-flag arguments
+    String[] processedArgs = parseFlags(args);
+
+    if (processedArgs.length == 0
+        || (processedArgs.length == 1 && processedArgs[0].equals("--repl"))) {
       runRepl();
-    } else if (args.length >= 1 && args[0].equals("--listen")) {
-      int port = args.length > 1 ? Integer.parseInt(args[1]) : SocketReplServer.DEFAULT_PORT;
+    } else if (processedArgs.length >= 1 && processedArgs[0].equals("--listen")) {
+      int port =
+          processedArgs.length > 1
+              ? Integer.parseInt(processedArgs[1])
+              : SocketReplServer.DEFAULT_PORT;
       runSocketServer(port);
-    } else if (args.length >= 2 && args[0].equals("-e")) {
-      runExpression(args);
+    } else if (processedArgs.length >= 2 && processedArgs[0].equals("-e")) {
+      runExpression(processedArgs);
     } else {
-      runScript(args[0]);
+      runScript(processedArgs[0]);
     }
+  }
+
+  /**
+   * Parses command line flags and returns the remaining arguments.
+   *
+   * @param args the original command line arguments
+   * @return arguments with flags removed
+   */
+  private String[] parseFlags(String[] args) {
+    java.util.List<String> remaining = new java.util.ArrayList<>();
+    for (String arg : args) {
+      if (arg.equals("--r7rs")) {
+        r7rsMode = true;
+      } else {
+        remaining.add(arg);
+      }
+    }
+    return remaining.toArray(new String[0]);
   }
 
   /**
@@ -180,7 +208,7 @@ public class Main {
    * @return a new Lisp instance
    */
   protected Lisp createLisp() {
-    return new Lisp();
+    return new Lisp(r7rsMode);
   }
 
   /**
@@ -224,6 +252,11 @@ public class Main {
    * @return the banner text, or null/empty to display no banner
    */
   protected String getBanner() {
-    return "KleinLisp REPL\nType expressions to evaluate. Press Ctrl+D to exit.";
+    String banner = "KleinLisp REPL";
+    if (r7rsMode) {
+      banner += " (R7RS mode)";
+    }
+    banner += "\nType expressions to evaluate. Press Ctrl+D to exit.";
+    return banner;
   }
 }

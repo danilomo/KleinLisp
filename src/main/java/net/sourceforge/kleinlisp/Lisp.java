@@ -38,8 +38,14 @@ public class Lisp {
   private final Parser parser;
   private final Evaluator evaluator;
   private final LoadContext loadContext;
+  private boolean r7rsMode;
 
   public Lisp() {
+    this(false);
+  }
+
+  public Lisp(boolean r7rsMode) {
+    this.r7rsMode = r7rsMode;
     environment = new LispEnvironment();
     parser = Parser.defaultParser();
     evaluator = new Evaluator(environment);
@@ -154,5 +160,29 @@ public class Lisp {
 
   public Evaluator evaluator() {
     return evaluator;
+  }
+
+  /**
+   * Returns whether R7RS mode is enabled.
+   *
+   * <p>In R7RS mode, KleinLisp follows stricter R7RS semantics. When disabled (default), KleinLisp
+   * operates in a backwards-compatible R5RS-style mode with R7RS features available globally.
+   *
+   * @return true if R7RS mode is enabled, false otherwise
+   */
+  public boolean isR7rsMode() {
+    return r7rsMode;
+  }
+
+  /**
+   * Enables or disables R7RS mode.
+   *
+   * <p>This flag controls whether KleinLisp operates in strict R7RS compliance mode or in
+   * backwards-compatible mode. Note: This should be set before evaluating any code.
+   *
+   * @param r7rsMode true to enable R7RS mode, false to use default R5RS-style mode
+   */
+  public void setR7rsMode(boolean r7rsMode) {
+    this.r7rsMode = r7rsMode;
   }
 }
