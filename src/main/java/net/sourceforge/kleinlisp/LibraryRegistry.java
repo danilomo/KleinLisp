@@ -101,36 +101,35 @@ public class LibraryRegistry {
    * for compatibility and validation purposes.
    */
   private void registerStandardLibraries() {
-    // Core library - contains fundamental forms and functions
-    registerStdLib("scheme", "base");
-
-    // Additional R7RS standard libraries
-    registerStdLib("scheme", "case-lambda");
-    registerStdLib("scheme", "char");
-    registerStdLib("scheme", "cxr");
-    registerStdLib("scheme", "eval");
-    registerStdLib("scheme", "file");
-    registerStdLib("scheme", "inexact");
-    registerStdLib("scheme", "lazy");
-    registerStdLib("scheme", "load");
-    registerStdLib("scheme", "process-context");
-    registerStdLib("scheme", "read");
-    registerStdLib("scheme", "repl");
-    registerStdLib("scheme", "time");
-    registerStdLib("scheme", "write");
+    // Register each standard library with its R7RS exports
+    registerSchemeBase();
+    registerSchemeCaseLambda();
+    registerSchemeChar();
+    registerSchemeCxr();
+    registerSchemeEval();
+    registerSchemeFile();
+    registerSchemeInexact();
+    registerSchemeLazy();
+    registerSchemeLoad();
+    registerSchemeProcessContext();
+    registerSchemeRead();
+    registerSchemeRepl();
+    registerSchemeTime();
+    registerSchemeWrite();
 
     // Note: (scheme complex) is not supported by KleinLisp
   }
 
   /**
-   * Helper method to register a standard library with given name parts.
+   * Helper method to register a standard library with given name parts and exports.
    *
    * @param parts the library name parts (e.g., "scheme", "base")
+   * @param exports the exported symbols
    */
-  private void registerStdLib(String... parts) {
+  private void registerStdLib(String[] parts, String... exports) {
     List<Object> name = Arrays.asList((Object[]) parts);
-    // Empty exports and body - these are marker libraries only
-    Library lib = new Library(name, new HashSet<>(), null);
+    Set<String> exportSet = new HashSet<>(Arrays.asList(exports));
+    Library lib = new Library(name, exportSet, null);
     register(lib);
   }
 
@@ -150,5 +149,381 @@ public class LibraryRegistry {
    */
   public int size() {
     return libraries.size();
+  }
+
+  // ===================================================================================
+  // Standard Library Export Registration (R7RS Appendix A)
+  // ===================================================================================
+
+  /** Registers (scheme base) with all R7RS exports. R7RS Section 6: Standard Procedures */
+  private void registerSchemeBase() {
+    registerStdLib(
+        new String[] {"scheme", "base"},
+        // Booleans
+        "not",
+        "boolean?",
+        "boolean=?",
+        // Equivalence
+        "eq?",
+        "eqv?",
+        "equal?",
+        // Numbers
+        "+",
+        "-",
+        "*",
+        "/",
+        "=",
+        "<",
+        ">",
+        "<=",
+        ">=",
+        "number?",
+        "complex?",
+        "real?",
+        "rational?",
+        "integer?",
+        "exact?",
+        "inexact?",
+        "exact-integer?",
+        "zero?",
+        "positive?",
+        "negative?",
+        "odd?",
+        "even?",
+        "max",
+        "min",
+        "abs",
+        "floor",
+        "ceiling",
+        "truncate",
+        "round",
+        "quotient",
+        "remainder",
+        "modulo",
+        "floor-quotient",
+        "floor-remainder",
+        "floor/",
+        "truncate-quotient",
+        "truncate-remainder",
+        "truncate/",
+        "gcd",
+        "lcm",
+        "numerator",
+        "denominator",
+        "floor-remainder",
+        "truncate-remainder",
+        "rationalize",
+        "square",
+        "exact-integer-sqrt",
+        "expt",
+        "sqrt",
+        "number->string",
+        "string->number",
+        // Lists and pairs
+        "pair?",
+        "cons",
+        "car",
+        "cdr",
+        "set-car!",
+        "set-cdr!",
+        "caar",
+        "cadr",
+        "cdar",
+        "cddr",
+        "null?",
+        "list?",
+        "make-list",
+        "list",
+        "length",
+        "append",
+        "reverse",
+        "list-tail",
+        "list-ref",
+        "list-set!",
+        "list-copy",
+        "memq",
+        "memv",
+        "member",
+        "assq",
+        "assv",
+        "assoc",
+        // Symbols
+        "symbol?",
+        "symbol=?",
+        "symbol->string",
+        "string->symbol",
+        // Characters
+        "char?",
+        "char=?",
+        "char<?",
+        "char>?",
+        "char<=?",
+        "char>=?",
+        "char->integer",
+        "integer->char",
+        // Strings
+        "string?",
+        "make-string",
+        "string",
+        "string-length",
+        "string-ref",
+        "string-set!",
+        "string=?",
+        "string<?",
+        "string>?",
+        "string<=?",
+        "string>=?",
+        "substring",
+        "string-append",
+        "string->list",
+        "list->string",
+        "string-copy",
+        "string-copy!",
+        "string-fill!",
+        // Vectors
+        "vector?",
+        "make-vector",
+        "vector",
+        "vector-length",
+        "vector-ref",
+        "vector-set!",
+        "vector->list",
+        "list->vector",
+        "vector->string",
+        "string->vector",
+        "vector-copy",
+        "vector-copy!",
+        "vector-append",
+        "vector-fill!",
+        // Bytevectors
+        "bytevector?",
+        "make-bytevector",
+        "bytevector",
+        "bytevector-length",
+        "bytevector-u8-ref",
+        "bytevector-u8-set!",
+        "bytevector-copy",
+        "bytevector-copy!",
+        "bytevector-append",
+        "utf8->string",
+        "string->utf8",
+        // Control features
+        "procedure?",
+        "apply",
+        "map",
+        "for-each",
+        "string-map",
+        "string-for-each",
+        "vector-map",
+        "vector-for-each",
+        "call-with-current-continuation",
+        "call/cc",
+        "values",
+        "call-with-values",
+        "dynamic-wind",
+        // Exceptions
+        "error",
+        "error-object?",
+        "error-object-message",
+        "error-object-irritants",
+        "read-error?",
+        "file-error?",
+        "raise",
+        "raise-continuable",
+        "with-exception-handler",
+        // Environments and evaluation
+        "environment",
+        "scheme-report-environment",
+        "null-environment",
+        "interaction-environment",
+        // Input and output
+        "input-port?",
+        "output-port?",
+        "textual-port?",
+        "binary-port?",
+        "port?",
+        "input-port-open?",
+        "output-port-open?",
+        "current-input-port",
+        "current-output-port",
+        "current-error-port",
+        "close-port",
+        "close-input-port",
+        "close-output-port",
+        "open-input-string",
+        "open-output-string",
+        "get-output-string",
+        "open-input-bytevector",
+        "open-output-bytevector",
+        "get-output-bytevector",
+        "read-char",
+        "peek-char",
+        "read-line",
+        "eof-object?",
+        "eof-object",
+        "char-ready?",
+        "read-string",
+        "read-u8",
+        "peek-u8",
+        "u8-ready?",
+        "read-bytevector",
+        "read-bytevector!",
+        "write-char",
+        "newline",
+        "write-string",
+        "write-u8",
+        "write-bytevector",
+        "flush-output-port",
+        // System interface
+        "features",
+        "command-line",
+        "exit",
+        "emergency-exit",
+        "get-environment-variable",
+        "get-environment-variables",
+        "current-second",
+        "current-jiffy",
+        "jiffies-per-second",
+        // Note: Special forms like define, lambda, if are not included
+        // as they are handled specially and not looked up as functions
+        "_" // Placeholder symbol for pattern matching
+        );
+  }
+
+  private void registerSchemeCaseLambda() {
+    registerStdLib(new String[] {"scheme", "case-lambda"}, "case-lambda");
+  }
+
+  private void registerSchemeChar() {
+    registerStdLib(
+        new String[] {"scheme", "char"},
+        "char-alphabetic?",
+        "char-numeric?",
+        "char-whitespace?",
+        "char-upper-case?",
+        "char-lower-case?",
+        "char-upcase",
+        "char-downcase",
+        "char-foldcase",
+        "digit-value",
+        "char-ci=?",
+        "char-ci<?",
+        "char-ci>?",
+        "char-ci<=?",
+        "char-ci>=?",
+        "string-ci=?",
+        "string-ci<?",
+        "string-ci>?",
+        "string-ci<=?",
+        "string-ci>=?",
+        "string-upcase",
+        "string-downcase",
+        "string-foldcase");
+  }
+
+  private void registerSchemeCxr() {
+    registerStdLib(
+        new String[] {"scheme", "cxr"},
+        "caaar",
+        "caadr",
+        "cadar",
+        "caddr",
+        "cdaar",
+        "cdadr",
+        "cddar",
+        "cdddr",
+        "caaaar",
+        "caaadr",
+        "caadar",
+        "caaddr",
+        "cadaar",
+        "cadadr",
+        "caddar",
+        "cadddr",
+        "cdaaar",
+        "cdaadr",
+        "cdadar",
+        "cdaddr",
+        "cddaar",
+        "cddadr",
+        "cdddar",
+        "cddddr");
+  }
+
+  private void registerSchemeEval() {
+    registerStdLib(new String[] {"scheme", "eval"}, "eval");
+  }
+
+  private void registerSchemeFile() {
+    registerStdLib(
+        new String[] {"scheme", "file"},
+        "call-with-input-file",
+        "call-with-output-file",
+        "open-input-file",
+        "open-output-file",
+        "open-binary-input-file",
+        "open-binary-output-file",
+        "with-input-from-file",
+        "with-output-to-file",
+        "file-exists?",
+        "delete-file");
+  }
+
+  private void registerSchemeInexact() {
+    registerStdLib(
+        new String[] {"scheme", "inexact"},
+        "acos",
+        "asin",
+        "atan",
+        "cos",
+        "sin",
+        "tan",
+        "exp",
+        "log",
+        "finite?",
+        "infinite?",
+        "nan?");
+  }
+
+  private void registerSchemeLazy() {
+    registerStdLib(
+        new String[] {"scheme", "lazy"},
+        "delay",
+        "delay-force",
+        "force",
+        "make-promise",
+        "promise?");
+  }
+
+  private void registerSchemeLoad() {
+    registerStdLib(new String[] {"scheme", "load"}, "load");
+  }
+
+  private void registerSchemeProcessContext() {
+    registerStdLib(
+        new String[] {"scheme", "process-context"},
+        "command-line",
+        "exit",
+        "emergency-exit",
+        "get-environment-variable",
+        "get-environment-variables");
+  }
+
+  private void registerSchemeRead() {
+    registerStdLib(new String[] {"scheme", "read"}, "read");
+  }
+
+  private void registerSchemeRepl() {
+    registerStdLib(new String[] {"scheme", "repl"}, "interaction-environment");
+  }
+
+  private void registerSchemeTime() {
+    registerStdLib(
+        new String[] {"scheme", "time"}, "current-second", "current-jiffy", "jiffies-per-second");
+  }
+
+  private void registerSchemeWrite() {
+    registerStdLib(
+        new String[] {"scheme", "write"}, "write", "write-shared", "write-simple", "display");
   }
 }

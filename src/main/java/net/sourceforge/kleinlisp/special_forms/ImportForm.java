@@ -152,12 +152,35 @@ public class ImportForm implements SpecialForm {
   /**
    * Processes an (only ...) import.
    *
-   * @param importForm the import form
+   * @param importForm the import form (only <import-set> <identifier> ...)
    * @param r7rsMode whether R7RS mode is enabled
    */
   private void processOnlyImport(ListObject importForm, boolean r7rsMode) {
     FormErrors.assertMinArgs("only", importForm, 2);
     LispObject nestedImport = importForm.cdr().car();
+
+    // In R7RS mode, validate that requested symbols exist in the library
+    if (r7rsMode) {
+      // Get the library being imported
+      Library library = resolveLibrary(nestedImport);
+
+      if (library != null) {
+        // Extract the symbols to import (everything after the nested import)
+        List<String> requestedSymbols = extractSymbolList(importForm.cdr().cdr());
+
+        // Validate each symbol exists in the library's exports
+        for (String symbol : requestedSymbols) {
+          if (!library.exports(symbol)) {
+            throw new LispRuntimeException(
+                "import: symbol '"
+                    + symbol
+                    + "' not exported by library "
+                    + library.getNameString());
+          }
+        }
+      }
+    }
+
     // Recursively process the nested import set
     processImportSet(nestedImport, r7rsMode);
     // In backwards-compatible mode, we don't actually filter anything
@@ -166,12 +189,35 @@ public class ImportForm implements SpecialForm {
   /**
    * Processes an (except ...) import.
    *
-   * @param importForm the import form
+   * @param importForm the import form (except <import-set> <identifier> ...)
    * @param r7rsMode whether R7RS mode is enabled
    */
   private void processExceptImport(ListObject importForm, boolean r7rsMode) {
     FormErrors.assertMinArgs("except", importForm, 2);
     LispObject nestedImport = importForm.cdr().car();
+
+    // In R7RS mode, validate that excluded symbols exist in the library
+    if (r7rsMode) {
+      // Get the library being imported
+      Library library = resolveLibrary(nestedImport);
+
+      if (library != null) {
+        // Extract the symbols to exclude
+        List<String> excludedSymbols = extractSymbolList(importForm.cdr().cdr());
+
+        // Validate each symbol exists in the library's exports
+        for (String symbol : excludedSymbols) {
+          if (!library.exports(symbol)) {
+            throw new LispRuntimeException(
+                "import: cannot exclude '"
+                    + symbol
+                    + "' - not exported by library "
+                    + library.getNameString());
+          }
+        }
+      }
+    }
+
     processImportSet(nestedImport, r7rsMode);
   }
 
@@ -190,12 +236,52 @@ public class ImportForm implements SpecialForm {
   /**
    * Processes a (rename ...) import.
    *
-   * @param importForm the import form
+   * @param importForm the import form (rename <import-set> (<old> <new>) ...)
    * @param r7rsMode whether R7RS mode is enabled
    */
   private void processRenameImport(ListObject importForm, boolean r7rsMode) {
     FormErrors.assertMinArgs("rename", importForm, 2);
     LispObject nestedImport = importForm.cdr().car();
+
+    // In R7RS mode, validate that renamed symbols exist in the library
+    if (r7rsMode) {
+      // Get the library being imported
+      Library library = resolveLibrary(nestedImport);
+
+      if (library != null) {
+        // Extract and validate rename pairs
+        ListObject renamePairs = importForm.cdr().cdr().asList();
+        while (renamePairs != null && renamePairs != ListObject.NIL) {
+          LispObject pairObj = renamePairs.car();
+          if (pairObj == null) break;
+
+          ListObject pair = pairObj.asList();
+          if (pair == null) {
+            throw new LispRuntimeException("import: invalid rename pair: " + pairObj);
+          }
+
+          // Get the old symbol name (first element of pair)
+          LispObject oldSymbolObj = pair.car();
+          if (oldSymbolObj == null || oldSymbolObj.asAtom() == null) {
+            throw new LispRuntimeException("import: invalid symbol in rename: " + oldSymbolObj);
+          }
+
+          String oldSymbol = oldSymbolObj.asAtom().toString();
+
+          // Validate the old symbol exists in the library
+          if (!library.exports(oldSymbol)) {
+            throw new LispRuntimeException(
+                "import: cannot rename '"
+                    + oldSymbol
+                    + "' - not exported by library "
+                    + library.getNameString());
+          }
+
+          renamePairs = renamePairs.cdr().asList();
+        }
+      }
+    }
+
     processImportSet(nestedImport, r7rsMode);
   }
 
@@ -245,5 +331,70 @@ public class ImportForm implements SpecialForm {
     }
     sb.append(")");
     return sb.toString();
+  }
+
+  /**
+   * Resolves an import set to the underlying library. Handles nested filters like (only (prefix
+   * (scheme base) foo:) +)
+   *
+   * @param importSet the import set to resolve
+   * @return the library, or null if not found
+   */
+  private Library resolveLibrary(LispObject importSet) {
+    ListObject importList = importSet.asList();
+    if (importList == null) {
+      return null;
+    }
+
+    LispObject first = importList.car();
+    String firstSymbol = first.asAtom() != null ? first.asAtom().toString() : null;
+
+    if (firstSymbol != null) {
+      // Check for import modifiers - recursively resolve nested filters
+      switch (firstSymbol) {
+        case "only":
+        case "except":
+        case "prefix":
+        case "rename":
+          // These all have the nested import as the second element
+          LispObject nestedImport = importList.cdr().car();
+          return resolveLibrary(nestedImport);
+        default:
+          // It's a library name - extract and lookup
+          List<Object> libraryName = extractLibraryName(importList);
+          return environment.getLibraryRegistry().get(libraryName);
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Extracts a list of symbols from a ListObject. Used to extract identifier lists from import
+   * filters.
+   *
+   * @param symbolList the list of symbols
+   * @return list of symbol names as strings
+   */
+  private List<String> extractSymbolList(ListObject symbolList) {
+    List<String> symbols = new ArrayList<>();
+    ListObject current = symbolList;
+
+    while (current != null && current != ListObject.NIL) {
+      LispObject elem = current.car();
+      if (elem == null) {
+        break;
+      }
+
+      if (elem.asAtom() != null) {
+        symbols.add(elem.asAtom().toString());
+      } else {
+        throw new LispRuntimeException("import: expected symbol, got: " + elem);
+      }
+
+      current = current.cdr().asList();
+    }
+
+    return symbols;
   }
 }

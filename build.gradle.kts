@@ -68,6 +68,8 @@ dependencies {
     implementation("org.json:json:20231013")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.1")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.1")
+    testImplementation("org.junit.platform:junit-platform-suite-api:1.9.1")
+    testRuntimeOnly("org.junit.platform:junit-platform-suite-engine:1.9.1")
     testImplementation("org.hamcrest:hamcrest-core:1.3")
 }
 

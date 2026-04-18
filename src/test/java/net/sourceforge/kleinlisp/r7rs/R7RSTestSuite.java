@@ -36,8 +36,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.sourceforge.kleinlisp.Lisp;
@@ -94,6 +92,11 @@ public class R7RSTestSuite {
     return loadTestCases("comparison-tests.scm");
   }
 
+  @TestFactory
+  public Stream<DynamicTest> truthinessTests() throws Exception {
+    return loadTestCases("truthiness-tests.scm");
+  }
+
   // Note: Time functions (current-second, current-jiffy, jiffies-per-second) are tested
   // in TimeFunctionsTest.java instead of here because:
   // 1. They are not supported by reference implementations (Guile/Chicken)
@@ -148,14 +151,99 @@ public class R7RSTestSuite {
     List<TestCase> testCases = new ArrayList<>();
 
     // Pattern to match ((expression) expected-result)
-    // This is a simplified parser that handles basic cases
-    Pattern pattern = Pattern.compile("\\(\\(([^)]+)\\)\\s+([^)]+)\\)");
-    Matcher matcher = pattern.matcher(content);
+    // Use a proper parser that handles nested parentheses
+    int pos = 0;
+    while (pos < content.length()) {
+      // Skip whitespace and comments
+      while (pos < content.length()
+          && (Character.isWhitespace(content.charAt(pos)) || content.charAt(pos) == ';')) {
+        if (content.charAt(pos) == ';') {
+          // Skip comment line
+          while (pos < content.length() && content.charAt(pos) != '\n') {
+            pos++;
+          }
+        }
+        pos++;
+      }
 
-    while (matcher.find()) {
-      String expression = "(" + matcher.group(1).trim() + ")";
-      String expected = normalizeResult(matcher.group(2).trim());
-      testCases.add(new TestCase(expression, expected));
+      // Check if we have a test case starting with ((
+      if (pos < content.length() - 1
+          && content.charAt(pos) == '('
+          && content.charAt(pos + 1) == '(') {
+        pos += 2; // Skip ((
+
+        // Extract expression by counting parentheses
+        StringBuilder exprBuilder = new StringBuilder();
+        int parenCount = 1;
+        while (pos < content.length() && parenCount > 0) {
+          char ch = content.charAt(pos);
+          if (ch == '(') {
+            parenCount++;
+          } else if (ch == ')') {
+            parenCount--;
+            if (parenCount == 0) {
+              pos++; // Skip the closing )
+              break;
+            }
+          }
+          exprBuilder.append(ch);
+          pos++;
+        }
+
+        String expression = "(" + exprBuilder.toString().trim() + ")";
+
+        // Skip whitespace between expression and expected
+        while (pos < content.length() && Character.isWhitespace(content.charAt(pos))) {
+          pos++;
+        }
+
+        // Extract expected result
+        StringBuilder expectedBuilder = new StringBuilder();
+        if (pos < content.length() && content.charAt(pos) == '(') {
+          // Expected is a list
+          parenCount = 0;
+          while (pos < content.length()) {
+            char ch = content.charAt(pos);
+            if (ch == '(') {
+              parenCount++;
+            } else if (ch == ')') {
+              expectedBuilder.append(ch);
+              pos++;
+              parenCount--;
+              if (parenCount == 0) {
+                break;
+              }
+              continue;
+            }
+            expectedBuilder.append(ch);
+            pos++;
+          }
+        } else {
+          // Expected is an atom
+          while (pos < content.length()
+              && !Character.isWhitespace(content.charAt(pos))
+              && content.charAt(pos) != ')') {
+            expectedBuilder.append(content.charAt(pos));
+            pos++;
+          }
+        }
+
+        String expected = normalizeResult(expectedBuilder.toString().trim());
+
+        // Skip closing paren of test case
+        while (pos < content.length() && content.charAt(pos) != ')') {
+          pos++;
+        }
+        if (pos < content.length()) {
+          pos++; // Skip )
+        }
+
+        if (!expression.isEmpty() && !expected.isEmpty()) {
+          testCases.add(new TestCase(expression, expected));
+        }
+      } else if (pos < content.length()) {
+        pos++;
+      }
     }
 
     return testCases;
