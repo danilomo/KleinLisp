@@ -204,15 +204,17 @@ public class PersistentCollectionLiteralsTest extends BaseTestClass {
   public void testNestedCollections() {
     // Complex nested structure
     lisp.evaluate(
-        "(define data #m{#:users #v[#m{#:name \"Alice\" #:age 30} #m{#:name \"Bob\" #:age 25}] #:tags #s{#:admin #:user}})");
+        "(define data #m{#:users #v[#m{#:name \"Alice\" #:age 30} #m{#:name \"Bob\" #:age 25}]"
+            + " #:tags #s{#:admin #:user}})");
 
     // Access nested data
     assertEquals(2, lisp.evaluate("(p-vec-length (p-map-get data #:users))").asInt().value);
-    assertEquals("Alice", evalAsString("(p-map-get (p-vec-ref (p-map-get data #:users) 0) #:name)"));
     assertEquals(
-        25, lisp.evaluate("(p-map-get (p-vec-ref (p-map-get data #:users) 1) #:age)").asInt().value);
-    assertTrue(
-        lisp.evaluate("(p-set-contains? (p-map-get data #:tags) #:admin)").truthiness());
+        "Alice", evalAsString("(p-map-get (p-vec-ref (p-map-get data #:users) 0) #:name)"));
+    assertEquals(
+        25,
+        lisp.evaluate("(p-map-get (p-vec-ref (p-map-get data #:users) 1) #:age)").asInt().value);
+    assertTrue(lisp.evaluate("(p-set-contains? (p-map-get data #:tags) #:admin)").truthiness());
   }
 
   @Test
