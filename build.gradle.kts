@@ -1,6 +1,7 @@
 plugins {
     java
     application
+    `maven-publish`
     id("com.diffplug.spotless") version "6.25.0"
 }
 
@@ -8,7 +9,7 @@ application {
     mainClass.set("net.sourceforge.kleinlisp.Main")
 }
 
-group = "net.sourceforge.kleinlisp"
+group = "com.github.danilomo"
 version = "0.0.1"
 
 java {
@@ -100,5 +101,13 @@ spotless {
             "src/main/java/net/sourceforge/kleinlisp/java_cup/**"
         )
         googleJavaFormat().reflowLongStrings()
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+        }
     }
 }
