@@ -5,7 +5,13 @@ import net.sourceforge.kleinlisp.evaluator.*;
 import net.sourceforge.kleinlisp.objects.*;
 import net.sourceforge.kleinlisp.objects.KeywordObject;
 import net.sourceforge.kleinlisp.objects.CharObject;
+import net.sourceforge.kleinlisp.objects.PVectorObject;
+import net.sourceforge.kleinlisp.objects.PMapObject;
+import net.sourceforge.kleinlisp.objects.PSetObject;
+import org.pcollections.HashTreePMap;
+import org.pcollections.PMap;
 import java.util.function.Consumer;
+import java.util.Iterator;
 
 parser code {:
     private LispEnvironment environment;
@@ -49,6 +55,8 @@ terminal String STRING_LITERAL;
 terminal String KEYWORD;
 terminal QUOTE, QUASIQUOTE, UNQUOTE, UNQUOTE_SPLICING, OPEN_PAR, CLOSE_PAR, OPEN_BRACKET, CLOSE_BRACKET;
 terminal VECTOR_OPEN;
+terminal PVEC_OPEN, PMAP_OPEN, PSET_OPEN;
+terminal OPEN_BRACE, CLOSE_BRACE;
 terminal DOT;
 
 terminal Integer INT_LITERAL;
@@ -59,6 +67,9 @@ terminal CharObject CHAR_LITERAL;
 non terminal LispObject self_evaluating_form;
 non terminal LispObject list_form;
 non terminal LispObject vector_form;
+non terminal LispObject pvector_form;
+non terminal LispObject pmap_form;
+non terminal LispObject pset_form;
 non terminal LispObject form_list;
 non terminal LispObject quoted_form;
 non terminal LispObject quasiquoted_form;
@@ -77,6 +88,9 @@ form ::=
     self_evaluating_form:f {: RESULT = f; :} |
     list_form:f {: RESULT = f; :} |
     vector_form:f {: RESULT = f; :} |
+    pvector_form:f {: RESULT = f; :} |
+    pmap_form:f {: RESULT = f; :} |
+    pset_form:f {: RESULT = f; :} |
     quoted_form:f {: RESULT = f; :} |
     quasiquoted_form:f {: RESULT = f; :} |
     unquoted_form:f {: RESULT = f; :} |
@@ -98,7 +112,10 @@ self_evaluating_form ::=
 list_form ::=
     OPEN_PAR     form_list:l                CLOSE_PAR     {: RESULT = l; :} |
     OPEN_PAR     form_list:l DOT form:last  CLOSE_PAR     {: ((ListObject) l).last().setTail(last); RESULT = l; :} |
-    OPEN_PAR                                CLOSE_PAR     {: RESULT = ListObject.NIL;  :};
+    OPEN_PAR                                CLOSE_PAR     {: RESULT = ListObject.NIL;  :} |
+    OPEN_BRACKET form_list:l                CLOSE_BRACKET {: RESULT = l; :} |
+    OPEN_BRACKET form_list:l DOT form:last  CLOSE_BRACKET {: ((ListObject) l).last().setTail(last); RESULT = l; :} |
+    OPEN_BRACKET                            CLOSE_BRACKET {: RESULT = ListObject.NIL;  :};
 
 vector_form ::=
     VECTOR_OPEN  form_list:l  CLOSE_PAR     {:
@@ -112,6 +129,55 @@ vector_form ::=
         RESULT = new VectorObject(arr);
     :} |
     VECTOR_OPEN               CLOSE_PAR     {: RESULT = new VectorObject(new LispObject[0]); :};
+
+pvector_form ::=
+    PVEC_OPEN form_list:l CLOSE_BRACKET {:
+        ListObject list = (ListObject) l;
+        java.util.List<LispObject> elems = new java.util.ArrayList<>();
+        for (LispObject obj : list) {
+            elems.add(obj);
+        }
+        LispObject[] arr = elems.toArray(new LispObject[0]);
+        RESULT = PVectorObject.of(arr);
+    :} |
+    PVEC_OPEN CLOSE_BRACKET {:
+        RESULT = PVectorObject.EMPTY;
+    :};
+
+pmap_form ::=
+    PMAP_OPEN form_list:l CLOSE_BRACE {:
+        // Convert list to map (key-value pairs)
+        ListObject list = (ListObject) l;
+        PMap<LispObject, LispObject> pmap = HashTreePMap.empty();
+
+        Iterator<LispObject> it = list.iterator();
+        while (it.hasNext()) {
+            LispObject key = it.next();
+            if (!it.hasNext()) {
+                throw new RuntimeException("Map literal requires even number of forms (key-value pairs)");
+            }
+            LispObject val = it.next();
+            pmap = pmap.plus(key, val);
+        }
+        RESULT = new PMapObject(pmap);
+    :} |
+    PMAP_OPEN CLOSE_BRACE {:
+        RESULT = PMapObject.EMPTY;
+    :};
+
+pset_form ::=
+    PSET_OPEN form_list:l CLOSE_BRACE {:
+        ListObject list = (ListObject) l;
+        java.util.List<LispObject> elems = new java.util.ArrayList<>();
+        for (LispObject obj : list) {
+            elems.add(obj);
+        }
+        LispObject[] arr = elems.toArray(new LispObject[0]);
+        RESULT = PSetObject.of(arr);
+    :} |
+    PSET_OPEN CLOSE_BRACE {:
+        RESULT = PSetObject.EMPTY;
+    :};
 
 form_list ::=
     form:head form_list:tail {: RESULT = new ListObject( head, tail );         :} |

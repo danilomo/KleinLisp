@@ -60,10 +60,19 @@ StringBuilder barredSymbol = new StringBuilder();
     ",@"                            { return symbol( sym.UNQUOTE_SPLICING ); }
     ","                             { return symbol( sym.UNQUOTE ); }
     "#("                            { return symbol( sym.VECTOR_OPEN ); }
+    // Persistent collection dispatch
+    "#v["                           { return symbol( sym.PVEC_OPEN ); }
+    "#vec["                         { return symbol( sym.PVEC_OPEN ); }
+    "#m{"                           { return symbol( sym.PMAP_OPEN ); }
+    "#map{"                         { return symbol( sym.PMAP_OPEN ); }
+    "#s{"                           { return symbol( sym.PSET_OPEN ); }
+    "#set{"                         { return symbol( sym.PSET_OPEN ); }
     "("                             { return symbol( sym.OPEN_PAR ); }
     ")"                             { return symbol( sym.CLOSE_PAR ); }
     "["                             { return symbol( sym.OPEN_BRACKET ); }
     "]"                             { return symbol( sym.CLOSE_BRACKET ); }
+    "{"                             { return symbol( sym.OPEN_BRACE ); }
+    "}"                             { return symbol( sym.CLOSE_BRACE ); }
     "."                             { return symbol( sym.DOT ); }
     "-"                             { return symbol( sym.ATOM, "-" ); }
     "#t"                            { return symbol( sym.BOOL_LITERAL, true ); }
