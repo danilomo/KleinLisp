@@ -78,14 +78,30 @@ tasks.test {
     useJUnitPlatform()
 }
 
+// Normal JAR for library usage (no bundled dependencies)
 tasks.jar {
+    archiveClassifier.set("")
+    manifest {
+        attributes(
+            "Main-Class" to "net.sourceforge.kleinlisp.Main"
+        )
+    }
+}
+
+// Fat JAR for standalone application usage (with bundled dependencies)
+tasks.register<Jar>("fatJar") {
+    archiveClassifier.set("all")
     manifest {
         attributes(
             "Main-Class" to "net.sourceforge.kleinlisp.Main"
         )
     }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+    from(sourceSets.main.get().output)
+    dependsOn(configurations.runtimeClasspath)
+    from({
+        configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
+    })
 }
 
 tasks.processResources {
