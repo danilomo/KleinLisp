@@ -682,6 +682,11 @@ public class LispEnvironment implements Environment {
     registerFunction("current-second", TimeFunctions::currentSecond);
     registerFunction("current-jiffy", TimeFunctions::currentJiffy);
     registerFunction("jiffies-per-second", TimeFunctions::jiffiesPerSecond);
+
+    // Date/time formatting functions
+    registerFunction("current-date-string", TimeFunctions::currentDateString);
+    registerFunction("timestamp->date-string", TimeFunctions::timestampToDateString);
+    registerFunction("date->display-string", TimeFunctions::dateToDisplayString);
   }
 
   private void initMacroTable() {

@@ -23,9 +23,14 @@
  */
 package net.sourceforge.kleinlisp.api;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.DoubleObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
+import net.sourceforge.kleinlisp.objects.StringObject;
 
 /**
  * R7RS (scheme time) library functions.
@@ -72,5 +77,28 @@ public class TimeFunctions {
    */
   public static LispObject jiffiesPerSecond(LispObject[] params) {
     return new IntObject(1000000000);
+  }
+
+  public static LispObject currentDateString(LispObject[] params) {
+    return new StringObject(LocalDate.now().toString());
+  }
+
+  public static LispObject timestampToDateString(LispObject[] params) {
+    long epochMs;
+    DoubleObject d = params[0].asDouble();
+    if (d != null) {
+      epochMs = (long) d.value;
+    } else {
+      epochMs = params[0].asInt().value;
+    }
+    LocalDate date = Instant.ofEpochMilli(epochMs).atZone(ZoneId.systemDefault()).toLocalDate();
+    return new StringObject(date.toString());
+  }
+
+  public static LispObject dateToDisplayString(LispObject[] params) {
+    String isoDate = params[0].asString().value();
+    LocalDate date = LocalDate.parse(isoDate);
+    DateTimeFormatter fmt = DateTimeFormatter.ofPattern("EEE, MMM d");
+    return new StringObject(date.format(fmt));
   }
 }
