@@ -88,15 +88,16 @@ public class DelayForceForm implements SpecialForm {
       // Capture current stack frame at the time delay-force is evaluated
       LispObject[] capturedParams = null;
       Environment capturedEnv = null;
+      LispEnvironment.FunctionStack[] capturedFrameHolder = null;
 
       if (!environment.isStackEmpty()) {
         LispEnvironment.FunctionStack stackTop = environment.stackTop();
-        // Make a copy of the parameters to capture their current values
         LispObject[] params = stackTop.getParameters();
         if (params != null) {
           capturedParams = params.clone();
         }
         capturedEnv = stackTop.getEnv();
+        capturedFrameHolder = stackTop.getOwnerFrameHolder();
       }
 
       // Capture the current let environment stack (for let bindings)
@@ -105,6 +106,7 @@ public class DelayForceForm implements SpecialForm {
       // Create the promise with a supplier that restores the captured context
       final LispObject[] finalParams = capturedParams;
       final Environment finalEnv = capturedEnv;
+      final LispEnvironment.FunctionStack[] finalFrameHolder = capturedFrameHolder;
 
       Supplier<LispObject> contextualSupplier =
           () -> {
@@ -116,10 +118,20 @@ public class DelayForceForm implements SpecialForm {
               if (finalParams != null) {
                 // Push the captured context onto the stack before evaluation
                 environment.stackPush(finalParams, finalEnv);
+                LispEnvironment.FunctionStack newFrame = environment.stackTop();
+                // Restore the owning lambda's frameHolder so parameter getters work correctly
+                LispEnvironment.FunctionStack savedFrameValue = null;
+                if (finalFrameHolder != null) {
+                  savedFrameValue = finalFrameHolder[0];
+                  finalFrameHolder[0] = newFrame;
+                }
                 try {
                   return exprSupplier.get();
                 } finally {
                   environment.stackPop();
+                  if (finalFrameHolder != null) {
+                    finalFrameHolder[0] = savedFrameValue;
+                  }
                 }
               } else {
                 // No captured context, evaluate directly

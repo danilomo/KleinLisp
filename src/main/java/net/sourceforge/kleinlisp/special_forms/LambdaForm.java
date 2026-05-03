@@ -38,7 +38,10 @@ import net.sourceforge.kleinlisp.Function;
 import net.sourceforge.kleinlisp.LispEnvironment;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.evaluator.ClosureVisitor.LambdaMeta;
+import net.sourceforge.kleinlisp.evaluator.Continuation;
+import net.sourceforge.kleinlisp.evaluator.CpsExpr;
 import net.sourceforge.kleinlisp.evaluator.Evaluator;
+import net.sourceforge.kleinlisp.evaluator.TcoResult;
 import net.sourceforge.kleinlisp.objects.AtomObject;
 import net.sourceforge.kleinlisp.objects.CellObject;
 import net.sourceforge.kleinlisp.objects.ComputedLispObject;
@@ -87,13 +90,24 @@ public class LambdaForm implements SpecialForm {
   public class LambdaFunction implements Function {
 
     private final Supplier<LispObject> body;
+    private final CpsExpr cpsBody;
     private final LambdaMeta meta;
     private final Environment env;
+    // Shared with the compiled body's parameter/closure getters. Set to the active FunctionStack
+    // frame on each call so getters no longer need to go through environment.stackTop().
+    final LispEnvironment.FunctionStack[] frameHolder;
 
-    public LambdaFunction(Supplier<LispObject> body, LambdaMeta meta, Environment env) {
+    public LambdaFunction(
+        Supplier<LispObject> body,
+        CpsExpr cpsBody,
+        LambdaMeta meta,
+        Environment env,
+        LispEnvironment.FunctionStack[] frameHolder) {
       this.body = body;
+      this.cpsBody = cpsBody;
       this.meta = meta;
       this.env = env;
+      this.frameHolder = frameHolder;
     }
 
     @Override
@@ -111,27 +125,160 @@ public class LambdaForm implements SpecialForm {
       }
 
       environment.stackPush(parameters, cenv);
-      LispObject result = body.get();
+      LispEnvironment.FunctionStack pushedFrame = environment.stackTop();
+      pushedFrame.setOwnerFrameHolder(frameHolder);
+      LispEnvironment.FunctionStack savedFrame = frameHolder[0];
+      frameHolder[0] = pushedFrame;
+      try {
+        LispObject result = body.get();
 
-      // Trampoline loop for TCO: handle tail calls without recursion
-      while (result instanceof TailCallObject) {
-        TailCallObject tailCall = (TailCallObject) result;
-        LambdaFunction targetFunc = tailCall.getFunction();
-        LispObject[] newParams = tailCall.getParameters();
+        // Trampoline loop for TCO: handle tail calls without recursion
+        while (result instanceof TailCallObject) {
+          TailCallObject tailCall = (TailCallObject) result;
+          LambdaFunction targetFunc = tailCall.getFunction();
+          LispObject[] newParams = tailCall.getParameters();
 
-        // Reuse the stack frame by updating parameters
-        environment.setStackTop(newParams);
-        result = targetFunc.body.get();
+          // Reuse the stack frame by updating parameters in place
+          environment.setStackTop(newParams);
+          // Point the target lambda's frameHolder at the current (reused) frame
+          targetFunc.frameHolder[0] = environment.stackTop();
+          result = targetFunc.body.get();
+        }
+
+        return result;
+      } finally {
+        frameHolder[0] = savedFrame;
+        environment.stackPop();
+      }
+    }
+
+    /**
+     * CPS entry point for lambda application. Pushes a call frame, runs the CPS body, and handles
+     * TCO via an inline loop: {@link TcoResult#ofTailApply} signals reuse the current frame.
+     *
+     * <p>{@code kClean} only pops the stack if the pushed frame is still the active top — safe for
+     * multi-shot continuations that re-invoke the same continuation after the original frame has
+     * already been cleaned up.
+     */
+    /**
+     * CPS entry point. Pushes a call frame, then runs the body with an internal trampoline that
+     * handles both normal continuations and {@link TcoResult#ofTailApply} signals (TCO frame
+     * reuse).
+     *
+     * <p>The internal trampoline is needed because {@code ofTailApply} signals can be produced
+     * after several {@code ofContinuation} steps (e.g. arg evaluation inside a tail call). Without
+     * it, the outer trampoline would receive {@code ofTailApply} and not know how to handle it.
+     */
+    public TcoResult evaluateCps(LispObject[] parameters, Continuation k) {
+      Environment closureEnv = upvaluesObj(parameters);
+      Environment cenv = buildCenv(closureEnv);
+
+      environment.stackPush(parameters, cenv);
+      final LispEnvironment.FunctionStack pushedFrame = environment.stackTop();
+      pushedFrame.setOwnerFrameHolder(frameHolder);
+
+      LambdaFunction[] fnHolder = {this};
+      LispEnvironment.FunctionStack[] savedHolder = {frameHolder[0]};
+      frameHolder[0] = pushedFrame;
+
+      // kClean: frame cleanup + outer continuation. Checks identity before popping so that
+      // multi-shot re-invocations (which don't own the frame) don't corrupt the stack.
+      Continuation kClean =
+          v -> {
+            LispEnvironment.FunctionStack top =
+                environment.isStackEmpty() ? null : environment.stackTop();
+            if (top == pushedFrame) {
+              fnHolder[0].frameHolder[0] = savedHolder[0];
+              environment.stackPop();
+            }
+            return k.apply(v);
+          };
+
+      // TCO loop: run body's internal trampoline, reuse frame on ofTailApply
+      TcoResult result;
+      try {
+        result = runBodyTrampoline(cpsBody, kClean);
+      } catch (Throwable t) {
+        if (!environment.isStackEmpty() && environment.stackTop() == pushedFrame) {
+          fnHolder[0].frameHolder[0] = savedHolder[0];
+          environment.stackPop();
+        }
+        throw t;
       }
 
-      environment.stackPop();
+      while (result.isTailApply()) {
+        LispObject nextFnObj = result.getTailApplyFn();
+        LispObject[] nextParams = result.getTailApplyParams();
+        net.sourceforge.kleinlisp.objects.FunctionObject nextFnFuncObj = nextFnObj.asFunction();
+
+        if (nextFnFuncObj == null || !(nextFnFuncObj.function() instanceof LambdaFunction)) {
+          // Non-lambda tail target: pop frame, apply built-in
+          if (!environment.isStackEmpty() && environment.stackTop() == pushedFrame) {
+            fnHolder[0].frameHolder[0] = savedHolder[0];
+            environment.stackPop();
+          }
+          net.sourceforge.kleinlisp.Function fn =
+              nextFnFuncObj != null ? nextFnFuncObj.function() : null;
+          LispObject r =
+              (fn != null)
+                  ? fn.evaluate(nextParams)
+                  : net.sourceforge.kleinlisp.objects.ListObject.NIL;
+          return result.getTailApplyCont().apply(r);
+        }
+
+        LambdaFunction nextFn = (LambdaFunction) nextFnFuncObj.function();
+        LispEnvironment.FunctionStack nextSaved = nextFn.frameHolder[0];
+
+        // Reuse frame: update params and env for nextFn
+        Environment nextClosureEnv = nextFn.upvaluesObj(nextParams);
+        Environment nextCenv = nextFn.buildCenv(nextClosureEnv);
+        LispEnvironment.FunctionStack frame = environment.stackTop();
+        frame.set(nextParams, nextCenv != null ? nextCenv : frame.getEnv());
+        frame.setOwnerFrameHolder(nextFn.frameHolder);
+        nextFn.frameHolder[0] = frame;
+
+        fnHolder[0] = nextFn;
+        savedHolder[0] = nextSaved;
+
+        try {
+          result = runBodyTrampoline(nextFn.cpsBody, kClean);
+        } catch (Throwable t) {
+          if (!environment.isStackEmpty() && environment.stackTop() == pushedFrame) {
+            nextFn.frameHolder[0] = nextSaved;
+            environment.stackPop();
+          }
+          throw t;
+        }
+      }
 
       return result;
     }
 
+    /**
+     * Run a mini-trampoline over {@code body.apply(kClean)}'s continuation chain, stopping when a
+     * non-continuation result or an {@link TcoResult#ofTailApply} signal is produced. The stopped
+     * result is returned so the TCO loop in {@link #evaluateCps} can handle it.
+     */
+    private TcoResult runBodyTrampoline(CpsExpr body, Continuation kClean) {
+      TcoResult result = body.apply(kClean);
+      while (result.isContinuation()) {
+        result = result.getContinuation().get();
+        if (result.isTailApply()) {
+          return result;
+        }
+      }
+      return result;
+    }
+
+    private Environment buildCenv(Environment closureEnv) {
+      if (closureEnv == null) return env;
+      if (env == null) return closureEnv;
+      return new net.sourceforge.kleinlisp.CompositeEnvironment(closureEnv, env);
+    }
+
     public LispObject evaluateTailCall(LispObject[] parameters) {
       environment.setStackTop(parameters);
-
+      frameHolder[0] = environment.stackTop();
       return body.get();
     }
 
@@ -261,10 +408,16 @@ public class LambdaForm implements SpecialForm {
     Set<AtomObject> fromClosure = new HashSet<>(meta.getParent().getClosureInfo().keySet());
     fromClosure.addAll(meta.getClosureInfo().keySet());
 
+    // Shared between the compiled body's parameter/closure getters and the LambdaFunction.
+    // Set at call time in LambdaFunction.evaluate() so getters read the correct frame.
+    LispEnvironment.FunctionStack[] frameHolder = new LispEnvironment.FunctionStack[1];
+
     ListObject transformed =
-        transformBodySymbols(body, meta.getParameters(), fromClosure, meta.getRestParameter());
+        transformBodySymbols(
+            body, meta.getParameters(), fromClosure, meta.getRestParameter(), frameHolder);
 
     Supplier<LispObject> functionSupplier = evaluateBody(transformed);
+    CpsExpr cpsFunctionSupplier = evaluateCpsBody(transformed);
 
     return () -> {
       Environment env = null;
@@ -285,7 +438,8 @@ public class LambdaForm implements SpecialForm {
         }
       }
 
-      LambdaFunction function = new LambdaFunction(functionSupplier, meta, env);
+      LambdaFunction function =
+          new LambdaFunction(functionSupplier, cpsFunctionSupplier, meta, env, frameHolder);
       FunctionObject functionObj = new FunctionObject(function);
 
       functionObj.setIdentifier(id);
@@ -328,7 +482,8 @@ public class LambdaForm implements SpecialForm {
       ListObject body,
       List<AtomObject> fromParameters,
       Set<AtomObject> fromClosure,
-      AtomObject restParameter) {
+      AtomObject restParameter,
+      LispEnvironment.FunctionStack[] frameHolder) {
     DefaultVisitor visitor =
         new DefaultVisitor() {
 
@@ -476,25 +631,18 @@ public class LambdaForm implements SpecialForm {
           }
 
           private LispObject getParameterObj(int i) {
-            Supplier<LispObject> getter =
-                () -> {
-                  return environment.stackTop().parameterAt(i);
-                };
-            Consumer<LispObject> setter =
-                (obj) -> {
-                  environment.stackTop().setParameterAt(i, obj);
-                };
+            Supplier<LispObject> getter = () -> frameHolder[0].parameterAt(i);
+            Consumer<LispObject> setter = (obj) -> frameHolder[0].setParameterAt(i, obj);
             return new ComputedLispObject(getter, setter);
           }
 
           private LispObject getRestParameterObj(int startIndex) {
             Supplier<LispObject> getter =
                 () -> {
-                  LispObject[] params = environment.stackTop().getParameters();
+                  LispObject[] params = frameHolder[0].getParameters();
                   if (startIndex >= params.length) {
                     return ListObject.NIL;
                   }
-                  // Build a list from remaining parameters
                   ListObject result = ListObject.NIL;
                   for (int i = params.length - 1; i >= startIndex; i--) {
                     result = new ListObject(params[i], result);
@@ -503,7 +651,6 @@ public class LambdaForm implements SpecialForm {
                 };
             Consumer<LispObject> setter =
                 (obj) -> {
-                  // Rest parameter is read-only
                   throw new UnsupportedOperationException("Cannot set rest parameter");
                 };
             return new ComputedLispObject(getter, setter);
@@ -512,31 +659,26 @@ public class LambdaForm implements SpecialForm {
           private LispObject getValueFromClosure(AtomObject id) {
             Supplier<LispObject> getter =
                 () -> {
-                  // First check the let environment stack (for let-bound variables)
                   LispObject letValue = environment.lookupInLetEnvStack(id);
                   if (letValue != null) {
                     return letValue;
                   }
-                  // Fall back to closure environment
-                  Environment env = environment.stackTop().getEnv();
-                  if (env != null) {
-                    return env.lookupValue(id);
+                  Environment closureEnv = frameHolder[0].getEnv();
+                  if (closureEnv != null) {
+                    return closureEnv.lookupValue(id);
                   }
-                  // Fall back to global
                   return environment.lookupValue(id);
                 };
             Consumer<LispObject> setter =
                 (obj) -> {
-                  // First check the let environment stack
                   LispObject letValue = environment.lookupInLetEnvStack(id);
                   if (letValue != null) {
                     environment.setInLetEnvStack(id, obj);
                     return;
                   }
-                  // Fall back to closure environment
-                  Environment env = environment.stackTop().getEnv();
-                  if (env != null) {
-                    env.lookupValue(id).set(obj);
+                  Environment closureEnv = frameHolder[0].getEnv();
+                  if (closureEnv != null) {
+                    closureEnv.lookupValue(id).set(obj);
                   }
                 };
             return new ComputedLispObject(getter, setter);
@@ -562,5 +704,14 @@ public class LambdaForm implements SpecialForm {
 
       return returnValue;
     };
+  }
+
+  /** Compile the transformed lambda body as a CPS expression (for use in evaluateCps). */
+  private CpsExpr evaluateCpsBody(ListObject body) {
+    List<CpsExpr> exprs = new ArrayList<>();
+    for (LispObject obj : body) {
+      exprs.add(evaluator.compileCps(obj));
+    }
+    return Evaluator.makeSequenceCps(exprs);
   }
 }

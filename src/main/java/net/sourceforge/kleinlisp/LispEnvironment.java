@@ -32,6 +32,7 @@ import java.util.Set;
 import net.sourceforge.kleinlisp.api.BooleanFunctions;
 import net.sourceforge.kleinlisp.api.BytevectorFunctions;
 import net.sourceforge.kleinlisp.api.CharFunctions;
+import net.sourceforge.kleinlisp.api.ContinuationFunctions;
 import net.sourceforge.kleinlisp.api.EqualityFunctions;
 import net.sourceforge.kleinlisp.api.ExceptionFunctions;
 import net.sourceforge.kleinlisp.api.FileFunctions;
@@ -91,6 +92,9 @@ public class LispEnvironment implements Environment {
 
     @Override
     public String toString() {
+      if (ref == null) {
+        return "at " + functionName;
+      }
       return String.format("%s[%d], at %s", ref.getSourceFile(), ref.getLine(), functionName);
     }
   }
@@ -99,12 +103,23 @@ public class LispEnvironment implements Environment {
 
     private LispObject[] parameters;
     private Environment env;
+    // Back-reference to the owning LambdaFunction's frameHolder, set in LambdaFunction.evaluate().
+    // Allows delay/force to restore the frameHolder when pushing a captured frame.
+    private FunctionStack[] ownerFrameHolder;
 
     public FunctionStack() {}
 
     public void set(LispObject[] parameters, Environment env) {
       this.parameters = parameters;
       this.env = env;
+    }
+
+    public void setOwnerFrameHolder(FunctionStack[] frameHolder) {
+      this.ownerFrameHolder = frameHolder;
+    }
+
+    public FunctionStack[] getOwnerFrameHolder() {
+      return ownerFrameHolder;
     }
 
     public final LispObject parameterAt(int i) {
@@ -172,7 +187,7 @@ public class LispEnvironment implements Environment {
   }
 
   public void popFuncCall() {
-    if (trackStackTrace) {
+    if (trackStackTrace && !functionCalls.isEmpty()) {
       functionCalls.remove(functionCalls.size() - 1);
     }
   }
@@ -561,6 +576,14 @@ public class LispEnvironment implements Environment {
     registerFunction("force", PromiseFunctions::force);
     registerFunction("promise?", PromiseFunctions::isPromise);
     registerFunction("make-promise", PromiseFunctions::makePromise);
+
+    // Continuation functions (R7RS)
+    registerFunction(
+        "call-with-current-continuation", ContinuationFunctions::callWithCurrentContinuation);
+    registerFunction("call/cc", ContinuationFunctions::callWithCurrentContinuation);
+    registerFunction("dynamic-wind", ContinuationFunctions::dynamicWind);
+    registerFunction("with-exception-handler", ContinuationFunctions::withExceptionHandler);
+    registerFunction("continuation?", ContinuationFunctions::isContinuation);
 
     // Exception functions (R7RS)
     registerFunction("raise", ExceptionFunctions::raise);

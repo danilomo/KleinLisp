@@ -76,11 +76,16 @@ public class TcoOptimizer {
   }
 
   private void optimizeTailCall(AtomObject name, ListObject list) {
-    if (list == null) {
+    if (list == null || list == ListObject.NIL) {
       return;
     }
 
-    AtomObject head = list.car().asAtom();
+    LispObject carObj = list.car();
+    if (carObj == null) {
+      return;
+    }
+
+    AtomObject head = carObj.asAtom();
 
     if (head == null) {
       return;
