@@ -26,6 +26,7 @@ package net.sourceforge.kleinlisp.api;
 import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.BooleanObject;
+import net.sourceforge.kleinlisp.objects.CellObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 import net.sourceforge.kleinlisp.objects.PVectorObject;
@@ -47,14 +48,14 @@ public class PersistentVectorFunctions {
 
   /** Returns the element at the given index. (p-vec-ref v i) */
   public static LispObject pVecRef(LispObject[] params) {
-    if (!(params[0] instanceof PVectorObject)) {
+    PVectorObject vec = asPVec(params[0]);
+    if (vec == null) {
       throw new LispArgumentError("p-vec-ref requires a persistent vector as first argument");
     }
     IntObject idx = params[1].asInt();
     if (idx == null) {
       throw new LispArgumentError("p-vec-ref requires an integer index");
     }
-    PVectorObject vec = (PVectorObject) params[0];
     return vec.get(idx.value);
   }
 
@@ -63,27 +64,26 @@ public class PersistentVectorFunctions {
    * the original vector.
    */
   public static LispObject pVecAssoc(LispObject[] params) {
-    if (!(params[0] instanceof PVectorObject)) {
+    PVectorObject vec = asPVec(params[0]);
+    if (vec == null) {
       throw new LispArgumentError("p-vec-assoc requires a persistent vector as first argument");
     }
     IntObject idx = params[1].asInt();
     if (idx == null) {
       throw new LispArgumentError("p-vec-assoc requires an integer index");
     }
-    PVectorObject vec = (PVectorObject) params[0];
     return vec.assoc(idx.value, params[2]);
   }
 
   /** Returns a new vector with the element added at the end. (p-vec-conj v val) */
   public static LispObject pVecConj(LispObject[] params) {
-    if (!(params[0] instanceof PVectorObject)) {
+    PVectorObject vec = asPVec(params[0]);
+    if (vec == null) {
       throw new LispArgumentError("p-vec-conj requires a persistent vector as first argument");
     }
-    PVectorObject vec = (PVectorObject) params[0];
     if (params.length == 2) {
       return vec.conj(params[1]);
     }
-    // Multiple values to add
     PVectorObject result = vec;
     for (int i = 1; i < params.length; i++) {
       result = result.conj(params[i]);
@@ -93,34 +93,35 @@ public class PersistentVectorFunctions {
 
   /** Returns a new vector without the last element. (p-vec-pop v) */
   public static LispObject pVecPop(LispObject[] params) {
-    if (!(params[0] instanceof PVectorObject)) {
+    PVectorObject vec = asPVec(params[0]);
+    if (vec == null) {
       throw new LispArgumentError("p-vec-pop requires a persistent vector");
     }
-    PVectorObject vec = (PVectorObject) params[0];
     return vec.pop();
   }
 
   /** Returns the last element of the vector. (p-vec-peek v) */
   public static LispObject pVecPeek(LispObject[] params) {
-    if (!(params[0] instanceof PVectorObject)) {
+    PVectorObject vec = asPVec(params[0]);
+    if (vec == null) {
       throw new LispArgumentError("p-vec-peek requires a persistent vector");
     }
-    PVectorObject vec = (PVectorObject) params[0];
     return vec.peek();
   }
 
   /** Returns the length of the vector. (p-vec-length v) */
   public static LispObject pVecLength(LispObject[] params) {
-    if (!(params[0] instanceof PVectorObject)) {
+    PVectorObject vec = asPVec(params[0]);
+    if (vec == null) {
       throw new LispArgumentError("p-vec-length requires a persistent vector");
     }
-    PVectorObject vec = (PVectorObject) params[0];
     return IntObject.valueOf(vec.length());
   }
 
   /** Returns a subvector from start (inclusive) to end (exclusive). (p-vec-subvec v start end) */
   public static LispObject pVecSubvec(LispObject[] params) {
-    if (!(params[0] instanceof PVectorObject)) {
+    PVectorObject vec = asPVec(params[0]);
+    if (vec == null) {
       throw new LispArgumentError("p-vec-subvec requires a persistent vector");
     }
     IntObject start = params[1].asInt();
@@ -128,16 +129,15 @@ public class PersistentVectorFunctions {
     if (start == null || end == null) {
       throw new LispArgumentError("p-vec-subvec requires integer indices");
     }
-    PVectorObject vec = (PVectorObject) params[0];
     return vec.subvec(start.value, end.value);
   }
 
   /** Converts a persistent vector to a list. (p-vec->list v) */
   public static LispObject pVecToList(LispObject[] params) {
-    if (!(params[0] instanceof PVectorObject)) {
+    PVectorObject vec = asPVec(params[0]);
+    if (vec == null) {
       throw new LispArgumentError("p-vec->list requires a persistent vector");
     }
-    PVectorObject vec = (PVectorObject) params[0];
     return vec.toList();
   }
 
@@ -162,30 +162,42 @@ public class PersistentVectorFunctions {
     if (params.length == 0) {
       return PVectorObject.EMPTY;
     }
-    if (!(params[0] instanceof PVectorObject)) {
+    PVectorObject result = asPVec(params[0]);
+    if (result == null) {
       throw new LispArgumentError("p-vec-concat requires persistent vectors");
     }
-    PVectorObject result = (PVectorObject) params[0];
     for (int i = 1; i < params.length; i++) {
-      if (!(params[i] instanceof PVectorObject)) {
+      PVectorObject other = asPVec(params[i]);
+      if (other == null) {
         throw new LispArgumentError("p-vec-concat requires persistent vectors");
       }
-      result = result.concat((PVectorObject) params[i]);
+      result = result.concat(other);
     }
     return result;
   }
 
   /** Tests if the value is a persistent vector. (p-vec? x) */
   public static LispObject isPVec(LispObject[] params) {
-    return (params[0] instanceof PVectorObject) ? BooleanObject.TRUE : BooleanObject.FALSE;
+    return (asPVec(params[0]) != null) ? BooleanObject.TRUE : BooleanObject.FALSE;
   }
 
   /** Tests if the persistent vector is empty. (p-vec-empty? v) */
   public static LispObject isPVecEmpty(LispObject[] params) {
-    if (!(params[0] instanceof PVectorObject)) {
+    PVectorObject vec = asPVec(params[0]);
+    if (vec == null) {
       throw new LispArgumentError("p-vec-empty? requires a persistent vector");
     }
-    PVectorObject vec = (PVectorObject) params[0];
     return vec.length() == 0 ? BooleanObject.TRUE : BooleanObject.FALSE;
+  }
+
+  private static LispObject unwrap(LispObject obj) {
+    if (obj instanceof CellObject) return ((CellObject) obj).get();
+    return obj;
+  }
+
+  private static PVectorObject asPVec(LispObject obj) {
+    LispObject unwrapped = unwrap(obj);
+    if (unwrapped instanceof PVectorObject) return (PVectorObject) unwrapped;
+    return null;
   }
 }

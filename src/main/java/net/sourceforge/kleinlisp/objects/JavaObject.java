@@ -43,7 +43,7 @@ public final class JavaObject implements LispObject {
 
   @Override
   public String toString() {
-    return "Object: " + object.toString();
+    return "Object: " + (object == null ? "null" : object.toString());
   }
 
   @Override
@@ -53,6 +53,9 @@ public final class JavaObject implements LispObject {
 
   @Override
   public <T> T asObject(Class<T> clazz) {
+    if (object == null) {
+      return null;
+    }
     if (clazz.isAssignableFrom(object.getClass())) {
       return (T) object;
     } else {

@@ -26,6 +26,7 @@ package net.sourceforge.kleinlisp.api;
 import net.sourceforge.kleinlisp.LispArgumentError;
 import net.sourceforge.kleinlisp.LispObject;
 import net.sourceforge.kleinlisp.objects.BooleanObject;
+import net.sourceforge.kleinlisp.objects.CellObject;
 import net.sourceforge.kleinlisp.objects.IntObject;
 import net.sourceforge.kleinlisp.objects.ListObject;
 import net.sourceforge.kleinlisp.objects.PMapObject;
@@ -50,7 +51,7 @@ public class PersistentCollectionFunctions {
    * default/nil - For p-set: returns the element if present, or default/nil
    */
   public static LispObject get(LispObject[] params) {
-    LispObject coll = params[0];
+    LispObject coll = unwrap(params[0]);
     LispObject key = params[1];
     LispObject defaultVal = params.length > 2 ? params[2] : ListObject.NIL;
 
@@ -91,7 +92,7 @@ public class PersistentCollectionFunctions {
    * the pair or #f
    */
   public static LispObject assoc(LispObject[] params) {
-    LispObject first = params[0];
+    LispObject first = unwrap(params[0]);
 
     // If first argument is a persistent collection, use Clojure-style assoc
     if (first instanceof PMapObject || first instanceof PVectorObject) {
@@ -136,7 +137,7 @@ public class PersistentCollectionFunctions {
    * 2-element list [key value]
    */
   public static LispObject conj(LispObject[] params) {
-    LispObject coll = params[0];
+    LispObject coll = unwrap(params[0]);
 
     if (coll instanceof PVectorObject) {
       PVectorObject vec = (PVectorObject) coll;
@@ -176,7 +177,7 @@ public class PersistentCollectionFunctions {
    * <p>- For p-map: removes keys - For p-set: removes elements (same as disj)
    */
   public static LispObject dissoc(LispObject[] params) {
-    LispObject coll = params[0];
+    LispObject coll = unwrap(params[0]);
 
     if (coll instanceof PMapObject) {
       PMapObject map = (PMapObject) coll;
@@ -205,7 +206,7 @@ public class PersistentCollectionFunctions {
    * if index is valid
    */
   public static LispObject contains(LispObject[] params) {
-    LispObject coll = params[0];
+    LispObject coll = unwrap(params[0]);
     LispObject key = params[1];
 
     if (coll instanceof PMapObject) {
@@ -239,7 +240,7 @@ public class PersistentCollectionFunctions {
    * <p>Works on p-map, p-vec, p-set, and also regular lists.
    */
   public static LispObject count(LispObject[] params) {
-    LispObject coll = params[0];
+    LispObject coll = unwrap(params[0]);
 
     if (coll instanceof PVectorObject) {
       return IntObject.valueOf(((PVectorObject) coll).length());
@@ -273,7 +274,7 @@ public class PersistentCollectionFunctions {
    * <p>Works on all persistent collections and regular lists.
    */
   public static LispObject isEmpty(LispObject[] params) {
-    LispObject coll = params[0];
+    LispObject coll = unwrap(params[0]);
 
     if (coll instanceof PVectorObject) {
       return ((PVectorObject) coll).length() == 0 ? BooleanObject.TRUE : BooleanObject.FALSE;
@@ -306,8 +307,8 @@ public class PersistentCollectionFunctions {
    * <p>Pours elements from from-coll into to-coll using conj.
    */
   public static LispObject into(LispObject[] params) {
-    LispObject toColl = params[0];
-    LispObject fromColl = params[1];
+    LispObject toColl = unwrap(params[0]);
+    LispObject fromColl = unwrap(params[1]);
 
     // Get elements from source collection
     Iterable<LispObject> elements;
@@ -368,9 +369,14 @@ public class PersistentCollectionFunctions {
 
   /** Check if a value is any persistent collection type. (persistent? x) */
   public static LispObject isPersistent(LispObject[] params) {
-    LispObject obj = params[0];
+    LispObject obj = unwrap(params[0]);
     return (obj instanceof PVectorObject || obj instanceof PMapObject || obj instanceof PSetObject)
         ? BooleanObject.TRUE
         : BooleanObject.FALSE;
+  }
+
+  private static LispObject unwrap(LispObject obj) {
+    if (obj instanceof CellObject) return ((CellObject) obj).get();
+    return obj;
   }
 }

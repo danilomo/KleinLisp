@@ -62,7 +62,7 @@ public final class DoubleObject implements NumericObject {
 
   @Override
   public IntObject asInt() {
-    return new IntObject((int) value);
+    return null;
   }
 
   @Override

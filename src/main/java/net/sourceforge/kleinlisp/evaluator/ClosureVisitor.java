@@ -251,9 +251,17 @@ public class ClosureVisitor extends DefaultVisitor {
       return super.visit(obj);
     }
 
-    // Handle let forms - add bindings to definedSymbols
-    if (head.specialForm() == SpecialFormEnum.LET) {
-      return visitLetForm(obj);
+    // Handle let forms - add bindings to definedSymbols so nested lambdas can capture them
+    switch (head.specialForm()) {
+      case LET:
+        return visitLetForm(obj);
+      case LET_STAR:
+        return visitLetStarForm(obj);
+      case LETREC:
+      case LETREC_STAR:
+        return visitLetrecForm(obj);
+      default:
+        break;
     }
 
     if (head.specialForm() != SpecialFormEnum.LAMBDA) {
@@ -449,6 +457,116 @@ public class ClosureVisitor extends DefaultVisitor {
     }
 
     // Result: (let new-bindings-list new-body...)
+    return new ListObject(obj.car(), new ListObject(newBindingsList, newBodyList));
+  }
+
+  /**
+   * Handle let*: each binding's name is added to scope after its value, so later bindings can
+   * reference earlier ones and nested lambdas can capture all of them.
+   */
+  private LispObject visitLetStarForm(ListObject obj) {
+    ListObject list = obj.cdr();
+    if (list == ListObject.NIL) throw FormErrors.badForm("let*", obj);
+
+    LispObject bindingsObj = list.car();
+    ListObject body = list.cdr();
+
+    List<LispObject> newBindings = new ArrayList<>();
+
+    if (bindingsObj.asList() != null) {
+      for (LispObject binding : bindingsObj.asList()) {
+        ListObject tuple = binding.asList();
+        if (tuple != null && tuple.length() >= 2) {
+          AtomObject name = tuple.car().asAtom();
+          LispObject valueExpr = tuple.cdr().car();
+
+          LispObject newValueExpr = valueExpr.accept(this);
+
+          // Add name AFTER visiting its value (let* sequential scoping)
+          if (name != null) {
+            definedSymbols.add(name);
+            currentFunction.letBoundVars.add(name);
+          }
+
+          newBindings.add(
+              new ListObject(tuple.car(), new ListObject(newValueExpr, ListObject.NIL)));
+        }
+      }
+    }
+
+    List<LispObject> newBody = new ArrayList<>();
+    for (LispObject expr : body) {
+      newBody.add(expr.accept(this));
+    }
+
+    ListObject newBindingsList = ListObject.NIL;
+    for (int i = newBindings.size() - 1; i >= 0; i--) {
+      newBindingsList = new ListObject(newBindings.get(i), newBindingsList);
+    }
+
+    ListObject newBodyList = ListObject.NIL;
+    for (int i = newBody.size() - 1; i >= 0; i--) {
+      newBodyList = new ListObject(newBody.get(i), newBodyList);
+    }
+
+    return new ListObject(obj.car(), new ListObject(newBindingsList, newBodyList));
+  }
+
+  /**
+   * Handle letrec / letrec*: all names are added to scope before any value is visited, enabling
+   * mutual recursion and correct closure capture from binding values.
+   */
+  private LispObject visitLetrecForm(ListObject obj) {
+    ListObject list = obj.cdr();
+    if (list == ListObject.NIL) throw FormErrors.badForm("letrec", obj);
+
+    LispObject bindingsObj = list.car();
+    ListObject body = list.cdr();
+
+    List<LispObject> newBindings = new ArrayList<>();
+
+    // First pass: add all names to scope (mutual recursion scoping)
+    if (bindingsObj.asList() != null) {
+      for (LispObject binding : bindingsObj.asList()) {
+        ListObject tuple = binding.asList();
+        if (tuple != null && tuple.length() >= 2) {
+          AtomObject name = tuple.car().asAtom();
+          if (name != null) {
+            definedSymbols.add(name);
+            currentFunction.letBoundVars.add(name);
+          }
+        }
+      }
+    }
+
+    // Second pass: visit values (all names already in scope)
+    if (bindingsObj.asList() != null) {
+      for (LispObject binding : bindingsObj.asList()) {
+        ListObject tuple = binding.asList();
+        if (tuple != null && tuple.length() >= 2) {
+          LispObject valueExpr = tuple.cdr().car();
+          LispObject newValueExpr = valueExpr.accept(this);
+          newBindings.add(
+              new ListObject(tuple.car(), new ListObject(newValueExpr, ListObject.NIL)));
+        }
+      }
+    }
+
+    List<LispObject> newBody = new ArrayList<>();
+    for (LispObject expr : body) {
+      newBody.add(expr.accept(this));
+    }
+
+    ListObject newBindingsList = ListObject.NIL;
+    for (int i = newBindings.size() - 1; i >= 0; i--) {
+      newBindingsList = new ListObject(newBindings.get(i), newBindingsList);
+    }
+
+    ListObject newBodyList = ListObject.NIL;
+    for (int i = newBody.size() - 1; i >= 0; i--) {
+      newBodyList = new ListObject(newBody.get(i), newBodyList);
+    }
+
     return new ListObject(obj.car(), new ListObject(newBindingsList, newBodyList));
   }
 

@@ -549,7 +549,11 @@ public class LambdaForm implements SpecialForm {
             }
 
             // Handle let forms specially - don't transform binding names
-            if (head.specialForm() == SpecialFormEnum.LET) {
+            SpecialFormEnum sf = head.specialForm();
+            if (sf == SpecialFormEnum.LET
+                || sf == SpecialFormEnum.LET_STAR
+                || sf == SpecialFormEnum.LETREC
+                || sf == SpecialFormEnum.LETREC_STAR) {
               return visitLetForm(obj);
             }
 
@@ -664,10 +668,11 @@ public class LambdaForm implements SpecialForm {
                     return letValue;
                   }
                   Environment closureEnv = frameHolder[0].getEnv();
-                  if (closureEnv != null) {
-                    return closureEnv.lookupValue(id);
-                  }
-                  return environment.lookupValue(id);
+                  LispObject val =
+                      (closureEnv != null)
+                          ? closureEnv.lookupValue(id)
+                          : environment.lookupValue(id);
+                  return unwrapCell(val);
                 };
             Consumer<LispObject> setter =
                 (obj) -> {
@@ -686,6 +691,10 @@ public class LambdaForm implements SpecialForm {
         };
 
     return body.accept(visitor).asList();
+  }
+
+  private static LispObject unwrapCell(LispObject obj) {
+    return (obj instanceof CellObject) ? ((CellObject) obj).get() : obj;
   }
 
   private Supplier<LispObject> evaluateBody(ListObject body) {
